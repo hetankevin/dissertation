@@ -1,6 +1,10 @@
 \chapter{Learning from Offline and Online Data}
 \label{ch:hybrid-rl}
 
+\todoresolve{CHAPTER 2 COMBINES TWO HYBRID RL PAPERS (SECTIONS 2.1-2.3: TAN AND XU 2024; SECTIONS 2.4-2.10: TAN, FAN, AND WEI 2024). AI-WRITTEN CHAPTER OVERVIEW, BRIDGE PARAGRAPHS, AND ALGORITHM-NAME REPLACEMENTS ARE IN GREEN.}
+
+\begin{aigenblock}
+
 Reinforcement learning (RL) encompasses two main paradigms distinguished by how training data are acquired: online RL and offline RL. In online RL, an agent interacts with the environment in real time and executes a sequence of adaptively chosen policies to maximize cumulative reward \citep{sutton1998, azar2017minimax, jin2018q, zhang2023settling}. In offline RL, the agent has access only to a pre-collected dataset logged by a behavior policy and seeks a near-optimal policy without further environmental interaction \citep{lange2012batch, levine2020offline, jin2021pessimism, li2024settling}. Purely online methods often require an impractically large number of interactive trajectories, whereas purely offline methods impose stringent coverage assumptions on the pre-collected dataset, typically requiring single-policy concentrability with respect to an optimal policy \citep{rashidinejad2021bridging, zhan2022offline, xie2021bellman}.
 
 Hybrid reinforcement learning combines offline datasets with online environmental interaction \citep{vecerik2017leveraging, nair2020awac, xie2022policy, song2023hybrid, nakamoto2023calql, wagenmaker2023leveraging, li2023reward, ball2023efficient, zhou2023offline, amortila2024harnessing}. A central theoretical question posed by \citet{xie2022policy} is whether hybrid RL can provably improve upon both purely offline and purely online learning when the offline dataset lacks single-policy concentrability. Indeed, \citet{xie2022policy} proved that if the behavior policy already satisfies single-policy concentrability and the learner can choose the ratio of offline to online trajectories, then either purely offline learning or purely online learning is minimax optimal, leaving no statistical advantage to combining both sources. Consequently, the regime in which hybrid RL offers genuine statistical gains is precisely when the offline dataset has only partial coverage of the state-action space, so that online interaction must fill in the regions left unexplored by the behavior policy.
@@ -11,6 +15,9 @@ This chapter develops the statistical theory and algorithmic design of hybrid RL
     \item \textbf{Breaking sample-size barriers in linear MDPs (Sections~\ref{sec:ch02-lin-intro}--\ref{sec:ch02-lin-discussion}):} While general function approximation yields broad adaptivity, its squared-Bellman-error confidence sets incur suboptimal $H^5$ horizon dependence when specialized to linear MDPs. Based on joint work with Wei Fan and Yuting Wei \citep{tan2024hybrid}, we develop two computationally efficient algorithms tailored to linear MDPs that sharpen both the dimension dependence and the horizon dependence to $H^3$. The first method, Algorithm~\ref{alg:ch02-alg2}, follows an online-to-offline design that uses reward-agnostic covariate collection \citep{wagenmaker2023instancedependent} followed by variance-weighted pessimistic value iteration \citep{xiong2023nearly} to output a fixed policy with near-optimal PAC suboptimality. The second method, Algorithm~\ref{alg:ch02-alg3}, follows an offline-to-online design that warm-starts variance-weighted optimistic value iteration \citep{he2023nearly} with offline parameter estimates to achieve sublinear online regret that improves upon the minimax lower bound for purely online linear MDPs whenever offline data cover a nontrivial subspace.
 \end{enumerate}
 All proofs and supplementary experimental figures for this chapter are presented in Appendix~\ref{app:ch02}.
+
+
+\end{aigenblock}
 
 % =========================================================================
 % PART 1: GENERAL FUNCTION APPROXIMATION (Tan and Xu, 2024)
@@ -92,7 +99,7 @@ Viewing $c_{\off}$ and $c_{\on}$ as complexity measures on the Bellman-error cla
 \section{Optimistic Experience Replay with Offline Initialization}
 \label{sec:ch02-gfa-alg}
 
-We now formalize our hybrid general function approximation method in Algorithm~\ref{alg:ch02-alg1}, which modifies the optimistic least-squares value-function elimination algorithm of \citet{jin2021bellmaneluder} and \citet{xie2022role} by including the offline transitions $\gD_{\off, h}$ in the empirical squared-Bellman-error loss $\gL_h^{(t)}$ at every online episode $t \in [N_{\on}]$.
+We now formalize our hybrid general function approximation method in \aigen{Algorithm~\ref{alg:ch02-alg1}}, which modifies the optimistic least-squares value-function elimination algorithm of \citet{jin2021bellmaneluder} and \citet{xie2022role} by including the offline transitions $\gD_{\off, h}$ in the empirical squared-Bellman-error loss $\gL_h^{(t)}$ at every online episode $t \in [N_{\on}]$.
 
 \begin{algorithm}[htbp]
     \caption{Optimistic Hybrid RL with General Function Approximation}
@@ -116,11 +123,11 @@ We now formalize our hybrid general function approximation method in Algorithm~\
     \end{algorithmic}
 \end{algorithm}
 
-Theorem~\ref{thm:ch02-regret_bound} shows that the regret of Algorithm~\ref{alg:ch02-alg1} decomposes across any partition $\gX_{\off}, \gX_{\on}$ of $\gX$, and therefore achieves the infimum over all partitions simultaneously.
+Theorem~\ref{thm:ch02-regret_bound} shows that the regret of \aigen{Algorithm~\ref{alg:ch02-alg1}} decomposes across any partition $\gX_{\off}, \gX_{\on}$ of $\gX$, and therefore achieves the infimum over all partitions simultaneously.
 
-\begin{thm}[Regret Bound for Algorithm~\ref{alg:ch02-alg1}]
+\begin{thm}[Regret Bound for \aigen{Algorithm~\ref{alg:ch02-alg1}}]
 \label{thm:ch02-regret_bound}
-Suppose Assumption~\ref{aspt:ch02-completeness} holds. Let $\gX_{\off}, \gX_{\on}$ be an arbitrary partition of $\gX = \gS \times \gA \times [H]$. Then with probability at least $1-\delta$, Algorithm~\ref{alg:ch02-alg1} satisfies
+Suppose Assumption~\ref{aspt:ch02-completeness} holds. Let $\gX_{\off}, \gX_{\on}$ be an arbitrary partition of $\gX = \gS \times \gA \times [H]$. Then with probability at least $1-\delta$, \aigen{Algorithm~\ref{alg:ch02-alg1}} satisfies
 \begin{equation}
     \Reg(N_{\on})
     = \gO\!\left(\inf_{\gX_{\on}, \gX_{\off}} \left(\sqrt{\beta H^4N_{\on}\!\left(\frac{N_{\on}}{N_{\off}}\right) c_{\off}(\gF, \gX_{\off})}  + \sqrt{\beta H^4 N_{\on} c_{\on}(\gF, \gX_{\on}, N_{\on})}\right)\right),
@@ -130,7 +137,7 @@ where $\beta = c_1\log\!\left(N H \mathcal{N}_{\mathcal{F}}(1/N) / \delta\right)
 
 The proof of Theorem~\ref{thm:ch02-regret_bound} is given in Appendix~\ref{app:ch02-proof_thm1}. Several features of this guarantee merit emphasis:
 \begin{itemize}
-    \item \textbf{Automatic adaptation to the best partition:} Algorithm~\ref{alg:ch02-alg1} takes no partition as input. When $N_{\on} \gg N_{\off}$, choosing $\gX_{\on} = \gX$ and $\gX_{\off} = \emptyset$ yields $c_{\off}(\gF, \emptyset) = 0$, recovering the purely online regret guarantee $\tilde{\gO}(\sqrt{\beta H^4 N_{\on} c_{\on}(\gF, \gX, N_{\on})})$. Conversely, in the offline-abundant regime $N_{\off} \gg N_{\on}$, the first term becomes negligible on the region $\gX_{\off}$ well-covered by $\mu$, reducing the effective online complexity from $c_{\on}(\gF, \gX, N_{\on})$ to $c_{\on}(\gF, \gX_{\on}, N_{\on})$.
+    \item \textbf{Automatic adaptation to the best partition:} \aigen{Algorithm~\ref{alg:ch02-alg1}} takes no partition as input. When $N_{\on} \gg N_{\off}$, choosing $\gX_{\on} = \gX$ and $\gX_{\off} = \emptyset$ yields $c_{\off}(\gF, \emptyset) = 0$, recovering the purely online regret guarantee $\tilde{\gO}(\sqrt{\beta H^4 N_{\on} c_{\on}(\gF, \gX, N_{\on})})$. Conversely, in the offline-abundant regime $N_{\off} \gg N_{\on}$, the first term becomes negligible on the region $\gX_{\off}$ well-covered by $\mu$, reducing the effective online complexity from $c_{\on}(\gF, \gX, N_{\on})$ to $c_{\on}(\gF, \gX_{\on}, N_{\on})$.
     \item \textbf{No single-policy concentrability or data discarding:} Unlike \citet{song2023hybrid}, \citet{nakamoto2023calql}, and \citet{amortila2024harnessing}, Theorem~\ref{thm:ch02-regret_bound} does not require full-space single-policy concentrability and retains all $N_{\off}$ offline episodes even when $N_{\off} > N_{\on}$, allowing the offline term to vanish at rate $\sqrt{N_{\on}^2 / N_{\off}}$ as $N_{\off}$ grows.
 \end{itemize}
 
@@ -142,14 +149,14 @@ We now instantiate Theorem~\ref{thm:ch02-regret_bound} in three canonical MDP fa
 \subsection{Tabular MDPs}
 In a tabular MDP with $|\gS| = S < \infty$ states and $|\gA| = A < \infty$ actions, we take the unconstrained tabular value class $\gF_h = [0, H]^{S A}$, which has log-covering number $\log \gN_{\gF}(1/N) = \gO(H S A \log N)$. For any threshold $\rho > 0$, a natural partition chooses $\gX_{\off}(\rho) \coloneqq \{(s, a, h) : \sup_{\pi} d^\pi_h(s, a)/\mu_h(s, a) \leq \rho\}$ and $\gX_{\on}(\rho) = \gX \setminus \gX_{\off}(\rho)$.
 
-\begin{prop}[Tabular MDP Regret of Algorithm~\ref{alg:ch02-alg1}]
+\begin{prop}[Tabular MDP Regret of \aigen{Algorithm~\ref{alg:ch02-alg1}}]
 \label{prop:ch02-case_tabular}
 In a tabular MDP with $\gF_h = [0, H]^{S A}$, for any partition $\gX_{\off} \cup \gX_{\on} = \gX$, we have
 \begin{equation}
     c_{\off}(\gF, \gX_{\off}) \leq \sup_{\pi \in \Pi} \sup_{(s, a, h) \in \gX_{\off}} \frac{d_h^{\pi}(s, a)}{\mu_h(s, a)} = \sup_{\pi \in \Pi}\left\lVert\frac{d_h^{\pi}\mathbbm{1}_{\gX_{\off}}}{\mu_h}\right\rVert_{\infty}, \qquad
     c_{\on}(\gF, \gX_{\on}, N_{\on}) \lesssim \max_{h \in [H]}|\gX_{\on, h}| \log(N_{\on}).
 \end{equation}
-Consequently, with probability at least $1-\delta$, Algorithm~\ref{alg:ch02-alg1} satisfies
+Consequently, with probability at least $1-\delta$, \aigen{Algorithm~\ref{alg:ch02-alg1}} satisfies
 \begin{equation}
     \Reg(N_{\on})
     = \tilde{\gO}\!\left(\inf_{\gX_{\on}, \gX_{\off}} \left(\sqrt{H^5 S A N_{\on}\!\left(\frac{N_{\on}}{N_{\off}}\right)\sup_{\pi \in \Pi}\left\lVert\frac{d_h^{\pi}\mathbbm{1}_{\gX_{\off}}}{\mu_h}\right\rVert_{\infty}}  + \sqrt{H^5 S A\max_{h \in [H]}|\gX_{\on, h}|N_{\on}}\right)\right).
@@ -172,14 +179,14 @@ with $\|\phi(s, a)\|_2 \leq 1$ for all $(s, a) \in \gS \times \gA$ and $\max\{\|
 
 Any partition $\gX_{\off} \cup \gX_{\on} = \gX$ induces two feature subspaces $\Phi_{\off} = \operatorname{Span}(\{\phi(s, a) : (s, a, h) \in \gX_{\off}\}) \subseteq \sR^d$ and $\Phi_{\on} = \operatorname{Span}(\{\phi(s, a) : (s, a, h) \in \gX_{\on}\}) \subseteq \sR^d$ of dimensions $d_{\off} = \dim(\Phi_{\off})$ and $d_{\on} = \dim(\Phi_{\on})$, respectively. Let $\gP_{\off}$ and $\gP_{\on}$ denote the orthogonal projection matrices onto $\Phi_{\off}$ and $\Phi_{\on}$, and let $\lambda_k(\mM)$ denote the $k$-th largest eigenvalue of a symmetric matrix $\mM$.
 
-\begin{prop}[Linear MDP Regret of Algorithm~\ref{alg:ch02-alg1}]
+\begin{prop}[Linear MDP Regret of \aigen{Algorithm~\ref{alg:ch02-alg1}}]
 \label{prop:ch02-case_linear}
 In a linear MDP (Definition~\ref{defn:ch02-linear_MDP}), let $\phi_{\off} = \gP_{\off} \phi$. For any partition $\gX_{\off} \cup \gX_{\on} = \gX$, we have
 \begin{equation}
     c_{\off}(\gF, \gX_{\off}) \leq \max_{h \in [H]} \frac{1}{\lambda_{d_{\off}}\!\left(\E_{\mu_h}[\phi_{\off}(s, a)\phi_{\off}(s, a)^\top]\right)}, \qquad
     c_{\on}(\gF, \gX_{\on}, N_{\on}) = \gO\!\left(d_{\on} \log(H N_{\on}) \log(N_{\on})\right).
 \end{equation}
-Consequently, with probability at least $1-\delta$, Algorithm~\ref{alg:ch02-alg1} satisfies
+Consequently, with probability at least $1-\delta$, \aigen{Algorithm~\ref{alg:ch02-alg1}} satisfies
 \begin{equation}
     \Reg(N_{\on}) = \tilde{\gO}\!\left(\inf_{\gX_{\on}, \gX_{\off}} \left(\sqrt{d H^5 N_{\on}\!\left(\frac{N_{\on}}{N_{\off}}\right)\max_{h \in [H]} \frac{1}{\lambda_{d_{\off}}(\E_{\mu_h}[ \phi_{\off}\phi_{\off}^\top])}}  + \sqrt{d_{\on} d H^5 N_{\on}}\right)\right).
 \end{equation}
@@ -197,14 +204,14 @@ An episodic MDP is a Block MDP if there exists a latent decoding function $f^\st
 
 Any partition $\gX_{\off} \cup \gX_{\on} = \gX$ induces a latent partition $\bar{\gX}_{\off} = \{(f^\star(s), a, h) : (s, a, h) \in \gX_{\off}\}$ and $\bar{\gX}_{\on} = \{(f^\star(s), a, h) : (s, a, h) \in \gX_{\on}\}$, along with latent occupancy measures $\bar{\mu}_h$ and $\bar{d}^\pi_h$ on $\gU \times \gA$.
 
-\begin{prop}[Block MDP Regret of Algorithm~\ref{alg:ch02-alg1}]
+\begin{prop}[Block MDP Regret of \aigen{Algorithm~\ref{alg:ch02-alg1}}]
 \label{prop:ch02-BMDP_bound}
 In a Block MDP with a Bellman-complete value class $\gF$, we have
 \begin{equation}
     c_{\off}(\gF, \gX_{\off}) \leq \sup_{\pi \in \Pi}\sup_{(u, a, h) \in \bar{\gX}_{\off}} \frac{\bar{d}_h^{\pi}(u, a)}{\bar{\mu}_h(u, a)}, \qquad
     c_{\on}(\gF, \gX_{\on}, N_{\on}) = \gO\!\left(\max_{h \in [H]}|\bar{\gX}_{\on, h}| \log(N_{\on})\right).
 \end{equation}
-Consequently, with probability at least $1-\delta$, Algorithm~\ref{alg:ch02-alg1} satisfies
+Consequently, with probability at least $1-\delta$, \aigen{Algorithm~\ref{alg:ch02-alg1}} satisfies
 \begin{equation}
     \Reg(N_{\on})
     = \tilde{\gO}\!\left(\inf_{\gX_{\on}, \gX_{\off}} \left(\sqrt{\beta H^4 N_{\on}\!\left(\frac{N_{\on}}{N_{\off}}\right) \sup_{\pi \in \Pi}\sup_{(u, a, h) \in \bar{\gX}_{\off}} \frac{\bar{d}_h^{\pi}(u, a)}{\bar{\mu}_h(u, a)}}  + \sqrt{\beta H^4 N_{\on}\max_{h \in [H]}|\bar{\gX}_{\on, h}| }\right)\right).
@@ -214,7 +221,7 @@ Consequently, with probability at least $1-\delta$, Algorithm~\ref{alg:ch02-alg1
 \section{A General Recipe for Hybridizing Online Algorithms}
 \label{sec:ch02-gfa-recipe}
 
-The state-action space partitioning technique used to analyze Algorithm~\ref{alg:ch02-alg1} extends to any online learning algorithm whose regret decomposes into per-step error terms that are controlled in-sample over the combined replay buffer. Proposition~\ref{prop:ch02-general_recipe} states this general conversion recipe, and its proof is given in Appendix~\ref{app:ch02-general_case}.
+The state-action space partitioning technique used to analyze \aigen{Algorithm~\ref{alg:ch02-alg1}} extends to any online learning algorithm whose regret decomposes into per-step error terms that are controlled in-sample over the combined replay buffer. Proposition~\ref{prop:ch02-general_recipe} states this general conversion recipe, and its proof is given in Appendix~\ref{app:ch02-general_case}.
 
 \begin{prop}[General Hybrid Conversion Recipe]
 \label{prop:ch02-general_recipe}
@@ -274,7 +281,7 @@ We next consider a scaled-down Tetris environment with board width $6$, pieces o
 \section{Breaking Sample Size Barriers in Linear MDPs}
 \label{sec:ch02-lin-intro}
 
-While Algorithm~\ref{alg:ch02-alg1} applies to any Bellman-complete function class, its specialization to $d$-dimensional linear MDPs in Proposition~\ref{prop:ch02-case_linear} yields a regret bound of $\tilde{\gO}(\sqrt{c_{\off}(\gX_{\off}) d H^5 N_{\on}^2 / N_{\off}} + \sqrt{d_{\on} d H^5 N_{\on}})$. In purely online linear MDPs, the minimax-optimal regret is $\tilde{\Theta}(\sqrt{d^2 H^3 T})$ \citep{zhou2021nearly, he2023nearly, hu2023nearlynot, agarwal2022voql}, and in purely offline linear MDPs, variance-weighted pessimistic value iteration achieves the minimax-optimal instance-dependent suboptimality bound $\tilde{\gO}(\sqrt{d}\sum_{h=1}^H \E_{\pi^\star}\|\phi(s_h, a_h)\|_{(\mSigma_{\off, h}^\star)^{-1}}) \leq \tilde{\gO}(\sqrt{C^\star d^2 H^4 / N_{\off}})$ \citep{xiong2023nearly}. Likewise, the reward-agnostic hybrid linear MDP algorithm of \citet{wagenmaker2023leveraging} attains a worst-case suboptimality bound of $\tilde{\gO}(\sqrt{d^2 H^7 / N})$. Thus, existing general or reward-agnostic hybrid bounds in linear MDPs lose factors of $H^2$ to $H^4$ relative to the optimal purely online and purely offline rates, as summarized in Tables~\ref{tab:ch02-prev-lit} and~\ref{tab:ch02-best-bounds}.
+While \aigen{Algorithm~\ref{alg:ch02-alg1}} applies to any Bellman-complete function class, its specialization to $d$-dimensional linear MDPs in Proposition~\ref{prop:ch02-case_linear} yields a regret bound of $\tilde{\gO}(\sqrt{c_{\off}(\gX_{\off}) d H^5 N_{\on}^2 / N_{\off}} + \sqrt{d_{\on} d H^5 N_{\on}})$. In purely online linear MDPs, the minimax-optimal regret is $\tilde{\Theta}(\sqrt{d^2 H^3 T})$ \citep{zhou2021nearly, he2023nearly, hu2023nearlynot, agarwal2022voql}, and in purely offline linear MDPs, variance-weighted pessimistic value iteration achieves the minimax-optimal instance-dependent suboptimality bound $\tilde{\gO}(\sqrt{d}\sum_{h=1}^H \E_{\pi^\star}\|\phi(s_h, a_h)\|_{(\mSigma_{\off, h}^\star)^{-1}}) \leq \tilde{\gO}(\sqrt{C^\star d^2 H^4 / N_{\off}})$ \citep{xiong2023nearly}. Likewise, the reward-agnostic hybrid linear MDP algorithm of \citet{wagenmaker2023leveraging} attains a worst-case suboptimality bound of $\tilde{\gO}(\sqrt{d^2 H^7 / N})$. Thus, existing general or reward-agnostic hybrid bounds in linear MDPs lose factors of $H^2$ to $H^4$ relative to the optimal purely online and purely offline rates, as summarized in Tables~\ref{tab:ch02-prev-lit} and~\ref{tab:ch02-best-bounds}.
 
 \begin{table}[htbp]
 \centering
@@ -285,7 +292,7 @@ Work & Function Class & Single-Policy Concentrability & Beats Pure Lower Bounds?
 \midrule
 \citet{song2023hybrid}, \citet{nakamoto2023calql} & General & Required & No & Regret \\
 \citet{amortila2024harnessing} & General & Required & No & Regret \\
-Algorithm~\ref{alg:ch02-alg1} \citep{tan2024natural} & General & Not Required & No ($H^5$ in linear) & Regret \\
+\aigen{Algorithm~\ref{alg:ch02-alg1}} \citep{tan2024natural} & General & Not Required & No ($H^5$ in linear) & Regret \\
 \citet{wagenmaker2023leveraging} & Linear & Not Required & No ($H^7$ worst-case) & PAC \\
 \citet{li2023reward} & Tabular & Not Required & Yes & PAC \\
 Algorithms~\ref{alg:ch02-alg2} and~\ref{alg:ch02-alg3} \citep{tan2024hybrid} & Linear & Not Required & Yes & PAC, Regret \\
@@ -309,12 +316,12 @@ Online Linear MDP (Regret) & $\sqrt{d^2 H^3 T}$ \citep{he2023nearly} & $\sqrt{d^
 Hybrid Paradigm & \multicolumn{2}{c}{Guarantee} \\
 \midrule
 Online-to-Offline (PAC Error) & \multicolumn{2}{c}{$\sqrt{d^2 H^7 / N}$ \citep{wagenmaker2023leveraging}} \\
-& \multicolumn{2}{c}{$\sqrt{c_{\off}(\gX_{\off}) d H^3 \min\{c_{\off}(\gX_{\off}), H\}/N_{\off}} + \sqrt{d_{\on} d H^3 \min\{d_{\on}, H\}/N_{\on}}$ (\textbf{Algorithm~\ref{alg:ch02-alg2}})} \\
+& \multicolumn{2}{c}{$\sqrt{c_{\off}(\gX_{\off}) d H^3 \min\{c_{\off}(\gX_{\off}), H\}/N_{\off}} + \sqrt{d_{\on} d H^3 \min\{d_{\on}, H\}/N_{\on}}$ (\textbf{\aigen{Algorithm~\ref{alg:ch02-alg2}}})} \\
 \midrule
 Offline-to-Online (Regret) & \multicolumn{2}{c}{$C^\star \sqrt{d^2 H^6 N_{\on}}$ \citep{song2023hybrid, nakamoto2023calql}} \\
 & \multicolumn{2}{c}{$\sqrt{(C^\star + c_{\on}(\gX)) d^3 H^6 N_{\on}}$ \citep{amortila2024harnessing}} \\
-& \multicolumn{2}{c}{$\sqrt{c_{\off}(\gX_{\off}) d H^5 N_{\on}^2 / N_{\off}} + \sqrt{d_{\on} d H^5 N_{\on}}$ (\textbf{Algorithm~\ref{alg:ch02-alg1}})} \\
-& \multicolumn{2}{c}{$\sqrt{c_{\off}(\gX_{\off})^2 d H^3 N_{\on}^2 / N_{\off}} + \sqrt{d_{\on} d H^3 N_{\on}}$ (\textbf{Algorithm~\ref{alg:ch02-alg3}})} \\
+& \multicolumn{2}{c}{$\sqrt{c_{\off}(\gX_{\off}) d H^5 N_{\on}^2 / N_{\off}} + \sqrt{d_{\on} d H^5 N_{\on}}$ (\textbf{\aigen{Algorithm~\ref{alg:ch02-alg1}}})} \\
+& \multicolumn{2}{c}{$\sqrt{c_{\off}(\gX_{\off})^2 d H^3 N_{\on}^2 / N_{\off}} + \sqrt{d_{\on} d H^3 N_{\on}}$ (\textbf{\aigen{Algorithm~\ref{alg:ch02-alg3}}})} \\
 \bottomrule
 \end{tabular}
 }
@@ -324,8 +331,8 @@ Offline-to-Online (Regret) & \multicolumn{2}{c}{$C^\star \sqrt{d^2 H^6 N_{\on}}$
 
 In the remainder of this chapter, we study both major paradigms of hybrid RL in linear MDPs:
 \begin{itemize}
-    \item \textbf{Online-to-offline PAC learning (Section~\ref{sec:ch02-lin-pac}):} When the goal is to output a single deterministic policy $\widehat{\pi}$ for deployment after exploration, randomizing over an online policy history (as in regret-to-PAC conversion) is often undesirable in safety-critical applications. Moreover, reward-agnostic online exploration produces a combined dataset that can be reused across multiple downstream reward functions. Algorithm~\ref{alg:ch02-alg2} combines reward-agnostic covariate collection \citep{wagenmaker2023instancedependent} with variance-weighted pessimistic value iteration \citep{xiong2023nearly} to achieve an error bound of $\tilde{\gO}(\sqrt{c_{\off}(\gX_{\off}) d H^3 \min\{c_{\off}(\gX_{\off}), H\} / N_{\off}} + \sqrt{d_{\on} d H^3 \min\{d_{\on}, H\} / N_{\on}})$.
-    \item \textbf{Offline-to-online regret minimization (Section~\ref{sec:ch02-lin-regret}):} When the agent must maintain high reward throughout online interaction, Algorithm~\ref{alg:ch02-alg3} warm-starts variance-weighted optimistic value iteration \citep{he2023nearly} with offline parameter and variance estimates, achieving $\Reg(N_{\on}) = \tilde{\gO}(\inf_{\gX_{\off}, \gX_{\on}}\{\sqrt{c_{\off}(\gX_{\off})^2 d H^3 N_{\on}^2 / N_{\off}} + \sqrt{d_{\on} d H^3 N_{\on}}\})$ without knowing the partition.
+    \item \textbf{Online-to-offline PAC learning (Section~\ref{sec:ch02-lin-pac}):} When the goal is to output a single deterministic policy $\widehat{\pi}$ for deployment after exploration, randomizing over an online policy history (as in regret-to-PAC conversion) is often undesirable in safety-critical applications. Moreover, reward-agnostic online exploration produces a combined dataset that can be reused across multiple downstream reward functions. \aigen{Algorithm~\ref{alg:ch02-alg2}} combines reward-agnostic covariate collection \citep{wagenmaker2023instancedependent} with variance-weighted pessimistic value iteration \citep{xiong2023nearly} to achieve an error bound of $\tilde{\gO}(\sqrt{c_{\off}(\gX_{\off}) d H^3 \min\{c_{\off}(\gX_{\off}), H\} / N_{\off}} + \sqrt{d_{\on} d H^3 \min\{d_{\on}, H\} / N_{\on}})$.
+    \item \textbf{Offline-to-online regret minimization (Section~\ref{sec:ch02-lin-regret}):} When the agent must maintain high reward throughout online interaction, \aigen{Algorithm~\ref{alg:ch02-alg3}} warm-starts variance-weighted optimistic value iteration \citep{he2023nearly} with offline parameter and variance estimates, achieving $\Reg(N_{\on}) = \tilde{\gO}(\inf_{\gX_{\off}, \gX_{\on}}\{\sqrt{c_{\off}(\gX_{\off})^2 d H^3 N_{\on}^2 / N_{\off}} + \sqrt{d_{\on} d H^3 N_{\on}}\})$ without knowing the partition.
 \end{itemize}
 
 \paragraph{Additional Linear MDP Notation.}
@@ -343,7 +350,7 @@ where $[\mathbb{V}_h V_{h+1}^\star](s, a) = \max\{1, [\operatorname{Var}_h V_{h+
 \section{Online-to-Offline PAC Learning in Linear MDPs}
 \label{sec:ch02-lin-pac}
 
-Given the offline dataset $\gD_{\off}$ with covariance matrices $\boldsymbol{\Lambda}_{\off, h}$, Algorithm~\ref{alg:ch02-alg2} first runs the reward-agnostic covariate-collection subroutine of \citet{wagenmaker2023instancedependent} (stated in full in Appendix~\ref{app:ch02-unabridged}) to collect online trajectories until the maximum leverage score $\max_{\phi_h \in \Phi} \phi_h^\top (\boldsymbol{\Lambda}_h + \lambda \mathbf{I} + \boldsymbol{\Lambda}_{\off, h})^{-1}\phi_h$ falls below a target tolerance $\tau$. It then runs variance-weighted pessimistic value iteration \citep{xiong2023nearly} on the combined dataset $\gD_{\off} \cup \gD_{\on}$ to output a deterministic policy $\widehat{\pi}$.
+Given the offline dataset $\gD_{\off}$ with covariance matrices $\boldsymbol{\Lambda}_{\off, h}$, \aigen{Algorithm~\ref{alg:ch02-alg2}} first runs the reward-agnostic covariate-collection subroutine of \citet{wagenmaker2023instancedependent} (stated in full in Appendix~\ref{app:ch02-unabridged}) to collect online trajectories until the maximum leverage score $\max_{\phi_h \in \Phi} \phi_h^\top (\boldsymbol{\Lambda}_h + \lambda \mathbf{I} + \boldsymbol{\Lambda}_{\off, h})^{-1}\phi_h$ falls below a target tolerance $\tau$. It then runs variance-weighted pessimistic value iteration \citep{xiong2023nearly} on the combined dataset $\gD_{\off} \cup \gD_{\on}$ to output a deterministic policy $\widehat{\pi}$.
 
 \begin{algorithm}[htbp]
     \caption{Online-to-Offline Hybrid RL via Reward-Agnostic Exploration and Pessimistic Planning}
@@ -361,7 +368,7 @@ Given the offline dataset $\gD_{\off}$ with covariance matrices $\boldsymbol{\La
     \end{algorithmic}
 \end{algorithm}
 
-To guarantee that the reward-agnostic exploration phase terminates, we impose a full-rank projected covariate condition analogous to that of \citet{wagenmaker2023leveraging}. This assumption is used only for Algorithm~\ref{alg:ch02-alg2}.
+To guarantee that the reward-agnostic exploration phase terminates, we impose a full-rank projected covariate condition analogous to that of \citet{wagenmaker2023leveraging}. This assumption is used only for \aigen{Algorithm~\ref{alg:ch02-alg2}}.
 
 \begin{aspt}[Full-Rank Projected Covariates]
 \label{aspt:ch02-full-rank-proj-covariates}
@@ -382,11 +389,11 @@ Let $\alpha_{\off} \coloneqq N_{\off}/N$, $\alpha_{\on} \coloneqq N_{\on}/N$, an
 \begin{equation}
     N^\star(\tau) \coloneqq \min \left\{ N \in \sN : \inf_{\boldsymbol{\Lambda} \in \boldsymbol{\Omega}} \max_{\boldsymbol{\phi} \in \Phi} \boldsymbol{\phi}^{\top}\!\left(N(\boldsymbol{\Lambda}+\bar{\lambda} \mathbf{I})+\boldsymbol{\Lambda}_{\mathrm{off}}\right)^{-1} \boldsymbol{\phi} \leq \tau \right\}.
 \end{equation}
-Theorem~\ref{thm:ch02-hybridoffline} establishes both an instance-dependent suboptimality bound and a worst-case partitioned suboptimality bound for Algorithm~\ref{alg:ch02-alg2}, with the full proof is given in Appendix~\ref{app:ch02-hybridoffline}.
+Theorem~\ref{thm:ch02-hybridoffline} establishes both an instance-dependent suboptimality bound and a worst-case partitioned suboptimality bound for \aigen{Algorithm~\ref{alg:ch02-alg2}}, with the full proof is given in Appendix~\ref{app:ch02-hybridoffline}.
 
-\begin{thm}[PAC Suboptimality Bound for Algorithm~\ref{alg:ch02-alg2}]
+\begin{thm}[PAC Suboptimality Bound for \aigen{Algorithm~\ref{alg:ch02-alg2}}]
 \label{thm:ch02-hybridoffline}
-Suppose Assumption~\ref{aspt:ch02-full-rank-proj-covariates} holds. For every $\delta \in (0,1)$ and any partition $\gX_{\off}, \gX_{\on}$, when $\tau \leq \tilde{\gO}(\max\{d_{\on}/N_{\on}, c_{\off}(\gX_{\off})/N_{\off}\})$ and $N \geq \max\{\alpha_{\on}^{4} d_{\on}^{-4}, \alpha_{\off}^{4} c_{\off}(\gX_{\off})^{-4}\}\max\{N^\star(\tau), \operatorname{poly}(d, H, c_{\off}(\gX_{\off}), \log(1/\delta))\}$, Algorithm~\ref{alg:ch02-alg2} achieves with probability at least $1-\delta$:
+Suppose Assumption~\ref{aspt:ch02-full-rank-proj-covariates} holds. For every $\delta \in (0,1)$ and any partition $\gX_{\off}, \gX_{\on}$, when $\tau \leq \tilde{\gO}(\max\{d_{\on}/N_{\on}, c_{\off}(\gX_{\off})/N_{\off}\})$ and $N \geq \max\{\alpha_{\on}^{4} d_{\on}^{-4}, \alpha_{\off}^{4} c_{\off}(\gX_{\off})^{-4}\}\max\{N^\star(\tau), \operatorname{poly}(d, H, c_{\off}(\gX_{\off}), \log(1/\delta))\}$, \aigen{Algorithm~\ref{alg:ch02-alg2}} achieves with probability at least $1-\delta$:
 \begin{align}
     V_1^\star(s)-V_1^{\widehat{\pi}}(s) &\lesssim \sqrt{d}\sum_{h=1}^H \E_{\pi^\star}\|\phi(s_h, a_h)\|_{(\boldsymbol{\Sigma}_{\off,h}^{\star}+ \boldsymbol{\Sigma}_{\on,h}^\star)^{-1}}\leq \sqrt{d}\sum_{h=1}^H \E_{\pi^\star}\|\phi(s_h, a_h)\|_{(\boldsymbol{\Sigma}_{\off,h}^{\star})^{-1}}, \label{eqn:ch02-rappel-res1}\\
     V_1^\star(s)-V_1^{\widehat{\pi}}(s) &\lesssim \min\left\{\sqrt{\frac{c_{\off}(\gX_{\off})dH^{4}}{N_{\off}}} + \sqrt{\frac{d_{\on}dH^{4}}{N_{\on}}},\; \sqrt{\frac{c_{\off}(\gX_{\off})^2dH^3}{N_{\off}\alpha_{\off}}} + \sqrt{\frac{d_{\on}^2dH^3}{N_{\on}\alpha_{\on}}}\right\}. \label{eqn:ch02-rappel-res2}
@@ -395,9 +402,9 @@ Suppose Assumption~\ref{aspt:ch02-full-rank-proj-covariates} holds. For every $\
 
 When specialized to tabular MDPs with one-hot features $\phi(s,a) = \ve_{s,a} \in \sR^{S A}$, where $\pi^\star$ is deterministic, Theorem~\ref{thm:ch02-hybridoffline} yields an $H^3$ horizon dependence without the extra factor of $c_{\off}(\gX_{\off})$ or $d_{\on}$ (proof in Appendix~\ref{app:ch02-proof-cor-rappel-tab}).
 
-\begin{cor}[Tabular Specialization of Algorithm~\ref{alg:ch02-alg2}]
+\begin{cor}[Tabular Specialization of \aigen{Algorithm~\ref{alg:ch02-alg2}}]
 \label{cor:ch02-rappel-tabular}
-In a tabular MDP, for every $\delta\in (0,1)$, with probability at least $1-\delta$, Algorithm~\ref{alg:ch02-alg2} satisfies
+In a tabular MDP, for every $\delta\in (0,1)$, with probability at least $1-\delta$, \aigen{Algorithm~\ref{alg:ch02-alg2}} satisfies
 \begin{equation}
     V_1^{\star}(s) - V_1^{\widehat{\pi}}(s) \lesssim \sqrt{H^3 S^2 A}\left(\sqrt{\frac{c_{\off}(\gX_{\off})}{N_{\off}}} + \sqrt{\frac{d_{\on}}{N_{\on}}}\right).
 \end{equation}
@@ -413,7 +420,7 @@ Using $(\mSigma^\star_h)^{-1} \preceq H^2 \mLambda_h^{-1}$ together with Lemma~\
 \section{Offline-to-Online Regret Minimization in Linear MDPs}
 \label{sec:ch02-lin-regret}
 
-When the agent must minimize cumulative regret during online interaction, reward-agnostic exploration is unsuitable. Algorithm~\ref{alg:ch02-alg3} warm-starts variance-weighted optimistic value iteration \citep{he2023nearly} by computing initial optimistic and pessimistic weight vectors $\widehat{\vw}_{1,h}, \widecheck{\vw}_{1,h}$, action-value functions $Q_{1,h}, \widecheck{Q}_{1,h}$, and variance weights $\bar{\sigma}_{n,h}^2$ on the $N_{\off}$ offline episodes, and initializing the precision matrix as $\mSigma_{1,h} = \sum_{n=1}^{N_{\off}} \bar{\sigma}_{n,h}^{-2}\phi_{n,h}\phi_{n,h}^\top + \lambda \mathbf{I}$. The unabridged pseudocode is given in Appendix~\ref{app:ch02-unabridged}.
+When the agent must minimize cumulative regret during online interaction, reward-agnostic exploration is unsuitable. \aigen{Algorithm~\ref{alg:ch02-alg3}} warm-starts variance-weighted optimistic value iteration \citep{he2023nearly} by computing initial optimistic and pessimistic weight vectors $\widehat{\vw}_{1,h}, \widecheck{\vw}_{1,h}$, action-value functions $Q_{1,h}, \widecheck{Q}_{1,h}$, and variance weights $\bar{\sigma}_{n,h}^2$ on the $N_{\off}$ offline episodes, and initializing the precision matrix as $\mSigma_{1,h} = \sum_{n=1}^{N_{\off}} \bar{\sigma}_{n,h}^{-2}\phi_{n,h}\phi_{n,h}^\top + \lambda \mathbf{I}$. The unabridged pseudocode is given in Appendix~\ref{app:ch02-unabridged}.
 
 \begin{algorithm}[htbp]
     \caption{Offline-to-Online Hybrid RL via Variance-Weighted Optimistic Value Iteration}
@@ -438,26 +445,26 @@ When the agent must minimize cumulative regret during online interaction, reward
     \end{algorithmic}
 \end{algorithm}
 
-Theorem~\ref{thm:ch02-hybridonline} establishes the cumulative regret bound of Algorithm~\ref{alg:ch02-alg3}, with the full proof is given in Appendix~\ref{app:ch02-hybridonline}.
+Theorem~\ref{thm:ch02-hybridonline} establishes the cumulative regret bound of \aigen{Algorithm~\ref{alg:ch02-alg3}}, with the full proof is given in Appendix~\ref{app:ch02-hybridonline}.
 
-\begin{thm}[Regret Bound for Algorithm~\ref{alg:ch02-alg3}]
+\begin{thm}[Regret Bound for \aigen{Algorithm~\ref{alg:ch02-alg3}}]
 \label{thm:ch02-hybridonline}
-For any $\delta \in (0,1)$, if $N_{\on}, N_{\off} = \tilde{\Omega}(d^{13}H^{14})$, then with probability at least $1-\delta$, Algorithm~\ref{alg:ch02-alg3} satisfies
+For any $\delta \in (0,1)$, if $N_{\on}, N_{\off} = \tilde{\Omega}(d^{13}H^{14})$, then with probability at least $1-\delta$, \aigen{Algorithm~\ref{alg:ch02-alg3}} satisfies
 \begin{equation}
     \Reg(N_{\on}) \lesssim \inf_{\gX_{\off}, \gX_{\on}}\left\{\sqrt{c_{\off}(\gX_{\off})^{2}dH^3\frac{N_{\on}^2}{N_{\off}}} + \sqrt{d_{\on}d H^3N_{\on}}\right\}.
 \end{equation}
 \end{thm}
 
-\begin{cor}[Regret-to-PAC Conversion for Algorithm~\ref{alg:ch02-alg3}]
+\begin{cor}[Regret-to-PAC Conversion for \aigen{Algorithm~\ref{alg:ch02-alg3}}]
 \label{cor:ch02-hyrule-pac}
-Under the conditions of Theorem~\ref{thm:ch02-hybridonline}, the uniform mixture policy $\widehat{\pi} = \operatorname{Unif}(\pi^{Q_{1,h}},\dots,\pi^{Q_{T,h}})$ output by Algorithm~\ref{alg:ch02-alg3} satisfies, with probability at least $1-\delta$,
+Under the conditions of Theorem~\ref{thm:ch02-hybridonline}, the uniform mixture policy $\widehat{\pi} = \operatorname{Unif}(\pi^{Q_{1,h}},\dots,\pi^{Q_{T,h}})$ output by \aigen{Algorithm~\ref{alg:ch02-alg3}} satisfies, with probability at least $1-\delta$,
 \begin{equation}
     V_1^\star(s)-V_1^{\widehat{\pi}}(s)\lesssim \inf_{\gX_{\off}, \gX_{\on}}\left\{\sqrt{\frac{c_{\off}(\gX_{\off})^2dH^3}{N_{\off}}} + \sqrt{\frac{d_{\on}d H^3}{N_{\on}}}\right\}.
 \end{equation}
 \end{cor}
 
 \paragraph{Comparison and Proof Sketch for Theorem~\ref{thm:ch02-hybridonline}.}
-Like Algorithm~\ref{alg:ch02-alg1}, Algorithm~\ref{alg:ch02-alg3} requires no knowledge of the partition $(\gX_{\off}, \gX_{\on})$ and automatically adapts to the infimum over all partitions. Taking $\gX_{\on} = \gX$ and $\gX_{\off} = \emptyset$ immediately recovers the minimax-optimal purely online regret bound $\tilde{\gO}(\sqrt{d^2 H^3 N_{\on}})$ of \citet{he2023nearly}, while in the offline-abundant regime $N_{\off} \gg N_{\on}$ the online regret scales as $\tilde{\gO}(\sqrt{d_{\on} d H^3 N_{\on}})$, breaking the $\Omega(\sqrt{d^2 H^3 N_{\on}})$ purely online lower bound whenever the offline dataset covers a subspace of dimension $d_{\off} = d - d_{\on} \geq 1$. Compared to Proposition~\ref{prop:ch02-case_linear} for Algorithm~\ref{alg:ch02-alg1}, Theorem~\ref{thm:ch02-hybridonline} sharpens the horizon dependence from $H^5$ to $H^3$.
+Like \aigen{Algorithm~\ref{alg:ch02-alg1}}, \aigen{Algorithm~\ref{alg:ch02-alg3}} requires no knowledge of the partition $(\gX_{\off}, \gX_{\on})$ and automatically adapts to the infimum over all partitions. Taking $\gX_{\on} = \gX$ and $\gX_{\off} = \emptyset$ immediately recovers the minimax-optimal purely online regret bound $\tilde{\gO}(\sqrt{d^2 H^3 N_{\on}})$ of \citet{he2023nearly}, while in the offline-abundant regime $N_{\off} \gg N_{\on}$ the online regret scales as $\tilde{\gO}(\sqrt{d_{\on} d H^3 N_{\on}})$, breaking the $\Omega(\sqrt{d^2 H^3 N_{\on}})$ purely online lower bound whenever the offline dataset covers a subspace of dimension $d_{\off} = d - d_{\on} \geq 1$. Compared to Proposition~\ref{prop:ch02-case_linear} for \aigen{Algorithm~\ref{alg:ch02-alg1}}, Theorem~\ref{thm:ch02-hybridonline} sharpens the horizon dependence from $H^5$ to $H^3$.
 
 To prove Theorem~\ref{thm:ch02-hybridonline}, we decompose the exploration bonuses across $\gX_{\off}$ and $\gX_{\on}$:
 \begin{equation}
@@ -473,33 +480,33 @@ We evaluate Algorithms~\ref{alg:ch02-alg2} and~\ref{alg:ch02-alg3} on the scaled
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.95\textwidth]{figures/ch02/imgs/cov_agnostic_linear.png}
-    \caption{Inverse minimum eigenvalue coverage ($1/\lambda_{\min}(\mLambda)$, $1/\lambda_{d_{\off}}(\mLambda_{\off})$, $1/\lambda_{d_{\on}}(\mLambda_{\on})$) during the reward-agnostic exploration phase of Algorithm~\ref{alg:ch02-alg2} initialized with 200 uniform offline trajectories, 200 adversarial offline trajectories, or no offline data (mean over 30 trials $\pm 1.96$ standard errors, where lower is better).}
+    \caption{Inverse minimum eigenvalue coverage ($1/\lambda_{\min}(\mLambda)$, $1/\lambda_{d_{\off}}(\mLambda_{\off})$, $1/\lambda_{d_{\on}}(\mLambda_{\on})$) during the reward-agnostic exploration phase of \aigen{Algorithm~\ref{alg:ch02-alg2}} initialized with 200 uniform offline trajectories, 200 adversarial offline trajectories, or no offline data (mean over 30 trials $\pm 1.96$ standard errors, where lower is better).}
     \label{fig:ch02-cov-agnostic}
 \end{figure}
 
-Figure~\ref{fig:ch02-cov-agnostic} shows the covariate coverage achieved during the exploration phase of Algorithm~\ref{alg:ch02-alg2} when initialized with 200 uniform-policy trajectories, 200 adversarial-policy trajectories (generated by negating the weights of a trained policy), or no offline data. Even with adversarially collected offline data, hybrid exploration achieves better conditioning across both the full space and the online subspace than purely online exploration.
+Figure~\ref{fig:ch02-cov-agnostic} shows the covariate coverage achieved during the exploration phase of \aigen{Algorithm~\ref{alg:ch02-alg2}} when initialized with 200 uniform-policy trajectories, 200 adversarial-policy trajectories (generated by negating the weights of a trained policy), or no offline data. Even with adversarially collected offline data, hybrid exploration achieves better conditioning across both the full space and the online subspace than purely online exploration.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.52\textwidth]{figures/ch02/imgs/reward_agnostic_value.png}
-    \caption{Policy value learned by pessimistic value iteration in Algorithm~\ref{alg:ch02-alg2} on the hybrid dataset (200 adversarial offline + 100 online trajectories) compared against 300 adversarial offline trajectories and 300 purely online reward-agnostic trajectories over 30 trials (higher is better).}
+    \caption{Policy value learned by pessimistic value iteration in \aigen{Algorithm~\ref{alg:ch02-alg2}} on the hybrid dataset (200 adversarial offline + 100 online trajectories) compared against 300 adversarial offline trajectories and 300 purely online reward-agnostic trajectories over 30 trials (higher is better).}
     \label{fig:ch02-reward-agnostic}
 \end{figure}
 
-Figure~\ref{fig:ch02-reward-agnostic} compares the value of the policy output by Algorithm~\ref{alg:ch02-alg2} using 200 adversarial offline trajectories and 100 online exploration trajectories against purely offline learning (300 adversarial trajectories) and purely online reward-agnostic exploration (300 online trajectories). The hybrid dataset yields substantially higher policy value than either pure baseline. Finally, Figure~\ref{fig:ch02-regret} compares Algorithm~\ref{alg:ch02-alg3} against purely online LSVI-UCB++ \citep{he2023nearly}, confirming that offline initialization yields strictly lower cumulative regret and faster reward convergence.
+Figure~\ref{fig:ch02-reward-agnostic} compares the value of the policy output by \aigen{Algorithm~\ref{alg:ch02-alg2}} using 200 adversarial offline trajectories and 100 online exploration trajectories against purely offline learning (300 adversarial trajectories) and purely online reward-agnostic exploration (300 online trajectories). The hybrid dataset yields substantially higher policy value than either pure baseline. Finally, Figure~\ref{fig:ch02-regret} compares \aigen{Algorithm~\ref{alg:ch02-alg3}} against purely online LSVI-UCB++ \citep{he2023nearly}, confirming that offline initialization yields strictly lower cumulative regret and faster reward convergence.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.78\textwidth]{figures/ch02/imgs/regret_linear.png}
     \vspace{0.1in}
     \includegraphics[width=0.78\textwidth]{figures/ch02/imgs/reward_linear.png}
-    \caption{Cumulative regret (top) and per-episode reward (bottom) of Algorithm~\ref{alg:ch02-alg3} versus purely online LSVI-UCB++ \citep{he2023nearly} in the linear Tetris environment (mean $\pm 1$ standard deviation over 10 trials).}
+    \caption{Cumulative regret (top) and per-episode reward (bottom) of \aigen{Algorithm~\ref{alg:ch02-alg3}} versus purely online LSVI-UCB++ \citep{he2023nearly} in the linear Tetris environment (mean $\pm 1$ standard deviation over 10 trials).}
     \label{fig:ch02-regret}
 \end{figure}
 
 \section{Discussion}
 \label{sec:ch02-lin-discussion}
 
-Together, Algorithms~\ref{alg:ch02-alg1}, \ref{alg:ch02-alg2}, and~\ref{alg:ch02-alg3} show that offline datasets with partial coverage can be exploited without single-policy concentrability by partitioning the state-action space into an offline-covered component $\gX_{\off}$ and an online-explored component $\gX_{\on}$. Under general function approximation, Algorithm~\ref{alg:ch02-alg1} achieves automatic adaptivity to the optimal partition simply by retaining the offline dataset in its experience replay buffer. In linear MDPs, Algorithms~\ref{alg:ch02-alg2} and~\ref{alg:ch02-alg3} combine this subspace decomposition with variance-weighted regression and variance truncation to achieve $H^3$ horizon dependence and $d_{\on} d$ online dimension dependence in both the online-to-offline PAC setting and the offline-to-online regret setting.
+Together, Algorithms~\ref{alg:ch02-alg1}, \ref{alg:ch02-alg2}, and~\ref{alg:ch02-alg3} show that offline datasets with partial coverage can be exploited without single-policy concentrability by partitioning the state-action space into an offline-covered component $\gX_{\off}$ and an online-explored component $\gX_{\on}$. Under general function approximation, \aigen{Algorithm~\ref{alg:ch02-alg1}} achieves automatic adaptivity to the optimal partition simply by retaining the offline dataset in its experience replay buffer. In linear MDPs, Algorithms~\ref{alg:ch02-alg2} and~\ref{alg:ch02-alg3} combine this subspace decomposition with variance-weighted regression and variance truncation to achieve $H^3$ horizon dependence and $d_{\on} d$ online dimension dependence in both the online-to-offline PAC setting and the offline-to-online regret setting.
 
 In the next chapter, we turn from learning a single decision process from partial-coverage offline data to learning shared low-dimensional representation structure across heterogeneous tasks or users in latent contextual bandits.

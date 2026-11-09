@@ -845,3 +845,15 @@ boxsep=0.1pt,left=0pt,right=0pt,top=0pt,bottom=0pt}}
 \newcommand\editTheoremOne{where the derivative with respect to $\theta$ on the right hand side propagates the derivative of the particle locations, via the chain rule, for fixed $\omega$.}
 \newcommand\editAncestorDefinition{Here, $X_{1:N,j}^{A,F,\theta}$ is the ancestral trajectory of $X_{N,j}^{F,\theta}$ at times $t_1,\dots,t_N$.}
 \newcommand\editPlugAndPlay{Plug-and-play methods are necessary when transition densities are not available, but can have advantages even when they are. The plug-and-play property avoids difficulties arising when the full latent transition densities at different parameter values are mutually singular \citep{roberts01,karppinen24}. The plug-and-play property also facilitates the development of statistical software applicable to a broad class of POMP models.}
+
+% Draft markup macros:
+% - \aigen{...} and \begin{aigenblock}...\end{aigenblock} render AI-generated prose in green
+% - \todoresolve{...} renders caveats and items to resolve in BOLD RED ALL CAPS
+\newif\ifdraftmarkup
+\draftmarkuptrue
+\definecolor{aigreen}{RGB}{0,135,50}
+\definecolor{caveatred}{RGB}{204,0,0}
+\newcommand{\aigen}[1]{\ifdraftmarkup{\color{aigreen}#1}\else#1\fi}
+\newenvironment{aigenblock}{\ifdraftmarkup\color{aigreen}\fi}{}
+\newcommand{\todoresolve}[1]{\ifdraftmarkup{\color{caveatred}\textbf{\MakeUppercase{[RESOLVE: #1]}}}\else\fi}
+
