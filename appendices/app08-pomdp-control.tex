@@ -543,7 +543,7 @@ binary control actions $A_{t,2}\in\{0,1\}$, and binary measurement actions
 $I_{t,1}\in\{0,1\}$ in the AOMDP formulation. The benchmark contains
 $42$ user-specific environments.
 
-For \aigen{Algorithm~\ref{alg:pf_mctq}}, our default settings use
+For \aigen{Algorithm~\ref{alg:pf_mcts}}, our default settings use
 \[
 J = 16
 \]
@@ -575,14 +575,14 @@ linear-function-approximation setting: the belief update uses the specified
 linear-Gaussian working model, and the control rule uses hand-specified linear
 features of the belief state, context, action, and action interactions.
 
-\aigen{Algorithm~\ref{alg:pf_mctq}} is also evaluated under the never-measure information pattern,
+\aigen{Algorithm~\ref{alg:pf_mcts}} is also evaluated under the never-measure information pattern,
 \[
     I_{t,1}=0,
 \]
 so it has the same lack of direct latent-reward measurements as RLSVI-SMC.
-However, \aigen{Algorithm~\ref{alg:pf_mctq}} is less specialized to the linear benchmark structure: it must
+However, \aigen{Algorithm~\ref{alg:pf_mcts}} is less specialized to the linear benchmark structure: it must
 learn a dynamics model, actor, and critic, parameterized by neural networks,
-from the observed data.  Consequently, \aigen{Algorithm~\ref{alg:pf_mctq}} pays an additional estimation
+from the observed data.  Consequently, \aigen{Algorithm~\ref{alg:pf_mcts}} pays an additional estimation
 cost relative to RLSVI-SMC, which is already matched to the linear basis and
 Bayesian regression structure of the benchmark.
 
@@ -599,14 +599,14 @@ Its control action is selected from the belief-weighted Q-values,
 while its measurement decision can reveal the latent reward and collapse the
 posterior uncertainty.  In our experiments Dyna-ATMQ measures the environment
 around half the time on average, giving it an informational advantage over both
-RLSVI-SMC/never-measure and \aigen{Algorithm~\ref{alg:pf_mctq}}, which do not measure the environment.
+RLSVI-SMC/never-measure and \aigen{Algorithm~\ref{alg:pf_mcts}}, which do not measure the environment.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/ch08/Figures/heartsteps_all.png}
     \caption{Cumulative reward above the baseline rollout across the twelve HeartSteps scenarios.
 Panels vary the positive intervention effect (rows: minimal, small, medium) and the delayed negative measurement effect or proxy informativeness (columns: zero negative effect, minimal negative effect, small negative effect, and uninformative passive proxy $O_t$). Solid lines show the mean across runs and shaded bands show 2.5\% and 97.5\% quantiles.
-The never-measure RLSVI-SMC benchmark performs best in most scenarios because it is specifically matched to the linear-Gaussian HeartSteps structure and is given access to hand-specified linear features. \aigen{Algorithm~\ref{alg:pf_mctq}} also never measures, but must learn its model, actor, and critic from data using neural approximators, so it typically improves over baseline while trailing the tailored linear benchmark. Dyna-ATMQ often underperforms when measurement has delayed negative effects, especially when the positive intervention effect is weak, because it measures frequently and therefore gains latent-state information at the cost of worsening future engagement. Its relative performance improves when the positive effect is larger or when passive proxy information is unavailable and so direct measurements become more valuable.
+The never-measure RLSVI-SMC benchmark performs best in most scenarios because it is specifically matched to the linear-Gaussian HeartSteps structure and is given access to hand-specified linear features. \aigen{Algorithm~\ref{alg:pf_mcts}} also never measures, but must learn its model, actor, and critic from data using neural approximators, so it typically improves over baseline while trailing the tailored linear benchmark. Dyna-ATMQ often underperforms when measurement has delayed negative effects, especially when the positive intervention effect is weak, because it measures frequently and therefore gains latent-state information at the cost of worsening future engagement. Its relative performance improves when the positive effect is larger or when passive proxy information is unavailable and so direct measurements become more valuable.
 }
     \label{fig:heartsteps-all}
 \end{figure}
@@ -614,7 +614,7 @@ The never-measure RLSVI-SMC benchmark performs best in most scenarios because it
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/ch08/Figures/heartsteps_snapshot.png}
-    \caption{Belief over the latent reward at three training checkpoints in HeartSteps. Rows show \aigen{Algorithm~\ref{alg:pf_mctq}}, the never-measure RLSVI-SMC benchmark, and Dyna-ATMQ; columns show days 27, 135, and 243. Each panel displays posterior particles, a kernel density estimate, the posterior interquartile range, and the posterior mean. The red vertical line marks the true latent reward. We see that Dyna-ATMQ having access to measurements of the environment gives it an informational advantage over the other two algorithms. On the other hand, the correct linear specification that RLSVI-SMC enjoys allows it to create a posterior that is close to Gaussian. \aigen{Algorithm~\ref{alg:pf_mctq}}, which has to estimate a dynamics model, actor, and critic, parameterized by neural networks,
+    \caption{Belief over the latent reward at three training checkpoints in HeartSteps. Rows show \aigen{Algorithm~\ref{alg:pf_mcts}}, the never-measure RLSVI-SMC benchmark, and Dyna-ATMQ; columns show days 27, 135, and 243. Each panel displays posterior particles, a kernel density estimate, the posterior interquartile range, and the posterior mean. The red vertical line marks the true latent reward. We see that Dyna-ATMQ having access to measurements of the environment gives it an informational advantage over the other two algorithms. On the other hand, the correct linear specification that RLSVI-SMC enjoys allows it to create a posterior that is close to Gaussian. \aigen{Algorithm~\ref{alg:pf_mcts}}, which has to estimate a dynamics model, actor, and critic, parameterized by neural networks,
 from the observed data, consequently has a much more expressive and multimodal posterior.
 }
     \label{fig:heartsteps-snapshot}
@@ -625,11 +625,11 @@ from the observed data, consequently has a much more expressive and multimodal p
     \includegraphics[width=\linewidth]{figures/ch08/Figures/heartsteps_posterior.png}
     \caption{
 Latent-reward belief trajectories for HeartSteps scenario (a), shown separately by random seed.
-Columns compare \aigen{Algorithm~\ref{alg:pf_mctq}}, the never-measure RLSVI-SMC benchmark, and Dyna-ATMQ; rows show five independent seeds.
+Columns compare \aigen{Algorithm~\ref{alg:pf_mcts}}, the never-measure RLSVI-SMC benchmark, and Dyna-ATMQ; rows show five independent seeds.
 Each panel plots the posterior median, interquartile range, and 10--90\% interval for the latent reward, with the dashed red curve showing the true latent reward.
 All three methods track the latent reward at the level needed for control, but they express uncertainty differently.
 Never-measure produces comparatively narrow posteriors because it is tailored to the linear-Gaussian HeartSteps model and uses a conjugate SMC/RLSVI update.
-\aigen{Algorithm~\ref{alg:pf_mctq}} has wider and more variable posteriors because it must learn the transition model and value functions from data while never directly measuring the latent reward.
+\aigen{Algorithm~\ref{alg:pf_mcts}} has wider and more variable posteriors because it must learn the transition model and value functions from data while never directly measuring the latent reward.
 Dyna-ATMQ also shows broad posterior support, but its belief remains centered near the true trajectory because it actively measures the latent reward on many days, partially collapsing uncertainty despite the coarser tabular approximation.
 }
     \label{fig:heartsteps-posterior}
@@ -1939,7 +1939,7 @@ A constant $\varepsilon$ gives the same $\widetilde O(T^{3/4})$ rate after optim
 The $T^{3/4}$ rate in Theorem~\ref{thm:final_regret_bound} arises from the coverage transfer for term~(A), which requires $\varepsilon$-greedy exploration to ensure the MLE concentrates at all policies. An alternative is to replace online exploration with an offline dataset that already provides coverage of the optimal policy. This mirrors the hybrid RL framework~\cite{song2023hybrid}, where offline data with sufficient coverage enables greedy online exploitation.
 
 \paragraph{Setting.}
-Suppose the agent has access to an offline dataset $\gD_{\mathrm{off}}$ of $N$ i.i.d.\ length-$H$ trajectories collected by a behavior policy $\pi_b$ in the true POMDP (model $\theta^\star$). The agent then runs \aigen{Algorithm~\ref{alg:pf_mctq}} for $T$ online steps with \emph{greedy} exploitation ($\varepsilon_t=0$, no exploration). The MLE is computed from the union $\gD_{\mathrm{off}}\cup\gD_{\mathrm{on}}$.
+Suppose the agent has access to an offline dataset $\gD_{\mathrm{off}}$ of $N$ i.i.d.\ length-$H$ trajectories collected by a behavior policy $\pi_b$ in the true POMDP (model $\theta^\star$). The agent then runs \aigen{Algorithm~\ref{alg:pf_mcts}} for $T$ online steps with \emph{greedy} exploitation ($\varepsilon_t=0$, no exploration). The MLE is computed from the union $\gD_{\mathrm{off}}\cup\gD_{\mathrm{on}}$.
 
 \begin{defn}[Single-policy concentrability]\label{def:spc}
 The single-policy concentrability coefficient of the behavior policy $\pi_b$ with respect to the optimal policy $\pi^\star:=\arg\max_\pi V_{\theta^\star}^{\pi,B}$ is
@@ -1953,7 +1953,7 @@ c_{\mathrm{off}}^\star
 Under Assumption~\ref{aspt:particle_error}, if $\pi_b(a\mid h)\ge\alpha_b/|\gA|$ for all $a,h$, Lemma~\ref{lem:coverage} gives $c_{\mathrm{off}}^\star\le K_{\mathrm{cov}}/\alpha_b=\frac{H|\gA|}{\alpha_b}\cdot\frac{g_{\max}^2}{\varepsilon_{\mathrm{mix}}\,g_{\min}^2}$. Note that $c_{\mathrm{off}}^\star$ involves only the \emph{optimal} policy, not a supremum over all policies; this is the key difference from the all-policy concentrability that $\varepsilon$-greedy provides.
 
 \begin{prop}[Regret with offline coverage]\label{prop:offline_regret}
-Under Assumption~\ref{aspt:particle_error}, suppose the agent has $N$ offline trajectories from $\pi_b$ and runs the doubling-epoch \aigen{Algorithm~\ref{alg:pf_mctq}} with greedy exploitation ($\varepsilon_k=0$) for $T$ online steps. Let $\beta_{T,N}:=\beta+\log[\gN_\Theta(1/(T+N))(T+N)/\delta]$. Then w.p.\ $\ge 1-\delta$:
+Under Assumption~\ref{aspt:particle_error}, suppose the agent has $N$ offline trajectories from $\pi_b$ and runs the doubling-epoch \aigen{Algorithm~\ref{alg:pf_mcts}} with greedy exploitation ($\varepsilon_k=0$) for $T$ online steps. Let $\beta_{T,N}:=\beta+\log[\gN_\Theta(1/(T+N))(T+N)/\delta]$. Then w.p.\ $\ge 1-\delta$:
 \begin{equation}\label{eq:offline_regret}
 \mathrm{Reg}_T
 \;\le\;
@@ -2283,7 +2283,7 @@ $$\sup_b[V_\theta^{\star,B}(b)-V_\theta^{\pi_{\mathrm{Q}},B}(b)]
 \label{sec:app08-validation-details}
 
 \subsection{Regret Decomposition Audit and Scaling Laws}
-In the Doeblin-mixing Tiger audit of Section~\ref{sec:validation}, the online maximum likelihood estimation run achieves total-variation model error scaling as $n^{-0.55}$ and optimistic bonus decay $\varepsilon_{\mathrm{opt}} \propto n^{-0.59}$ down to a known-model numerical floor of $1.3 \times 10^{-4}$. Across POMDP instances with multi-step information gap $\Xi \in [0.20, 0.40]$, the structural planning error contracts geometrically at rate $\gamma = 0.80$ inside the envelope predicted by Proposition~\ref{prop:ch08:qmdp_bias} (Figure~\ref{fig:ch08_bound_scaling}).
+In the Doeblin-mixing Tiger audit of Section~\ref{sec:validation}, the online maximum likelihood estimation run achieves total-variation model error scaling as $n^{-0.55}$ and optimistic bonus decay $\varepsilon_{\mathrm{opt}} \propto n^{-0.59}$ down to a known-model numerical floor of $1.3 \times 10^{-4}$. Across POMDP instances with multi-step information gap $\Xi \in [0.20, 0.40]$, the structural planning error contracts geometrically at rate $\gamma = 0.80$ inside the envelope predicted by Proposition~\ref{prop:variance_qmdp_bias_main} (Figure~\ref{fig:ch08_bound_scaling}).
 
 \begin{figure}[htbp]
     \centering
@@ -2343,7 +2343,7 @@ Analytic $(1 - 1/K)^J$ & 0.776 & 0.602 & 0.362 & 0.131 & 0.017 \\
 \subsection{Comparison of Belief-Tree Planners at Depth $d > 0$}
 \label{sec:app08-planner-comparison}
 
-Table~\ref{tab:ch08_planner_comp} compares uniform-exploration and UCB1 variants of Algorithm~\ref{alg:mctq} against POMCP and Sparse-PFT on the active-sensing POMDP ($\gamma = 0.9$, exact belief optimum $7.45 \pm 0.20$, exact QMDP policy return $5.54 \pm 0.32$, $40$ episodes $\times 3$ seeds sharing a $256$-particle root belief). Moving from $d \in \{0,1\}$ to $d=2$ yields the primary jump in return predicted by Proposition~\ref{prop:ch08:qmdp_bias}, and UCB1 allocation improves upon uniform allocation at matched simulator call budgets.
+Table~\ref{tab:ch08_planner_comp} compares uniform-exploration and UCB1 variants of Algorithm~\ref{alg:mctq} against POMCP and Sparse-PFT on the active-sensing POMDP ($\gamma = 0.9$, exact belief optimum $7.45 \pm 0.20$, exact QMDP policy return $5.54 \pm 0.32$, $40$ episodes $\times 3$ seeds sharing a $256$-particle root belief). Moving from $d \in \{0,1\}$ to $d=2$ yields the primary jump in return predicted by Proposition~\ref{prop:variance_qmdp_bias_main}, and UCB1 allocation improves upon uniform allocation at matched simulator call budgets.
 
 \begin{table}[htbp]
 \centering

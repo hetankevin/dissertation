@@ -9,7 +9,7 @@
 \label{app:proof-douhua}
 
 
-We prove a regret bound for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} here. This algorithm achieves sublinear regret only when the covering number of the function class does not increase linearly with the number of critic updates. 
+We prove a regret bound for Algorithm \ref{alg:DOUHUA} here. This algorithm achieves sublinear regret only when the covering number of the function class does not increase linearly with the number of critic updates. 
 
 \subsubsection{Regret decomposition}
 
@@ -53,7 +53,7 @@ The regret at time $T$ yields the following decomposition
 
 The first term is bounded by $\sqrt{H^4T\log|\gA|}$, as we see in the following lemma. This lemma is the standard mirror descent regret bound, and is a similar argument to lemmas found in \citet{liu2023optimisticnaturalpolicygradient} and \citet{cai2024provablyefficientexplorationpolicy}.
 
-\begin{lem}[Mirror Descent Tracking Error for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}]
+\begin{lem}[Mirror Descent Tracking Error for Algorithm \ref{alg:DOUHUA}]
     Let $\pi^{(1)} \propto 1$ and consider updating policies with respect to a set of Q-function estimates $f^{(1)},...,f^{(T)}$ by
     \begin{align}\label{eqn:mwu-update}\pi_{h+1}^{(t+1)}(\cdot | s') = \frac{\pi_{h+1}^{(t)}(\cdot | s') \exp(\eta f_{h+1}^{(t)}(s', \cdot))}{\sum_{a \in \gA} \pi_{h+1}^{(t)}(a | s') \exp(\eta f_{h+1}^{(t)}(s', a))} = Z^{-1}\pi_{h+1}^{(t)}(\cdot | s') \exp(\eta f_{h+1}^{(t)}(s', \cdot)).\end{align}
         The tracking error with respect to the optimal policy is then bounded by:
@@ -122,8 +122,8 @@ where the last inequality follows from the fact that the KL-divergence is non-ne
 
 \subsubsection{Asserting optimism}
 
-\begin{lem}[Negative Bellman Error, Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}]
-    Within Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}, it holds that
+\begin{lem}[Negative Bellman Error, Algorithm \ref{alg:DOUHUA}]
+    Within Algorithm \ref{alg:DOUHUA}, it holds that
     $$-\sum_{t=1}^T \sum_{h=1}^H \mathbb{E}_{\pi^*}\left[f_h^{(t)}-\mathcal{T}_h^{\pi^{*}} f_{h+1}^{(t)}\right] \leq  \sum_{t=1}^T \sum_{h=1}^H \mathbb{E}_{\pi^{*}}\left[\left\langle f_{h+1}^{(t)}(s_{h+1},\cdot), \pi_{h+1}^{*} (\cdot | s_{h+1}) -\pi_{h+1}^{(t)}(\cdot | s_{h+1}) \right\rangle\right] + \eta H^3T.$$
     \label{lem:negative-bellman-decomp-douhua}
 \end{lem}
@@ -159,8 +159,8 @@ For the third term, we note that
 
 \subsubsection{Bounding the Bellman error under the learned policies}
 
-\begin{lem}[Bellman Error Under Policy Occupancy, Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}]
-    Within Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}, it holds that
+\begin{lem}[Bellman Error Under Policy Occupancy, Algorithm \ref{alg:DOUHUA}]
+    Within Algorithm \ref{alg:DOUHUA}, it holds that
 \begin{align*}
     \sum_{t=1}^T \sum_{h=1}^H\mathbb{E}_{\pi^{(t)}}\left[\left(f_h^{(t)}-\gT^{\pi^{(t)}}_h f_{h+1}^{(t)}\right)\left(s_h, a_h\right)\right]\leq \sqrt{\beta H^4 T \mathsf{SEC}(\gF, \Pi, T)} + \eta H^3 T
 \end{align*}
@@ -210,10 +210,10 @@ Plugging (\ref{eqn:bellman-learned2}) into (\ref{eqn:bellman-learned}), we final
 
 \paragraph{Showing optimism for critics targeting $Q^{\pi^{(t)}}$}
 
-We prove the following lemma in more generality than is needed for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}, accomodating critic updates that are rarer than in every episode, with the aim to use the more general result in future sections. This can be thought of as an analogue of Lemma 15 in \citet{xie2022role}, which is also Lemmas 39 and 40 in \citet{jin2021bellman}.
+We prove the following lemma in more generality than is needed for Algorithm \ref{alg:DOUHUA}, accomodating critic updates that are rarer than in every episode, with the aim to use the more general result in future sections. This can be thought of as an analogue of Lemma 15 in \citet{xie2022role}, which is also Lemmas 39 and 40 in \citet{jin2021bellman}.
 
 \begin{lem}[Optimism and in-sample error control for critics targeting $Q^{\pi^{(t)}}$]
-Let $t_{\last}$ be the time of the last critic update before episode $t$. Consider a critic targeting $Q^{\pi^{(t)}}$ as in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}. With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$
+Let $t_{\last}$ be the time of the last critic update before episode $t$. Consider a critic targeting $Q^{\pi^{(t)}}$ as in Algorithm \ref{alg:DOUHUA}. With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$
 \begin{align*}
 &\text{(i) $\gT_h^{\pi^{(t_{\last})}} f_{h+1}^{{(t)}} \in \mathcal{F}_h^{(t)}$, and so $f_h^{(t)} \geq \gT_h^{\pi^{(t_{\last})}} f_{h+1}^{(t)}$}, \\
 &\text{(ii) $\sum_{i=1}^{t-1} \mathbb{E}_{d^{\pi^{(i)}}}\left[\left(f_h^{(t)} - \gT_h^{\pi^{(t-1)}} f_{h+1}^{(t)}\right)^2\right] \leq O\left(H^2 \beta\right)$,}
@@ -315,7 +315,7 @@ by choosing $\beta=c_1(\log [H T\mathcal{N}_{\mathcal{F},\left(\mathcal{T}^{\Pi}
 % We can then derive the following:
 
 % \begin{lem}[Bound on Log-Covering Number]
-% Within Algorithms \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} and \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-pi-long}, we can bound the covering number of the value function class $\gN_\gV(\rho) = \max_t \gN_{\gV_h^{(t)}}(\rho)$ as
+% Within Algorithms \ref{alg:DOUHUA} and \ref{alg:NORA-pi-long}, we can bound the covering number of the value function class $\gN_\gV(\rho) = \max_t \gN_{\gV_h^{(t)}}(\rho)$ as
 %     $$\log \gN_{\gV}(\rho) \leq O\left(H|\gA| + \log \gN_\gF(\rho)\right), \text{ and } \log \gN_{\gV}(\rho) \leq O\left(K \log \gN_{\gF}(\rho^2 / (dH \log T \sqrt{\log|\gA| / T}))\right),$$
 %     where $K$ is the number of critic updates.
 %     \label{lem:log-covering-number-ac}
@@ -416,8 +416,8 @@ Each term within the regret decomposition is dealt with differently. We bound th
 The attentive reader will note that the Bellman error is defined as $f - \gT f$ in our setup and that of \citet{liu2023optimisticnaturalpolicygradient}, and $\gT f - f$ in that of \citet{zhong2023theoreticalanalysisoptimisticproximal}.
 
 \subsubsection{Bounding the tracking error}
-\begin{lem}[Mirror Descent Tracking Error for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}]
-    Let $t_k$ and $t_{k+1}$ be switch times within Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}, where we use the convention that $\pi^{(t_k)} \propto 1$ is post-policy reset and $\pi^{(t_{k+1})} \not\propto 1$ is pre-policy reset. The tracking error with respect to the optimal policy is then bounded by:
+\begin{lem}[Mirror Descent Tracking Error for Algorithm \ref{alg:NORA}]
+    Let $t_k$ and $t_{k+1}$ be switch times within Algorithm \ref{alg:NORA}, where we use the convention that $\pi^{(t_k)} \propto 1$ is post-policy reset and $\pi^{(t_{k+1})} \not\propto 1$ is pre-policy reset. The tracking error with respect to the optimal policy is then bounded by:
     $$\sum_{t=t_k+1}^{t_{k+1}-1} \sum_{h=1}^H \mathbb{E}_{\pi^*}\left[\left\langle f_h^{(t)}\left(s_h, \cdot\right), \pi_h^*\left(\cdot \mid s_h\right)-\pi_h^{(t)}\left(\cdot \mid s_h\right)\right\rangle\right] \leq \eta H^3 (t_{k+1} - t_k)/2 + \frac{H \log |\gA|}{\eta} + H^2.$$
     \label{lem:mirror-descent-nora}
 \end{lem}
@@ -630,8 +630,8 @@ and so we can conclude that
 
 \subsubsection{Asserting optimism}
 
-\begin{lem}[Negative Bellman Error For Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}]
-    Within Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}, we have that
+\begin{lem}[Negative Bellman Error For Algorithm \ref{alg:NORA}]
+    Within Algorithm \ref{alg:NORA}, we have that
     $$-\sum_{t=1}^T \sum_{h=1}^H\mathbb{E}_{\pi^*}\left[f_h^{(t)} - \gT_h^{\pi^{*}} f_{h+1}^{(t)} \right]  \leq 0.$$
     % $$-\sum_{t=1}^T \sum_{h=1}^H\mathbb{E}_{\pi^*}\left[\delta_h^{(t)}\right]  \leq \sum_{t=1}^{T} \sum_{h=1}^H \mathbb{E}_{\pi^*}\left[ \left\langle f_{h+1}^{(t)}(s', \cdot), \pi_{h+1}^{(t)}(\cdot | s') - \pi_{h+1}^{(t_{\text{last}})}(\cdot | s')\right\rangle\right] \leq \eta H^3 T.$$
     % $$\gH^*(\pi_h^{(t)}, t_k) = \frac{1}{\eta}\sum_{h=1}^H\sum_{k=1}^{K_h} \mathbb{E}_{\pi^*}\left[ \text{KL}\left(\pi_{h+1}^{(t_k)}(\cdot | s')\; ||\; \pi_{h+1}^{(t_{k+1})}(\cdot | s')\right) \right] -\frac{1}{\eta}\sum_{t=1}^T\sum_{h=1}^H\mathbb{E}_{\pi^*}\left[ \text{KL}\left(\pi_{h+1}^{(t)}(\cdot | s')\; || \;\pi_{h+1}^{(t+1)}(\cdot | s')\right) \right].$$
@@ -1191,8 +1191,8 @@ Applying Lemma \ref{lem:ac-loss-bounded-optimism}, we note that $f_h^{(t)} \geq 
 We now turn our attention to the Bellman error with respect to $\gT_h$ under the current policy's occupancy measure.
 % This can be handled by a combination of the analyses in \citet{liu2023optimisticnaturalpolicygradient} and \citet{xiong2023generalframeworksequentialdecisionmaking}. The strategy is to use the broad approach of the former and to fill in details with the techniques of the latter. 
 
-\begin{lem}[Sum of Bellman Errors Under Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}]
-Within Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}, the sum of Bellman errors with respect to $\gT$ under the occupancy measure of $\pi^{(t)}$ can be bounded by: 
+\begin{lem}[Sum of Bellman Errors Under Algorithm \ref{alg:NORA}]
+Within Algorithm \ref{alg:NORA}, the sum of Bellman errors with respect to $\gT$ under the occupancy measure of $\pi^{(t)}$ can be bounded by: 
     $$\sum_{t=1}^T \sum_{h=1}^H\mathbb{E}_{\pi^{(t)}}\left[\left(f_h^{(t)}-\gT_h f_{h+1}^{(t)}\right)\left(s_h, a_h\right)\right] \leq \sqrt{\beta H^4 T\mathsf{SEC}(\gF, \Pi, T)},$$
     where $\beta = \Theta\left(\log \left(HT^2 \mathcal{N}_{\gF,\gT \gF}(1/T) / \delta\right) \right)$.
     \label{lem:occ-measure-regret-nora}
@@ -1264,8 +1264,8 @@ Within the last inequality, the first term can be bounded by $H$ times the SEC o
 
 % Interestingly, unlike \citet{zhong2023theoreticalanalysisoptimisticproximal}, we do not need to establish a policy Lipschitzness result as in their Lemma 3. They require this as they resample on-policy data every $T/m$ rounds, and show that the sum of bonuses is on the same order under (i) the occupancy measure at each round and (ii) the occupancy measure in the last update round. Instead, we use the GOLF argument. This lets us bound the error in terms of the SEC, achieving a sample complexity of $1/\epsilon^2$. 
 
-\begin{lem}[Greedy Policy Tracking Error For Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}]
-Let $t_k$ and $t_{k+1}$ be switch times within Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}, where we use the convention that $\pi^{(t_k)} \propto 1$ is post-policy reset and $\pi^{(t_{k+1})} \not\propto 1$ is pre-policy reset. The tracking error with respect to the greedy policy corresponding to the current critic is then bounded by:
+\begin{lem}[Greedy Policy Tracking Error For Algorithm \ref{alg:NORA}]
+Let $t_k$ and $t_{k+1}$ be switch times within Algorithm \ref{alg:NORA}, where we use the convention that $\pi^{(t_k)} \propto 1$ is post-policy reset and $\pi^{(t_{k+1})} \not\propto 1$ is pre-policy reset. The tracking error with respect to the greedy policy corresponding to the current critic is then bounded by:
     \begin{align*}
         \sum_{t=t_k+1}^{t_{k+1}-1} \sum_{h=1}^H \E_{d_h^{(t)}}\left[\left\langle f_{h+1}^{(t)}(s', \cdot) , \pi_{h+1}^{f^{(t)}}(\cdot | s') - \pi_{h+1}^{(t)} (\cdot | s')\right\rangle\right] \leq \eta H^3 (t_{k+1} - t_k)/2 + \frac{H\log|\gA|}{\eta} + H^2.
     \end{align*}
@@ -1614,14 +1614,14 @@ We bound the rare-switching update frequency via an argument similar to that of 
 
 \paragraph{Showing optimism for critics targeting $Q^{*}$}
 
-The following lemma applies to Algorithms \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} and \ref{alg:NOAH-star}. As Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} is optimistic, both properties apply to it, while only the second applies to Algorithm \ref{alg:NOAH-star}.
+The following lemma applies to Algorithms \ref{alg:NORA} and \ref{alg:NOAH-star}. As Algorithm \ref{alg:NORA} is optimistic, both properties apply to it, while only the second applies to Algorithm \ref{alg:NOAH-star}.
 
 \begin{lem}[Optimism and in-sample error control for critics targeting $Q^{*}$]
-With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$, an optimistic critic targeting $Q^*$ in the same way as defined in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} achieves
+With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$, an optimistic critic targeting $Q^*$ in the same way as defined in Algorithm \ref{alg:NORA} achieves
 \begin{align*}
 &\text{(i) $\gT_h^{\pi^{(t)}} f_{h+1}^{{(t)}} \in \mathcal{F}_h^{(t)}$, and $f_h^{(t)} \geq \gT_h^{\pi}f_{h+1}^{(t)}$ for all $\pi$,}
 \end{align*}
-Similarly, a critic targeting $Q^*$ as in Algorithms \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} and \ref{alg:NOAH-star} achieves
+Similarly, a critic targeting $Q^*$ as in Algorithms \ref{alg:NORA} and \ref{alg:NOAH-star} achieves
 \begin{align*}
 &\text{(ii) $\sum_{i=1}^{t-1} \mathbb{E}_{d^{\pi^{(i)}}}\left[\left(f_h^{(t)} - \gT_h f_{h+1}^{(t)}\right)^2\right] \leq O\left(H^2 \beta\right)$,}
 \end{align*}
@@ -1712,7 +1712,7 @@ by choosing $\beta=c_1\left(\log \left[H T\mathcal{N}_{\gF,\gT \gF}(\rho) / \del
 % We also require the following helper lemma:
 
 % \begin{lem}[Optimism and in-sample error control for critics targeting $Q^{\pi^{(t)}}$ in hybrid RL]
-% With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$, a critic targeting $Q^*$ in the same way as defined in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-long} achieves
+% With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$, a critic targeting $Q^*$ in the same way as defined in Algorithm \ref{alg:NORA-long} achieves
 % \begin{align*}
 % N_{\off}\mathbb{E}_{\mu_h}\left[\left(f_h^{(t)} - \gT_h f_{h+1}^{(t)}\right)^2\right] + \sum_{i=1}^{t-1} \mathbb{E}_{d^{\pi^{(i)}}}\left[\left(f_h^{(t)} - \gT_h f_{h+1}^{(t)}\right)^2\right] \leq O\left(H^2 \beta\right)
 % \end{align*}
@@ -1809,7 +1809,7 @@ So the remaining regret decomposition is:
 
 The proof then follows analogously to Theorem \ref{thm:nora-regret_bound} for the first, third, fourth and fifth terms. Note that the proofs for Lemmas \ref{lem:g1-ac-loss-bounded}, \ref{lem:g2-ac-loss-concentration-ub}, \ref{lem:g3-ac-loss-concentration-ub}, and Lemma \ref{lem:switch-cost} still hold. Intuitively, this is because the first three lemmas deal with the generalization error of the empirical TD loss under the occupancy measure of the current policy, and the switch cost proof depends only on these lemmas and choosing some $f^{(t)}$ with low enough training error. Choosing the minimizer as in Algorithm \ref{alg:NOAH-star} fulfills this condition.
 
-Unlike the analysis for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}, we bound the second term with the offline data here. We use a similar argument to that of Theorem \ref{thm:hybrid-nora-regret_bound}. Concretely, as long as $-f \in \gF$ for all $f \in \gF$,
+Unlike the analysis for Algorithm \ref{alg:NORA}, we bound the second term with the offline data here. We use a similar argument to that of Theorem \ref{thm:hybrid-nora-regret_bound}. Concretely, as long as $-f \in \gF$ for all $f \in \gF$,
 \begin{align}
     &\sum_{t=1}^T \sum_{h=1}^H\mathbb{E}_{\pi^*}\left[\left(\gT_hf_{h+1}^{(t)} - f_h^{(t)}\right)\left(s_h, a_h\right)\right] \nonumber\\ 
     &\leq \sum_{t=1}^T \sum_{h=1}^H \E_{\pi^*}\left[\left(\gT_hf_{h+1}^{(t)} - f_h^{(t)}\right)\right] \left(\frac{N_{\off}\E_{\mu}\left[\left(\gT_hf_{h+1}^{(t)} - f_h^{(t)}\right)^2\right] + \sum_{i=1}^{t-1}\E_{d_h^{(i)}}\left[\left(\gT_hf_{h+1}^{(t)} - f_h^{(t)}\right)^2\right]}{N_{\off}\E_{\mu}\left[\left(\gT_hf_{h+1}^{(t)} - f_h^{(t)}\right)^2\right] + \sum_{i=1}^{t-1}\E_{d_h^{(i)}}\left[\left(\gT_hf_{h+1}^{(t)} - f_h^{(t)}\right)^2\right]}\right)^{1/2} \nonumber\\
@@ -1840,7 +1840,7 @@ We further note that it is possible to have the critic target $Q^{\pi^{(t)}}$ wi
 %     \label{defn:partial-all-policy-concentrability}
 % \end{defn}
 
-% We now present Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} modified for hybrid RL below. 
+% We now present Algorithm \ref{alg:NORA} modified for hybrid RL below. 
 
 % \begin{algorithm}[h]
 %     \caption{\aigen{Rare-Switching Optimistic Actor-Critic for Hybrid RL}}
@@ -1870,12 +1870,12 @@ We further note that it is possible to have the critic target $Q^{\pi^{(t)}}$ wi
 %         % \STATE {\bfseries Output:} $\bar \pi = \operatorname{unif}(\pi^{1:N_{on}})$.
 %         % \STATE {\bfseries Output:} $\bar \pi$ by calling offline-learning oracle on $\gD_{\off} \cup \{\gD^{(T)}_h\}_{h \in [H]}$.
 %     \end{algorithmic}
-% \label{alg:\aigen{Algorithm~\ref{alg:NORA}}-long-app}
+% \label{alg:NORA-long-app}
 % \end{algorithm}
 
 
 % \begin{lem}[Optimism and in-sample error control for critics targeting $Q^{*}$ in hybrid RL]
-% With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$, a critic targeting $Q^*$ in the same way as defined in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-long} achieves
+% With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$, a critic targeting $Q^*$ in the same way as defined in Algorithm \ref{alg:NORA-long} achieves
 % \begin{align*}
 % &\text{(i) $\gT_h^{\pi^{(t)}} f_{h+1}^{{(t)}} \in \mathcal{F}_h^{(t)}$, and $f_h^{(t)} \geq \gT_h^{\pi^{(t)}}f_{h+1}^{(t)}$,} \\
 % &\text{(ii) $N_{\off}\mathbb{E}_{\mu_h}\left[\left(f_h^{(t)} - \gT_h f_{h+1}^{(t)}\right)^2\right] + \sum_{i=1}^{t-1} \mathbb{E}_{d^{\pi^{(i)}}}\left[\left(f_h^{(t)} - \gT_h f_{h+1}^{(t)}\right)^2\right] \leq O\left(H^2 \beta\right)$,}
@@ -1942,7 +1942,7 @@ by choosing $\beta=c_1\left(\log [NH \mathcal{N}_{\mathcal{F},\left(\mathcal{T}^
 \end{proof}
 
 \begin{lem}[Optimism and in-sample error control for critics targeting $Q^{*}$ in hybrid RL]\label{lem:optimism-Q-pi-star}
-With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$, a critic targeting $Q^*$ in the same way as defined in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-long} achieves
+With probability at least $1-\delta$, for all $t \in\left[T\right]$, we have that for all $h=1, \ldots, H$, a critic targeting $Q^*$ in the same way as defined in Algorithm \ref{alg:NORA-long} achieves
 \begin{align*}
 &\text{(i) $\gT_h^{\pi^{(t)}} f_{h+1}^{{(t)}} \in \mathcal{F}_h^{(t)}$, and $f_h^{(t)} \geq \gT_h^{\pi^{(t)}}f_{h+1}^{(t)}$,} \\
 &\text{(ii) $N_{\off}\mathbb{E}_{\mu_h}\left[\left(f_h^{(t)} - \gT_h f_{h+1}^{(t)}\right)^2\right] + \sum_{i=1}^{t-1} \mathbb{E}_{d^{\pi^{(i)}}}\left[\left(f_h^{(t)} - \gT_h f_{h+1}^{(t)}\right)^2\right] \leq O\left(H^2 \beta\right)$,}
@@ -2126,7 +2126,7 @@ by choosing $\beta=c_1\left(\log \left[N H \mathcal{N}_{\gF,\gT \gF}(\rho) / \de
         % \STATE {\bfseries Output:} $\bar \pi = \operatorname{unif}(\pi^{1:N_{on}})$.
         % \STATE {\bfseries Output:} $\bar \pi$ by calling offline-learning oracle on $\gD_{\off} \cup \{\gD^{(T)}_h\}_{h \in [H]}$.
     \end{algorithmic}
-\label{alg:\aigen{Algorithm~\ref{alg:NORA}}-pi-long}
+\label{alg:NORA-pi-long}
 \end{algorithm}
 
 
@@ -2310,7 +2310,7 @@ $$\sum_{t=1}^T\sum_{h=1}^H\mathbb{E}_{\pi^*}\left[ \left\langle f_{h+1}^{(t)}(s'
 %         % \STATE {\bfseries Output:} $\bar \pi = \operatorname{unif}(\pi^{1:N_{on}})$.
 %         % \STATE {\bfseries Output:} $\bar \pi$ by calling offline-learning oracle on $\gD_{\off} \cup \{\gD^{(T)}_h\}_{h \in [H]}$.
 %     \end{algorithmic}
-% \label{alg:\aigen{Algorithm~\ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-double-long}}-long}
+% \label{alg:NORA-double-long-long}
 % \end{algorithm}
 
 % \subsubsection{Showing optimism}
@@ -2581,7 +2581,7 @@ $$\sum_{t=\min\{t_1,t_2\}}^{\max\{t_1,t_2\}} \mathbb{E}_{\mu^{(t)}}\left[\left\l
 Figure \ref{fig:cumulative-regret} can be reproduced by running \texttt{actor\_critic.ipynb} within the following GitHub repository (\href{https://github.com/hetankevin/hybridcov}{https://github.com/hetankevin/hybridcov}). 
 Figure \ref{fig:average-return} can be reproduced by running \texttt{scripts/run\_antmaze.sh} within the following GitHub repository (\href{https://github.com/nakamotoo/Cal-QL}{https://github.com/nakamotoo/Cal-QL}). The results for Cal-QL arise from running the script as-is. Algorithm 2H can be reproduced by adding the flags \texttt{--enable\_calql=False}, \texttt{--use\_cql=False}, and \texttt{--online\_use\_cql=False}. Algorithm 1H can be reproduced with the same flags as Algorithm 2H, but additionally setting the \texttt{config.cql\_max\_target\_backup} argument within the \texttt{ConservativeSAC()} object to False. 
 
-To implement the mirror descent update in Figure \ref{fig:cumulative-regret}, we store the sequence of past Q-functions fitted for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}, and the last Q-function for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}. Upon receiving a query to evaluate or sample from $\pi_h^{(t)}(s,a)$ for a given $h,s,a$ tuple, we compute $\exp(\eta \sum_{t=1}^T f_h^{(t)}(s,a))$ for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}, and $\exp(\eta (t-t_{\last}) f_h^{(t)}(s,a))$ for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}. To generate a sample from this density, the normalizing constant can be computed exactly in the case where there is a finite number of actions. Otherwise a sample can be generated via MCMC, importance sampling, or rejection sampling.
+To implement the mirror descent update in Figure \ref{fig:cumulative-regret}, we store the sequence of past Q-functions fitted for Algorithm \ref{alg:DOUHUA}, and the last Q-function for Algorithm \ref{alg:NORA}. Upon receiving a query to evaluate or sample from $\pi_h^{(t)}(s,a)$ for a given $h,s,a$ tuple, we compute $\exp(\eta \sum_{t=1}^T f_h^{(t)}(s,a))$ for Algorithm \ref{alg:DOUHUA}, and $\exp(\eta (t-t_{\last}) f_h^{(t)}(s,a))$ for Algorithm \ref{alg:NORA}. To generate a sample from this density, the normalizing constant can be computed exactly in the case where there is a finite number of actions. Otherwise a sample can be generated via MCMC, importance sampling, or rejection sampling.
 
 % \newpage
 

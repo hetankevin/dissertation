@@ -99,16 +99,16 @@ However, the problem is unresolved with general function approximation -- the be
         \citet{liu2023optimisticnaturalpolicygradient} & $d\log|\gA|\log|\gF|H^6/\epsilon^3$& None & ``Good'' case only, $1/\epsilon^4$ generally 
         
         \tabularnewline
-        \aigen{Algorithm~\ref{alg:DOUHUA}} (Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}})& $\tcbhighmath[colframe=ballblue]{H^4\log|\gA|/{\epsilon^2} + dH^4\log|\gF|/\epsilon^2}$ & $\tcbhighmath[colframe=ballblue]{\sqrt{H^4\log|\gA|T} + \sqrt{dH^4\log|\gF|T}}$ & ``Good'' case only, vacuous generally
+        \aigen{Algorithm~\ref{alg:DOUHUA}} (Algorithm \ref{alg:DOUHUA})& $\tcbhighmath[colframe=ballblue]{H^4\log|\gA|/{\epsilon^2} + dH^4\log|\gF|/\epsilon^2}$ & $\tcbhighmath[colframe=ballblue]{\sqrt{H^4\log|\gA|T} + \sqrt{dH^4\log|\gF|T}}$ & ``Good'' case only, vacuous generally
         
         \tabularnewline
-        \aigen{Algorithm~\ref{alg:NORA}} (Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}) & $\tcbhighmath[colframe=red]{dH^5\log|\gA|/{\epsilon^2} + dH^4\log|\gF|/{\epsilon^2}}$ & $\tcbhighmath[colframe=red]{\sqrt{dH^5\log|\gA|T} + \sqrt{dH^4\log|\gF|T}}$ & 
+        \aigen{Algorithm~\ref{alg:NORA}} (Algorithm \ref{alg:NORA}) & $\tcbhighmath[colframe=red]{dH^5\log|\gA|/{\epsilon^2} + dH^4\log|\gF|/{\epsilon^2}}$ & $\tcbhighmath[colframe=red]{\sqrt{dH^5\log|\gA|T} + \sqrt{dH^4\log|\gF|T}}$ & 
         Holds generally
         \tabularnewline
         \bottomrule
     \end{tabular}
     }
-    \caption{Comparison of our work to existing literature. Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} achieves the best known bound for actor-critic methods with general function approximation, and resolves an open problem on whether $\sqrt{T}$ regret or $1/\epsilon^2$ sample complexity is achievable in this scenario.}
+    \caption{Comparison of our work to existing literature. Algorithm \ref{alg:NORA} achieves the best known bound for actor-critic methods with general function approximation, and resolves an open problem on whether $\sqrt{T}$ regret or $1/\epsilon^2$ sample complexity is achievable in this scenario.}
     \label{tab:bounds-ac}
 \end{table*}
 
@@ -120,7 +120,7 @@ We sharpen this bound to the number of critic updates in Lemma \ref{lem:b2-cover
 in line with the results of \citep{efroni2020optimisticpolicyoptimizationbandit, cai2024provablyefficientexplorationpolicy} for tabular and linear mixture MDPs respectively.
 
 
-However, this is not the case in many practical scenarios -- for example, where one uses linear models, decision trees, neural networks, or even random forests for the critic. In this much harder setting, Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} cannot achieve sublinear regret. We address this by introducing an algorithm, \aigen{Algorithm~\ref{alg:NORA}} (Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}), which leverages three crucial ingredients: (1) optimism, (2) off-policy learning, and (3) rare-switching critic updates that target $Q^*$ and accompanying policy resets. Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} achieves $\sqrt{d H^4 \log|\gF| T} + \sqrt{dH^5 \log|\mathcal{A}|T}$ regret, requiring only a factor of $dH\log T$ more samples than Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} even in the best case for the latter.
+However, this is not the case in many practical scenarios -- for example, where one uses linear models, decision trees, neural networks, or even random forests for the critic. In this much harder setting, Algorithm \ref{alg:DOUHUA} cannot achieve sublinear regret. We address this by introducing an algorithm, \aigen{Algorithm~\ref{alg:NORA}} (Algorithm \ref{alg:NORA}), which leverages three crucial ingredients: (1) optimism, (2) off-policy learning, and (3) rare-switching critic updates that target $Q^*$ and accompanying policy resets. Algorithm \ref{alg:NORA} achieves $\sqrt{d H^4 \log|\gF| T} + \sqrt{dH^5 \log|\mathcal{A}|T}$ regret, requiring only a factor of $dH\log T$ more samples than Algorithm \ref{alg:DOUHUA} even in the best case for the latter.
 
 
 
@@ -194,7 +194,7 @@ Additionally, we write $\pi_h^{f}(a|s) = \mathbbm{1}(a' \in \argmax_{a\in \gA} f
 \end{aspt}
 
 
-This auxiliary function class is $(\gT^\Pi)^T \gF = \{\gT^{\pi^{(T)}} \cdot ... \cdot \gT^{\pi^{(1)}} f \mid f \in \gF, \pi^{(1)},...,\pi^{(T)} \in \Pi\}$ for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}, and $\gT \gF = \{\gT f \mid f \in \gF\}$ for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}. The former is far larger than the latter, with exceptions that we highlight in Section \ref{sec:douhua-easy}. 
+This auxiliary function class is $(\gT^\Pi)^T \gF = \{\gT^{\pi^{(T)}} \cdot ... \cdot \gT^{\pi^{(1)}} f \mid f \in \gF, \pi^{(1)},...,\pi^{(T)} \in \Pi\}$ for Algorithm \ref{alg:DOUHUA}, and $\gT \gF = \{\gT f \mid f \in \gF\}$ for Algorithm \ref{alg:NORA}. The former is far larger than the latter, with exceptions that we highlight in Section \ref{sec:douhua-easy}. 
 We write $\gN_\gF(\rho)$ for the $\rho$-covering number of a function class $\gF$.\footnote{The $\rho$-covering number of a class corresponds to the smallest cardinality of a set of points, such that every point in the class is at least $\rho$-close to some point in that set. See \cite{wainwright2019high}.} To learn $f \in \gF$ that approximates the Q-function of a policy $\pi$ (we say that $f$ targets $\pi$), it is common to minimize the temporal difference (TD) error over a dataset $\gD$, as an estimate of the Bellman error:
 \begin{align}\label{eqn:TD-error}
     \gL_h^{(t,\pi)}(f_h,f_{h+1})  = \sum_{(s,a,r,s') \in \gD} (f_h(s,a) - r - f_{h+1}(s',\pi_{h+1}(s')))^2.
@@ -223,9 +223,9 @@ The sequential extrapolation coefficient (SEC) of \citet{xie2022role} subsumes t
 
 The $\mathsf{SEC}$ is always bounded by $d \log T$, but there exist MDPs that have a Bellman eluder dimension $d$ on the order of $\sqrt{T}$, but a constant SEC \citep{xie2022role}. 
 We shall use these measures of complexity to characterize the regret. 
-Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} scales with the SEC, which is more general and weaker than the Bellman eluder dimension. Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}, as presented, has a switching cost that scales with the $\gD_\Delta$-type Bellman eluder dimension. While this can be weakened to the more general $\ell_2$ eluder condition of \cite{xiong2023generalframeworksequentialdecisionmaking} with nothing more than a change in notation, we present our results in the Bellman eluder dimension framework for familiarity and ease of presentation.
+Algorithm \ref{alg:DOUHUA} scales with the SEC, which is more general and weaker than the Bellman eluder dimension. Algorithm \ref{alg:NORA}, as presented, has a switching cost that scales with the $\gD_\Delta$-type Bellman eluder dimension. While this can be weakened to the more general $\ell_2$ eluder condition of \cite{xiong2023generalframeworksequentialdecisionmaking} with nothing more than a change in notation, we present our results in the Bellman eluder dimension framework for familiarity and ease of presentation.
 
-% As such, we use the SEC whenever possible in this paper, but require the Bellman eluder dimension to bound the switching cost of Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}. 
+% As such, we use the SEC whenever possible in this paper, but require the Bellman eluder dimension to bound the switching cost of Algorithm \ref{alg:NORA}. 
 
 
 \paragraph{Policy optimization and actor-critic algorithms.}
@@ -247,7 +247,7 @@ As mirror ascent, this update is identical to the multiplicative weights or Hedg
 
 \subsection{Optimistic actor-critics -- The easy case}
 \label{sec:douhua-easy}
-We now present an optimistic actor-critic algorithm, \aigen{Algorithm~\ref{alg:DOUHUA}} (Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}), with provable guarantees under general function approximation. \aigen{Algorithm~\ref{alg:DOUHUA}} is a natural derivative of the GOLF algorithm of \citet{jin2021bellman} for actor-critic approaches\footnote{Or a completely off-policy version of \citet{liu2023optimisticnaturalpolicygradient}.}, with only two (very natural) changes. The critic targets $Q^{\pi^{(t)}}$ instead of $Q^*$ while performing optimistic planning at every $s,a$ pair, and we maintain a stochastic policy that is updated with Equation \ref{eqn:multiplicative-weights-update}. Learning an optimistic critic off-policy achieves sample efficiency by reusing data while exploring efficiently.\footnote{Similarly to \citet{cai2024provablyefficientexplorationpolicy} in linear mixture MDPs.}
+We now present an optimistic actor-critic algorithm, \aigen{Algorithm~\ref{alg:DOUHUA}} (Algorithm \ref{alg:DOUHUA}), with provable guarantees under general function approximation. \aigen{Algorithm~\ref{alg:DOUHUA}} is a natural derivative of the GOLF algorithm of \citet{jin2021bellman} for actor-critic approaches\footnote{Or a completely off-policy version of \citet{liu2023optimisticnaturalpolicygradient}.}, with only two (very natural) changes. The critic targets $Q^{\pi^{(t)}}$ instead of $Q^*$ while performing optimistic planning at every $s,a$ pair, and we maintain a stochastic policy that is updated with Equation \ref{eqn:multiplicative-weights-update}. Learning an optimistic critic off-policy achieves sample efficiency by reusing data while exploring efficiently.\footnote{Similarly to \citet{cai2024provablyefficientexplorationpolicy} in linear mixture MDPs.}
 
 
 \begin{algorithm}[t]
@@ -269,15 +269,15 @@ We now present an optimistic actor-critic algorithm, \aigen{Algorithm~\ref{alg:D
         \STATE Update $\pi_h^{(t+1)}(a|s) \propto \pi_h^{(t)}(a|s)\exp(\eta f_h^{(t)}(s,a))$.
         \ENDFOR
     \end{algorithmic}
-\label{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}
+\label{alg:DOUHUA}
 \end{algorithm}
 
-Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} maintains confidence sets $\gF^{(t, \pi^{(t)})}$ that contain all $f \in \gF$ where the TD error $\gL_h^{(t,\pi^{(t)})}$ with respect to the Bellman operator $\gT_h^{\pi^{(t)}}$ is a $H^2\beta$-additive approximation of the minimizer $\min_{f_h' \in \gF_h} \gL_h^{(t,\pi^{(t)})}(f_h',f_{h+1})$. Upon the start of each trajectory $t$, Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} maximizes among all functions in the confidence set to play 
+Algorithm \ref{alg:DOUHUA} maintains confidence sets $\gF^{(t, \pi^{(t)})}$ that contain all $f \in \gF$ where the TD error $\gL_h^{(t,\pi^{(t)})}$ with respect to the Bellman operator $\gT_h^{\pi^{(t)}}$ is a $H^2\beta$-additive approximation of the minimizer $\min_{f_h' \in \gF_h} \gL_h^{(t,\pi^{(t)})}(f_h',f_{h+1})$. Upon the start of each trajectory $t$, Algorithm \ref{alg:DOUHUA} maximizes among all functions in the confidence set to play 
 $f_h^{(t)}(s,a) = \sup_{f_h \in \gF_h^{(t-1,\pi^{(t-1)})}} f_h(s,a)$ for all $h, s,a$. This is exactly in line with GOLF, except that the critic targets $Q^{\pi^{(t)}}$ instead of $Q^*$, and we perform optimistic planning with regard to every state and action like \citet{liu2023optimisticnaturalpolicygradient}. We then perform a mirror ascent update $\pi_h^{(t+1)} \propto \pi_h^{(t)}\exp(\eta f_h^{(t)})$ instead of playing the greedy policy $\pi_h^{f^{(t)}}$. This algorithm satisfies the following  regret/sample complexity bound: 
 
 \begin{thm}[Regret Bound for \aigen{Algorithm~\ref{alg:DOUHUA}}]
     
-Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} achieves the following regret with probability at least $1-\delta$:
+Algorithm \ref{alg:DOUHUA} achieves the following regret with probability at least $1-\delta$:
 \begin{align*}
     \mathrm{Reg}(T)
     = O\left(\sqrt{H^4 T \log|\gA|} + \sqrt{\beta H^4 T\mathsf{SEC}(\gF, \Pi, T)}\right),
@@ -332,7 +332,7 @@ where the second equality holds when we set $\eta = O(\sqrt{\log|\mathcal{A}|H^{
     \begin{align}\gN_{\Pi_h^{(T)}}(\rho/2H) \leq \min\left\{\prod_{k=1}^{K}\gN_{\gF_h^{(t_k)}}(\rho^2/16\eta k H^2 T), \;\gN_{\gA}(\rho/2H)\right\}.\end{align}
     \label{lem:b2-covering-number-policy}
 \end{lem}
-The proof is deferred to Appendix \ref{app:ac-covering-number}. Within Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}, this implies that $\log \gN_{(\gT^\Pi)^{T}\gF}(\rho) = O(\min\{ T , H\gN_{\gA}(\rho)\}\log \gN_{\gF}(\rho))$ in general, making the bound in Theorem \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} vacuous. 
+The proof is deferred to Appendix \ref{app:ac-covering-number}. Within Algorithm \ref{alg:DOUHUA}, this implies that $\log \gN_{(\gT^\Pi)^{T}\gF}(\rho) = O(\min\{ T , H\gN_{\gA}(\rho)\}\log \gN_{\gF}(\rho))$ in general, making the bound in Theorem \ref{alg:DOUHUA} vacuous. 
 
 \paragraph{A Good Case.} However, within certain circumstances, it is possible to have $\log \gN_{(\gT^\Pi)^{T}\gF}(\rho) = O(\log \gN_{\gF}(\rho))$. This happens, for instance, when there exists a low-dimensional representation of the sum of clipped Q-functions -- such as when the sum of clipped Q-functions is a scaled Q-function:
 \begin{defn}[Closure Under Truncated Sums]
@@ -340,14 +340,14 @@ The proof is deferred to Appendix \ref{app:ac-covering-number}. Within Algorithm
     \label{defn:closure-truncated-sums}
 \end{defn}
 
-As such, this is an interesting case where the log-covering number of the policy class does not blow up, with downstream implications for the regret of Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}:
+As such, this is an interesting case where the log-covering number of the policy class does not blow up, with downstream implications for the regret of Algorithm \ref{alg:DOUHUA}:
 \begin{lem}[Policy Class Growth]
     Let $\gF$ be a function class that satisfies Definition \ref{defn:closure-truncated-sums}, i.e. it is closed under truncated sums. Then, $\log \gN_{(\gT^\Pi)^{T}\gF}(\rho) = O(\gN_{\gF}(\rho^2/16\eta TH^2))$.
     \label{lem:policy-class-growth-sums}
 \end{lem}
 
 \begin{cor}[Regret of \aigen{Algorithm~\ref{alg:DOUHUA}}, The Good Case]
-    If $\gF$ is closed under truncated sums, then with probability at least $1-\delta$, Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} achieves a regret of:
+    If $\gF$ is closed under truncated sums, then with probability at least $1-\delta$, Algorithm \ref{alg:DOUHUA} achieves a regret of:
 $$\mathrm{Reg}(T)
     = O\left(\sqrt{H^4 T \log|\gA|}  + \sqrt{\beta H^4 T\mathsf{SEC}(\gF, \Pi, T)}\right),$$
 where $\beta = \Theta(\log (HT \mathcal{N}_{\gF}(H/\log|\gA| T^2) / \delta))$. To learn an $\epsilon$-optimal policy, it therefore requires:
@@ -355,14 +355,14 @@ $$N \geq \Omega\left(H^4 \log|\gA|/\epsilon^2 + H^4 \beta \mathsf{SEC}(\gF, \Pi,
 \label{cor:good-case-douhua}
 \end{cor}
 
-We defer the proof of Lemma \ref{lem:policy-class-growth-sums} to Appendix \ref{app:closure-truncated-sums}. Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} then achieves a regret that aligns with the results of \citep{efroni2020optimisticpolicyoptimizationbandit, cai2024provablyefficientexplorationpolicy} for tabular and linear mixture MDPs, respectively.\footnote{Where both the SEC and Bellman eluder dimension are $SA$ (tabular) and $d$ (linear).}
+We defer the proof of Lemma \ref{lem:policy-class-growth-sums} to Appendix \ref{app:closure-truncated-sums}. Algorithm \ref{alg:DOUHUA} then achieves a regret that aligns with the results of \citep{efroni2020optimisticpolicyoptimizationbandit, cai2024provablyefficientexplorationpolicy} for tabular and linear mixture MDPs, respectively.\footnote{Where both the SEC and Bellman eluder dimension are $SA$ (tabular) and $d$ (linear).}
 However, closure under truncated sums is a strong condition that is not fulfilled by many function classes, although tabular classes fulfill it. It is not fulfilled by linear models due to the clipping operator, requiring \citet{sherman2024rateoptimalpolicyoptimizationlinear} and \citet{cassel2024warmupfreepolicyoptimization} to develop bespoke algorithms to get around this in the setting of linear MDPs.\footnote{The former use reward-agnostic exploration to warm-start the critic to avoid truncation. The latter shrink features to do the same. Both employ rare-switching updates for the bonus function but not the critic, avoiding the moving target issue.} In the case of trees, random forests, boosting, and neural networks, without further assumptions, one needs to increase the size of the function class -- perhaps even on the same order as the increase in Lemma \ref{lem:b2-covering-number-policy}.\footnote{For instance, with neural networks, averaging two neural networks of $12$ layers results in a larger neural network with $24$ layers, and averaging two random forests of $500$ trees results in a random forest of $1000$ trees. However, one can argue that the effective complexity does not increase too much in these cases, and as such we can expect to see sublinear regret with certain nonparametric function classes.}
 
-This prompts us to explore the possibility of algorithmic modifications to Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} in order to achieve the optimal regret rates in more general settings where the log-covering number of the policy class may increase linearly in the number of critic updates. We do so in the next section.
+This prompts us to explore the possibility of algorithmic modifications to Algorithm \ref{alg:DOUHUA} in order to achieve the optimal regret rates in more general settings where the log-covering number of the policy class may increase linearly in the number of critic updates. We do so in the next section.
 
 \subsection{Optimistic actor-critics -- The hard case}
 
-Given what we have seen in our analysis of Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}}, can we simply modify Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} to include rare-switching critic updates? If we can perform only $O(dH\log T)$ critic updates as in \cite{xiong2023generalframeworksequentialdecisionmaking}, perhaps it may be possible to obtain a similar regret bound to Corollary \ref{cor:good-case-douhua}. 
+Given what we have seen in our analysis of Algorithm \ref{alg:DOUHUA}, can we simply modify Algorithm \ref{alg:DOUHUA} to include rare-switching critic updates? If we can perform only $O(dH\log T)$ critic updates as in \cite{xiong2023generalframeworksequentialdecisionmaking}, perhaps it may be possible to obtain a similar regret bound to Corollary \ref{cor:good-case-douhua}. 
 
 \subsubsection{Challenges and algorithm design} 
 
@@ -390,7 +390,7 @@ The total tracking error scales with the number of critic updates -- which is th
 Lastly, we increase the learning rate to reduce the regret incurred by the policy resets. This makes more aggressive policy updates to catch up with the sudden, rare, and large critic updates. 
 
 
-\paragraph{Summary. } Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} combines \emph{optimism} for strategic exploration and \emph{off-policy learning} for sample efficiency. While rare-switching critic updates are a-priori appealing, they are unstable when the critic targets $\pi^{(t)}$, due to limited optimism and the challenge of tracking a moving policy (as we describe below, and further show in Appendix \ref{app:problem-target-q-pi}). These are resolved by \emph{targeting $\pi^*$} and re-introducing \emph{rare-switching critic updates} respectively. However, this introduces additional error, as the agent has to effectively unlearn the policy after each rare critic update. We therefore introduce \emph{policy resets} to the uniform policy after each critic update -- incurring minimal cost due to their rarity (as there are only $O(dH\log T)$ updates). A \emph{more aggressive learning rate} (by a factor of $\sqrt{dH\log T}$) mitigates some of the additional regret incurred, and can be seen as making more aggressive updates to make up for lost ground from policy resets. See Appendix \ref{app:proof-nora} for more details.
+\paragraph{Summary. } Algorithm \ref{alg:NORA} combines \emph{optimism} for strategic exploration and \emph{off-policy learning} for sample efficiency. While rare-switching critic updates are a-priori appealing, they are unstable when the critic targets $\pi^{(t)}$, due to limited optimism and the challenge of tracking a moving policy (as we describe below, and further show in Appendix \ref{app:problem-target-q-pi}). These are resolved by \emph{targeting $\pi^*$} and re-introducing \emph{rare-switching critic updates} respectively. However, this introduces additional error, as the agent has to effectively unlearn the policy after each rare critic update. We therefore introduce \emph{policy resets} to the uniform policy after each critic update -- incurring minimal cost due to their rarity (as there are only $O(dH\log T)$ updates). A \emph{more aggressive learning rate} (by a factor of $\sqrt{dH\log T}$) mitigates some of the additional regret incurred, and can be seen as making more aggressive updates to make up for lost ground from policy resets. See Appendix \ref{app:proof-nora} for more details.
 
 \begin{algorithm}[t]
     \caption{\aigen{Rare-Switching Optimistic Actor-Critic with Uniform Actor Resets}}
@@ -416,7 +416,7 @@ Lastly, we increase the learning rate to reduce the regret incurred by the polic
         \STATE Update $\pi_h^{(t+1)}(a|s) \; \propto \; \pi_h^{(t)}(a|s)\exp(\eta f_h^{(t)}(s,a))$.
         \ENDFOR
     \end{algorithmic}
-\label{alg:\aigen{Algorithm~\ref{alg:NORA}}}
+\label{alg:NORA}
 \end{algorithm}
 
 
@@ -435,11 +435,11 @@ To control the switching cost with the framework of \citet{xiong2023generalframe
     Let $\mathcal{D}_{\Delta}:=\left\{\mathcal{D}_{\Delta, h}\right\}_{h \in[H]}$, where $\mathcal{D}_{\Delta, h}=\left\{\delta_{(s, a)}(\cdot) \mid s \in \mathcal{S}, a \in \mathcal{A}\right\}$. That is, we only consider distributions that are Dirac deltas on a single state-action pair. We assume that $d := d_{\text{BE}}(\gF, D_\Delta, 1/\sqrt{T}) < \infty$. 
 \end{aspt}
 
-This can be weakened to the more general $\ell_2$ eluder condition of \cite{xiong2023generalframeworksequentialdecisionmaking} with nothing more than a change in notation. However, we present our results in the Bellman eluder dimension framework for familiarity and ease of presentation. We now show the following for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}:
+This can be weakened to the more general $\ell_2$ eluder condition of \cite{xiong2023generalframeworksequentialdecisionmaking} with nothing more than a change in notation. However, we present our results in the Bellman eluder dimension framework for familiarity and ease of presentation. We now show the following for Algorithm \ref{alg:NORA}:
 
 \begin{thm}[Regret Bound for \aigen{Algorithm~\ref{alg:NORA}}]
 \label{thm:nora-regret_bound}
-Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} achieves the following regret with probability at least $1-\delta$:
+Algorithm \ref{alg:NORA} achieves the following regret with probability at least $1-\delta$:
 \begin{align}
     \mathrm{Reg}(T)
     &= O\left(\sqrt{d H^5 T \log T \log|\gA|} + dH^3 \log T + \sqrt{\beta H^4 T  \mathsf{SEC}(\gF, \Pi, T)}\right).
@@ -513,13 +513,13 @@ Plugging (\ref{eqn:nora-regret-decom-1}) -- (\ref{eqn:nora-regret-decom-3}) into
 
 \paragraph{Quality of the regret bound.} 
 % This regret bound is very encouraging. 
-Even compared to the ``good case'' for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} in Corollary \ref{cor:good-case-douhua}, Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} requires only $dH \log T$ more samples to learn an $\epsilon$-optimal policy. This is exactly the same as the switch cost, in line with what \citet{cassel2024warmupfreepolicyoptimization} observed for linear MDPs. 
+Even compared to the ``good case'' for Algorithm \ref{alg:DOUHUA} in Corollary \ref{cor:good-case-douhua}, Algorithm \ref{alg:NORA} requires only $dH \log T$ more samples to learn an $\epsilon$-optimal policy. This is exactly the same as the switch cost, in line with what \citet{cassel2024warmupfreepolicyoptimization} observed for linear MDPs. 
 
 
-It is known that the Bellman eluder dimension may scale unfavorably with $T$ in rare cases \citep{xie2022role} where $d = d_{\text{BE}}(\gF, D_\Delta, 1/\sqrt{T}) = \Omega(\sqrt{T})$. Although we use the $\mathsf{SEC}$ of \citet{xie2022role} to bound the online regret whenever possible, as it is never larger than $O(d\log T)$, our result still depends on $d$ due to the switch cost. Still, function classes with low Bellman eluder dimension are ubiquitous, and so Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} achieves $\sqrt{T}$ regret on a large class of problems including linear and kernel MDPs \citep{jin2021bellman}. We note that it is possible to weaken the dependence on the $d_\Delta$-type Bellman eluder dimension to the $\ell_2$ eluder condition of \cite{xiong2023generalframeworksequentialdecisionmaking} with nothing more than a change of notation, but we present our results in the language of the Bellman eluder dimension for ease of presentation.
+It is known that the Bellman eluder dimension may scale unfavorably with $T$ in rare cases \citep{xie2022role} where $d = d_{\text{BE}}(\gF, D_\Delta, 1/\sqrt{T}) = \Omega(\sqrt{T})$. Although we use the $\mathsf{SEC}$ of \citet{xie2022role} to bound the online regret whenever possible, as it is never larger than $O(d\log T)$, our result still depends on $d$ due to the switch cost. Still, function classes with low Bellman eluder dimension are ubiquitous, and so Algorithm \ref{alg:NORA} achieves $\sqrt{T}$ regret on a large class of problems including linear and kernel MDPs \citep{jin2021bellman}. We note that it is possible to weaken the dependence on the $d_\Delta$-type Bellman eluder dimension to the $\ell_2$ eluder condition of \cite{xiong2023generalframeworksequentialdecisionmaking} with nothing more than a change of notation, but we present our results in the language of the Bellman eluder dimension for ease of presentation.
 
 
-\paragraph{Comparison with prior work.} The only other method we know of that claims to have achieved $\sqrt{T}$ regret with policy optimization and general function approximation is \citet{zhou2023offlinedataenhancedonpolicy}. However, they allow themselves to collect $\Omega(T)$ samples \textit{at every timestep $t$ without incurring any additional regret}. This incurs a sample complexity of $1/\epsilon^6$, while Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} enjoys a $1/\epsilon^2$ gurarantee in comparison. As such, their regret bound is not sublinear in the more common setup where this sampling contributes to the regret. 
+\paragraph{Comparison with prior work.} The only other method we know of that claims to have achieved $\sqrt{T}$ regret with policy optimization and general function approximation is \citet{zhou2023offlinedataenhancedonpolicy}. However, they allow themselves to collect $\Omega(T)$ samples \textit{at every timestep $t$ without incurring any additional regret}. This incurs a sample complexity of $1/\epsilon^6$, while Algorithm \ref{alg:NORA} enjoys a $1/\epsilon^2$ gurarantee in comparison. As such, their regret bound is not sublinear in the more common setup where this sampling contributes to the regret. 
 \citet{liu2023optimisticnaturalpolicygradient} achieve a result of $1/\epsilon^3$ by performing critic updates in batches. However, \citet{liu2023optimisticnaturalpolicygradient} do not account for the potential growth of the policy class in the $O(\sqrt{T})$ critic updates they make. Their result of $1/\epsilon^3$ sample complexity is therefore somewhat optimistic, and may very well be $1/\epsilon^4$. 
 
 
@@ -548,7 +548,7 @@ It is known that the Bellman eluder dimension may scale unfavorably with $T$ in 
     &\sum_{t=1}^T \sum_{h=1}^H \mathbb{E}_{\pi^{(t)}}\left[\left\langle f_h^{(t)}(s, \cdot), \pi_h^{f^{(t)}}(\cdot | s)-\pi_h^{(t)}(\cdot | s)\right\rangle\right] \leq \mathrm{OPT}^f,
     \end{align}
     \end{subequations}
-    then Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} with this policy update obtains a regret of
+    then Algorithm \ref{alg:NORA} with this policy update obtains a regret of
     \begin{equation}\mathrm{Reg}(T) = O\left(\sqrt{\beta H^4 T \mathsf{SEC}(\gF, \Pi, T)} + \mathrm{OPT}^* + \mathrm{OPT}^f\right).\end{equation}
 \end{cor}
 
@@ -557,15 +557,15 @@ It is known that the Bellman eluder dimension may scale unfavorably with $T$ in 
 
 
 \paragraph{Targeting $Q^*$.} We are not the only ones who consider a critic that targets $Q^*$ instead of $Q^{\pi^{(t)}}$. By way of illustration, \citet{crites1994actorcriticqlearning} propose an actor-critic algorithm that mimics Q-learning via a critic that targets $Q^*$. Another example is the popular DDPG algorithm \citep{lillicrap2019continuouscontroldeepreinforcement} and its successor, TD3 \citep{fujimoto2018addressingfunctionapproximationerror}, that take turns to update an approximately greedy deterministic policy that approximately maximizes an estimate of the approximately greedy deterministic policy's Q-function (and so approximately targets $Q^*$), while performing stochastic exploration that tracks the deterministic policy over time. 
-% We elaborate on the spiritual similarities between Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} and DDPG later in this section.
+% We elaborate on the spiritual similarities between Algorithm \ref{alg:NORA} and DDPG later in this section.
 
-\paragraph{Similarity to deep deterministic policy gradients (DDPG).} Several aspects of the design of Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} are reminiscent of the popular DDPG algorithm of \citet{lillicrap2019continuouscontroldeepreinforcement}. DDPG alternates between optimizing a deterministic policy $g_h^{(t)}(s)$ and a critic $f_h^{(t)}(s,a)$:
+\paragraph{Similarity to deep deterministic policy gradients (DDPG).} Several aspects of the design of Algorithm \ref{alg:NORA} are reminiscent of the popular DDPG algorithm of \citet{lillicrap2019continuouscontroldeepreinforcement}. DDPG alternates between optimizing a deterministic policy $g_h^{(t)}(s)$ and a critic $f_h^{(t)}(s,a)$:
 \begin{align}
     g_h^{(t)}(s) &\approx \argmax_{a\in\gA} f_h^{(t)}(s,a), \\
     f_h^{(t)}(s,a) &\approx \argmin \gL_h^{(t,g^{(t-k)})}(f_h,f_{h+1}^{(t-k)}),
     \label{eqn:ddpg}
 \end{align}
-while exploring according to a stochastic exploration policy that tracks the deterministic policy. In practice, the exploration policy $\pi_{\text{exp}}^{(t)}(a|s) \propto \mathbbm{1}(a = g^{(t)}(s)) + \gN_t$ is often given by the deterministic function perturbed by Gaussian noise. The critic is optimized according to slowly updating targets approximating the actor and critic from a few steps ago -- in a manner reminiscent of the rare-switching critic update in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}. As the deterministic policy approximates the greedy policy, and the approximately greedy policy is used when computing TD error targets, the DDPG critic approximately targets $Q^*$. This suggests that DDPG and its successor TD3 \citep{fujimoto2018addressingfunctionapproximationerror} may be useful backbones for adapting algorithmic insights garnered from the design and analysis of Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} for practical RL.\footnote{This provides insight on why DDPG/TD3 are more sample-efficient than on-policy PPO. Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} needs $1/\epsilon^2$ samples, while on-policy sampling needs at least $1/\epsilon^4$ \citep{liu2023optimisticnaturalpolicygradient}} 
+while exploring according to a stochastic exploration policy that tracks the deterministic policy. In practice, the exploration policy $\pi_{\text{exp}}^{(t)}(a|s) \propto \mathbbm{1}(a = g^{(t)}(s)) + \gN_t$ is often given by the deterministic function perturbed by Gaussian noise. The critic is optimized according to slowly updating targets approximating the actor and critic from a few steps ago -- in a manner reminiscent of the rare-switching critic update in Algorithm \ref{alg:NORA}. As the deterministic policy approximates the greedy policy, and the approximately greedy policy is used when computing TD error targets, the DDPG critic approximately targets $Q^*$. This suggests that DDPG and its successor TD3 \citep{fujimoto2018addressingfunctionapproximationerror} may be useful backbones for adapting algorithmic insights garnered from the design and analysis of Algorithm \ref{alg:NORA} for practical RL.\footnote{This provides insight on why DDPG/TD3 are more sample-efficient than on-policy PPO. Algorithm \ref{alg:NORA} needs $1/\epsilon^2$ samples, while on-policy sampling needs at least $1/\epsilon^4$ \citep{liu2023optimisticnaturalpolicygradient}} 
 
 
 \subsection{Extension to hybrid RL}
@@ -590,7 +590,7 @@ In this section, we demonstrate that the benefits of having access to both offli
 
 \subsubsection{Computational efficiency through optimism-free hybrid RL}
 
-The benefits of hybrid RL extend beyond sample efficiency gains. \citet{song2023hybrid, amortila2024harnessing, zhou2023offlinedataenhancedonpolicy} show that it is possible for a hybrid RL algorithm to bypass the need for optimism altogether, as long as the offline dataset achieves sufficient coverage. In this spirit, we provide an algorithm, NOAH, with two variants in Algorithms \ref{alg:NOAH-pi} and \ref{alg:NOAH-star} that achieve $\sqrt{T}$ regret without using optimism. Algorithm \ref{alg:NOAH-pi} (\aigen{Algorithm~\ref{alg:NOAH-pi}}) targets $\pi^{(t)}$, and follows the very natural procedure of performing a critic update via Fitted Q-Evaluation (FQE) \citep{munos2008finite} and an actor update in every episode. It therefore requires closure of the critic function class under truncated sums as in Definition \ref{defn:closure-truncated-sums} to control the growth of the policy class as in Lemma \ref{lem:policy-class-growth-sums}. Algorithm \ref{alg:NOAH-star} (\aigen{Algorithm~\ref{alg:NOAH-star}}), like \aigen{Algorithm~\ref{alg:NORA}} in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}, circumvents this by targeting $\pi^*$ and performing a rare-switching critic update. Both algorithms are fully off-policy, utilizing offline data and all collected online data without throwing any away. 
+The benefits of hybrid RL extend beyond sample efficiency gains. \citet{song2023hybrid, amortila2024harnessing, zhou2023offlinedataenhancedonpolicy} show that it is possible for a hybrid RL algorithm to bypass the need for optimism altogether, as long as the offline dataset achieves sufficient coverage. In this spirit, we provide an algorithm, NOAH, with two variants in Algorithms \ref{alg:NOAH-pi} and \ref{alg:NOAH-star} that achieve $\sqrt{T}$ regret without using optimism. Algorithm \ref{alg:NOAH-pi} (\aigen{Algorithm~\ref{alg:NOAH-pi}}) targets $\pi^{(t)}$, and follows the very natural procedure of performing a critic update via Fitted Q-Evaluation (FQE) \citep{munos2008finite} and an actor update in every episode. It therefore requires closure of the critic function class under truncated sums as in Definition \ref{defn:closure-truncated-sums} to control the growth of the policy class as in Lemma \ref{lem:policy-class-growth-sums}. Algorithm \ref{alg:NOAH-star} (\aigen{Algorithm~\ref{alg:NOAH-star}}), like \aigen{Algorithm~\ref{alg:NORA}} in Algorithm \ref{alg:NORA}, circumvents this by targeting $\pi^*$ and performing a rare-switching critic update. Both algorithms are fully off-policy, utilizing offline data and all collected online data without throwing any away. 
 
 We use the following form of the single-policy concentrability coefficient, tweaked from that of \citet{zhan2022offline}, that has some resemblance to the transfer coefficient of \cite{song2023hybrid}:
 \begin{defn}[Single-Policy Concentrability Coefficient]
@@ -683,7 +683,7 @@ Still, our result shows that the provable efficiency achieved without optimism b
 
 
 \subsubsection{Sample efficiency gains with hybrid RL}
-We now extend Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} to leverage both offline and online data, which aligns with the framework of \citet{tan2024natural}. The extension, found in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-long}, appends $N_{\off}$ offline samples to the online data at rounds $t=1,...,T$ and minimizes the TD error over the combined dataset when constructing the confidence sets. 
+We now extend Algorithm \ref{alg:NORA} to leverage both offline and online data, which aligns with the framework of \citet{tan2024natural}. The extension, found in Algorithm \ref{alg:NORA-long}, appends $N_{\off}$ offline samples to the online data at rounds $t=1,...,T$ and minimizes the TD error over the combined dataset when constructing the confidence sets. 
 
 \begin{algorithm}[h]
     \caption{\aigen{Rare-Switching Optimistic Actor-Critic for Hybrid RL}}
@@ -713,7 +713,7 @@ We now extend Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} to leverage b
         % \STATE {\bfseries Output:} $\bar \pi = \operatorname{unif}(\pi^{1:N_{on}})$.
         % \STATE {\bfseries Output:} $\bar \pi$ by calling offline-learning oracle on $\gD_{\off} \cup \{\gD^{(T)}_h\}_{h \in [H]}$.
     \end{algorithmic}
-\label{alg:\aigen{Algorithm~\ref{alg:NORA}}-long}
+\label{alg:NORA-long}
 \end{algorithm}
 Before we proceed, it is useful to introduce the partial all-policy concentrability coefficient from \citet{tan2024natural}.
 \begin{defn}[Partial All-Policy Concentrability Coefficient]
@@ -732,7 +732,7 @@ This yields the following guarantee:
 \begin{thm}[Hybrid RL Regret Bound for \aigen{Algorithm~\ref{alg:NORA}}]
 \label{thm:hybrid-nora-regret_bound}
 Let $c_{\off}(\gF\mathbbm{1}_{\gX_{\off}})$ be the partial all-policy concentrability coefficient defined in Definition \ref{defn:partial-all-policy-concentrability} and let $\gX_{\off}, \gX_{\on}$ be an arbitrary partition over $\gX = \gS \times \gA \times [H]$. 
-Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-long} satisfies with probability at least $1-\delta$:
+Algorithm \ref{alg:NORA-long} satisfies with probability at least $1-\delta$:
 \begin{align}
     &\mathrm{Reg}(T)
     = \gO\left(\inf_{\gX_{\on}, \gX_{\off}} \left(\sqrt{\beta H^4c_{\off}(\gF\mathbbm{1}_{\gX_{\off}})T^2/N_{\off}} + \sqrt{\beta H^4 T \mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)} + \sqrt{dH^5T \log|\gA|}\right)\right),
@@ -741,12 +741,12 @@ where
 $\beta = C\log \left(HN \mathcal{N}_{\mathcal{\gF, \gT\gF}}(1/N) / \delta\right)$ for some constant $C$, $N = N_{\off} + T$, $\mathbbm{1}_{\gX_{\off}}, \mathbbm{1}_{\gX_{\on}}$ are indicator variables for whether $s,a\in\gX_{\off}$ or $\gX_{\on}$, and $c_{\off}(\gF\mathbbm{1}_{\gX_{\off}})$ is the partial all-policy concentrability coefficient \citep{tan2024natural}.
 \end{thm}
 
-We defer further details to Appendix \ref{app:hybrid-rl-nora}. On the high level, the critic error is split into an offline and an online term. One uses the coverage of the offline data to bound the former and online exploration for the latter. Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-long} is completely unaware of the partition, but the regret bound optimizes over all partitions of the state-action space. Should the offline data be plentiful and of good coverage, the regret approximately becomes $\sqrt{\beta H^4 T \mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)} + \sqrt{dH^5T \log|\gA|}$ for some small $\gX_{\on}$, yielding improvements over Theorem \ref{thm:nora-regret_bound}.
+We defer further details to Appendix \ref{app:hybrid-rl-nora}. On the high level, the critic error is split into an offline and an online term. One uses the coverage of the offline data to bound the former and online exploration for the latter. Algorithm \ref{alg:NORA-long} is completely unaware of the partition, but the regret bound optimizes over all partitions of the state-action space. Should the offline data be plentiful and of good coverage, the regret approximately becomes $\sqrt{\beta H^4 T \mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)} + \sqrt{dH^5T \log|\gA|}$ for some small $\gX_{\on}$, yielding improvements over Theorem \ref{thm:nora-regret_bound}.
 This shows that actor-critic methods can benefit from hybrid data, achieving the provable gains in sample efficiency compared to offline-only and online-only learning observed
 by \citet{li2023reward, tan2024hybridreinforcementlearningbreaks}.
 
 
-This guarantee in Theorem \ref{thm:hybrid-nora-regret_bound} for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}-long} is stronger than the result in Theorem \ref{thm:hybrid-noah-star} for Algorithm \ref{alg:NOAH-star}. As mentioned earlier, if the offline data is plentiful and enjoys good coverage, the regret in Theorem \ref{thm:hybrid-nora-regret_bound} primarily comes from the $\sqrt{dH^5 T \log|\gA|}$ cost of optimizing the actor as $\mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)$ is small if $\gX_{\on}$ is small.\footnote{Which can possibly be mitigated as well by performing offline policy optimization.} On the other hand, Algorithm \ref{alg:NOAH-star} incurs a term depending on $\mathsf{SEC}(\gF, \Pi, T)$, which can be much larger than $\mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)$.
+This guarantee in Theorem \ref{thm:hybrid-nora-regret_bound} for Algorithm \ref{alg:NORA-long} is stronger than the result in Theorem \ref{thm:hybrid-noah-star} for Algorithm \ref{alg:NOAH-star}. As mentioned earlier, if the offline data is plentiful and enjoys good coverage, the regret in Theorem \ref{thm:hybrid-nora-regret_bound} primarily comes from the $\sqrt{dH^5 T \log|\gA|}$ cost of optimizing the actor as $\mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)$ is small if $\gX_{\on}$ is small.\footnote{Which can possibly be mitigated as well by performing offline policy optimization.} On the other hand, Algorithm \ref{alg:NOAH-star} incurs a term depending on $\mathsf{SEC}(\gF, \Pi, T)$, which can be much larger than $\mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)$.
 
 
 % \subsection{Linear Function Approximation}
@@ -806,7 +806,7 @@ This guarantee in Theorem \ref{thm:hybrid-nora-regret_bound} for Algorithm \ref{
 %     \label{alg:oppo++}
 % \end{algorithm}
 
-% We will see that Algorithm \ref{alg:oppo++} enjoys a stronger form of optimism than Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}. Informally, the optimism in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} only addresses Bellman backups under the policies $\pi_{t_1},...,\pi_{t_K}$ where critic updates occur, as we are only able to establish in Lemma \ref{lem:ac-loss-bounded-optimism} that $f_h^{(t)} \geq \gT_h^{\pi^{(t_{\last}})} f_{h+1}^{(t)}$. In contrast, Algorithm \ref{alg:oppo++} enjoys a similar type of optimism as that of OPPO \citep{zhong2023theoreticalanalysisoptimisticproximal} and LSVI-UCB \citep{jin2019provably}. As such, in this case, we can accomodate a wider range of potential policy updates beyond just the multiplicative weights update in Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}. Our only assumption required on these updates is that the policy updates incur no more than $\sqrt{T}$ regret:
+% We will see that Algorithm \ref{alg:oppo++} enjoys a stronger form of optimism than Algorithm \ref{alg:NORA}. Informally, the optimism in Algorithm \ref{alg:NORA} only addresses Bellman backups under the policies $\pi_{t_1},...,\pi_{t_K}$ where critic updates occur, as we are only able to establish in Lemma \ref{lem:ac-loss-bounded-optimism} that $f_h^{(t)} \geq \gT_h^{\pi^{(t_{\last}})} f_{h+1}^{(t)}$. In contrast, Algorithm \ref{alg:oppo++} enjoys a similar type of optimism as that of OPPO \citep{zhong2023theoreticalanalysisoptimisticproximal} and LSVI-UCB \citep{jin2019provably}. As such, in this case, we can accomodate a wider range of potential policy updates beyond just the multiplicative weights update in Algorithm \ref{alg:NORA}. Our only assumption required on these updates is that the policy updates incur no more than $\sqrt{T}$ regret:
 % \begin{aspt}[$\sqrt{T}$ Regret Optimization Oracle]
 %     $$\sum_{t=1}^T \E_{\pi^*}\left[\left\langle Q_{t,h}(s_h,\cdot), \pi_h^*(\cdot \mid s_h) - \pi_h^{(t)}(\cdot \mid s_h) \right\rangle\right] \lesssim \sqrt{T \cdot \text{OPT}(H,\gA)}.$$
 %     \label{assump:no-regret-opt-oracle}
@@ -881,10 +881,10 @@ This guarantee in Theorem \ref{thm:hybrid-nora-regret_bound} for Algorithm \ref{
 
 We provide two numerical experiments to empirically verify our findings. Details on reproducing our findings are deferred to Appendix \ref{app:experiment_details}.
 
-\paragraph{Optimism in linear MDPs.} The first experiment examines Algorithms \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} and \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} in a linear MDP setting, in order to validate if they indeed achieve $\sqrt{T}$ regret in practice. Accordingly, we implement optimism with LSVI-UCB bonuses \citep{jin2019provably} instead of global optimism as in GOLF.
+\paragraph{Optimism in linear MDPs.} The first experiment examines Algorithms \ref{alg:DOUHUA} and \ref{alg:NORA} in a linear MDP setting, in order to validate if they indeed achieve $\sqrt{T}$ regret in practice. Accordingly, we implement optimism with LSVI-UCB bonuses \citep{jin2019provably} instead of global optimism as in GOLF.
 
-We compare our algorithms to a rare-switching\footnote{Implemented with the doubling determinant method used in \cite{he2023nearly}. This incurs at most a $dH\log T$ switching cost.} version of LSVI-UCB on a linear MDP tetris task \citep{tan2024hybridreinforcementlearningbreaks, tan2024natural}. The condition required for Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} to work holds here, as we do not clip the Q-function estimates. 
-Figure~\ref{fig:median-reward} shows that Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:DOUHUA}}} (surprisingly) performs better than LSVI-UCB, and Figure~\ref{fig:cumulative-regret} empirically illustrates that Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} also achieves $\sqrt{T}$ regret even though it performs slightly worse than LSVI-UCB.
+We compare our algorithms to a rare-switching\footnote{Implemented with the doubling determinant method used in \cite{he2023nearly}. This incurs at most a $dH\log T$ switching cost.} version of LSVI-UCB on a linear MDP tetris task \citep{tan2024hybridreinforcementlearningbreaks, tan2024natural}. The condition required for Algorithm \ref{alg:DOUHUA} to work holds here, as we do not clip the Q-function estimates. 
+Figure~\ref{fig:median-reward} shows that Algorithm \ref{alg:DOUHUA} (surprisingly) performs better than LSVI-UCB, and Figure~\ref{fig:cumulative-regret} empirically illustrates that Algorithm \ref{alg:NORA} also achieves $\sqrt{T}$ regret even though it performs slightly worse than LSVI-UCB.
 
 \begin{figure}[h]
     \centering
@@ -915,13 +915,13 @@ Algorithm 2H outperforms Cal-QL, which in turn slightly outperforms Algorithm 1H
 
 \subsection{Conclusions and future work}
 
-To conclude, we resolve an open problem in the online RL literature by designing an actor-critic method \aigen{Algorithm~\ref{alg:NORA}} (Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}}) with general function approximation that achieves $1/\epsilon^2$ (and matching $\sqrt{T}$ regret) without making any reachability or coverage assumptions. This was achieved through several key ingredients in the algorithm design. By (1) performing optimistic exploration, (2) learning a critic off-policy without throwing away any data, (3) having the critic target $Q^*$ instead of $Q^{\pi^{(t)}}$ to ensure sufficient optimism and enable rare-switching critic updates, and (4) performing policy resets to control the deviation of the current policy from the greedy policy, we achieve the desired result in Theorem \ref{thm:nora-regret_bound}.
+To conclude, we resolve an open problem in the online RL literature by designing an actor-critic method \aigen{Algorithm~\ref{alg:NORA}} (Algorithm \ref{alg:NORA}) with general function approximation that achieves $1/\epsilon^2$ (and matching $\sqrt{T}$ regret) without making any reachability or coverage assumptions. This was achieved through several key ingredients in the algorithm design. By (1) performing optimistic exploration, (2) learning a critic off-policy without throwing away any data, (3) having the critic target $Q^*$ instead of $Q^{\pi^{(t)}}$ to ensure sufficient optimism and enable rare-switching critic updates, and (4) performing policy resets to control the deviation of the current policy from the greedy policy, we achieve the desired result in Theorem \ref{thm:nora-regret_bound}.
 
 We resolve another open problem in the hybrid RL literature by providing a non-optimistic provably efficient actor-critic
 algorithm that only additionally requires $N_{\off} \geq c_{\off}^*(\gF,\Pi)dH^4/\epsilon^2$ offline samples in exchange for omitting optimism. This, along with the result in Theorem \ref{thm:hybrid-nora-regret_bound}, shows that hybrid RL therefore allows for sample efficiency gains with optimistic algorithms and computational efficiency gains with non-optimistic algorithms. 
 
-While Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} is generally computationally inefficient, the insights gained are promising for empirical applications. 
-Optimism is necessary for strategic exploration, and can be implemented via linear model bonuses \citet{agarwal2020pcpgpolicycoverdirected}, count-based exploration \citet{martin2017countbasedexplorationfeaturespace}, randomized value functions \citet{osband2019deepexplorationrandomizedvalue}, or random latent exploration \citet{mahankali2024randomlatentexplorationdeep}. An off-policy critic can be learned with the DDQN algorithm of \citet{vanhasselt2015deepreinforcementlearningdouble}, with the insight that one only needs to update when the TD error is high. Finally, an optimistic version of TD3 \citep{fujimoto2018addressingfunctionapproximationerror} with rare-switching critic updates and policy resets when necessary is a promising approach for a practical adaptation of Algorithm \ref{alg:\aigen{Algorithm~\ref{alg:NORA}}} in future work. Further numerical experiments and an extensive empirical study would constitute a very welcome contribution to the literature.
+While Algorithm \ref{alg:NORA} is generally computationally inefficient, the insights gained are promising for empirical applications. 
+Optimism is necessary for strategic exploration, and can be implemented via linear model bonuses \citet{agarwal2020pcpgpolicycoverdirected}, count-based exploration \citet{martin2017countbasedexplorationfeaturespace}, randomized value functions \citet{osband2019deepexplorationrandomizedvalue}, or random latent exploration \citet{mahankali2024randomlatentexplorationdeep}. An off-policy critic can be learned with the DDQN algorithm of \citet{vanhasselt2015deepreinforcementlearningdouble}, with the insight that one only needs to update when the TD error is high. Finally, an optimistic version of TD3 \citep{fujimoto2018addressingfunctionapproximationerror} with rare-switching critic updates and policy resets when necessary is a promising approach for a practical adaptation of Algorithm \ref{alg:NORA} in future work. Further numerical experiments and an extensive empirical study would constitute a very welcome contribution to the literature.
 
 One may wish to incorporate bonus function classes as in \cite{agarwal2022voql, zhao2023nearlyoptimallowswitchingalgorithm}. With a rarely-updated bonus function class, updating the base critic every episode, one may be able to achieve sufficient optimism without targeting $Q^*$, but only if the sum of Q-functions is close to a scaled Q-function. 
 Lastly, adapting the work of \citet{he2023nearly} to see if policy optimization can be minimax-optimal in linear MDPs, like \citet{wu2022nearlyoptimalpolicyoptimization} do for tabular MDPs, is a welcome contribution to the literature. 
@@ -1330,7 +1330,7 @@ In order to effectively bound the logarithm of the covering number, previous wor
 \paragraph{Comparison to~\citet{sherman2023rate,cassel2024warm}} The off-policy sample-complexity in~\cref{thm:off_policy_sample_efficiency} matches the bound in~\citet{sherman2023rate,cassel2024warm}. Similar to~\citet{liu2023optimistic}, both works use NPG with implicit policies for the actor and $\UCB$ bonuses for the critic. Consequently, the resulting methods suffer from a high cost of policy inference. Finally, we note that similar to the proposed algorithm (see~\cref{subsec:bounding_projection_error}),~\citet{sherman2023rate} also uses a reward-free warm-up phase~\citep{wagenmaker2022reward}. However, while we require the warm-up phase to identify a coreset to efficiently minimize the actor loss (a computational reason), ~\citet{sherman2023rate} requires the warm-up procedure to restrict the subsequent regret minimization procedure to high occupancy regions of the state-action space and effectively control the capacity of the policy class (a statistical reason). 
 
 \subsection{Experiments}
-\label{sec:experiments}
+\label{sec:ch04-experiments}
 In this section, we first evaluate our proposed algorithm in linear MDPs, consistent with our theoretical analyses. To further demonstrate its versatility, we extend the proposed algorithm to large-scale deep RL applications, evaluating its performance across several Atari games.
 
 \subsubsection{Experiments in Linear MDPs}

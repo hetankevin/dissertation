@@ -184,7 +184,7 @@ Combing all the results above, the proof for Theorem \ref{thm:krrconv} is as fol
     \end{align*}
     Then we can show that $\sum_{b=1}^\infty\norm{\epsilon_b}^2=\sum_{b=1}^\infty O(\frac{1}{b^2})<\infty.$
     
-    Similarly we can show both conditions for Algorithm \ref{algorithm1}. Replacing the stepwise difference according to the new update rule gives:
+    Similarly we can show both conditions for Algorithm \ref{alg:structured-dropout}. Replacing the stepwise difference according to the new update rule gives:
     \begin{align*} 
     \norm{\E[\mathbf{z}_{b+1}\mid\mathcal{F}_b]}
     &= \norm{\E[\widehat{\by}_{b+1,K}-\widehat{\by}_K^*\mid\mathcal{F}_b]}\\
@@ -1003,7 +1003,7 @@ Following the discussion in Section \ref{sec:coverage-experiments}, we present m
 As an extension of Section \ref{sec:coverage-experiments}, we display more visualizations of our intervals on a 1D interval.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\linewidth]{figures/ch06/plots_gb/ne_300_lr_1.0_md_8_sr_0.9_dr_0.6.png}
+    \includegraphics[width=1.0\linewidth]{figures/ch06/plots_gb/1d_coverage.png}
     \caption{Moderate coverage, neither overfitting nor underfitting.}
     \subcaption{Ensemble Size: 300; Learning Rate: 1.0; Maximum Depth: 8; Subsampling Rate: 0.9; Dropout rate: 0.6}
     \label{fig:1d-moderate}
@@ -1019,7 +1019,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\linewidth]{figures/ch06/plots_gb/ne_100_lr_0.3_md_4_sr_0.6_dr_0.6.png}
+    \todoresolve{MISSING IMAGE FILE IN ARXIV 2509.23127 TARBALL: plots/ne_100_lr_0.3_md_4_sr_0.6_dr_0.6.png}
     \caption{High coverage, underfitting.}
     \subcaption{Ensemble Size: 100; Learning Rate: 0.3; Maximum Depth: 4; Subsampling Rate: 0.6; Dropout rate: 0.6}
     \label{fig:1d-under-fit}
@@ -1769,7 +1769,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 	Rearranging the equation gives the following identity
 	
 	\begin{equation}
-		\label{eqn:eqn1}
+		\label{eqn:eqn1-b}
 		\widetilde{\mathbf{y}}_k^* = (\bI-\Smatk)^\dagger(\bI-\frac{1}{n}\mathbf{1}\mathbf{1}^\top) \Smatk(\mathbf{y}-\widehat{\mathbf{y}})
 	\end{equation}
 	
@@ -1933,7 +1933,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 	Under stated assumptions, we can prove that Algorithm \ref{alg:brebm_ident}'s prediction converge almost surely to a postulated fixed point. Formally, we make use of Theorem \ref{ch06b:thm:stochastic-contraction-mapping}, called a stochastic contraction mapping theorem, to demonstrate the difference between the current prediction and the fixed point is a stochastic contraction mapping. 
 	
 	\begin{theorem}
-		\label{thm:finite-sample-convergence-2}
+		\label{thm:finite-sample-convergence-2-app}
 		Denote the prediction using feature $k$ at boosting round $b$ as $\widehat{\mathbf{y}}^{(k)}_b = \frac{1}{b}\sum_{s=1}^bt^{(s, k)}(\mathbf{x}^{(k)})$.
 		Define the aggregated kernel $\mathcal{K}:=\sum_{k=1}^{p}(\bI-\E\Smatk)^{-1}\jmat\E\Smatk$. Suppose for each feature, there exists a fixed point:
 		

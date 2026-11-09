@@ -1,6 +1,10 @@
 \chapter{\MakeUppercase{Introduction}}
 \label{ch:introduction}
 
+\todoresolve{CHAPTER 1 IS ENTIRELY AI-DRAFTED SYNTHESIS TO TIE THE 7 RESEARCH CHAPTERS TOGETHER (RENDERED IN GREEN). REVIEW NARRATIVE ARC AND CHAPTER TRANSITIONS, ESPECIALLY PLACEMENT OF CHAPTER 6 (BOOSTING INFERENCE).}
+
+\begin{aigenblock}
+
 \section{Statistical and Computational Costs in Sequential Learning}
 
 Many problems in science and engineering require learning from observations that arrive sequentially over time. A robotic controller selects motor commands and observes the resulting motion of a physical system. A recommendation platform observes how users respond to suggested items and adapts future recommendations as more responses arrive. An epidemiological model assimilates weekly reported case counts to infer the unobserved spread of an infectious disease and evaluate candidate interventions. Across these settings, a learning system faces two distinct resource constraints: the statistical cost of collecting informative data from the environment, and the computational cost of representing, updating, and optimizing models, beliefs, and policies once those data are in hand.
@@ -96,5 +100,4 @@ Algorithm~1 of Chapter~\ref{ch:pomdp-control} bridges this gap by combining epoc
 which explicitly separates the statistical interaction error $\widetilde{O}(T^{-1/4})$ of online model learning from the three computational approximations: particle belief tracking error $O(J^{-1/(2\kappa_{\mathrm{pf}})})$, Monte Carlo tree rollout error $O(C_{\mathrm{mc}}(d,M) N^{-1/2})$ across $M$ observation bins, and structural lookahead error $O(\gamma^{d+1}\overline{\Xi}_T)$ from deferring the full-observability leaf bootstrap by $d$ steps. We validate each of the four scaling rates separately on a mixing POMDP that satisfies the theorem's assumptions exactly, and we instantiate the depth-zero particle state-rollout planner with learned dynamics and actor--critic networks on continuous-control and mobile-health benchmarks.
 
 Chapter~\ref{ch:conclusion} concludes the dissertation by synthesizing the common principles connecting statistical coverage, structural representation, and computational approximation across Chapters~\ref{ch:hybrid-rl} through~\ref{ch:pomdp-control} and outlining open directions for future research.
-
 \end{aigenblock}
