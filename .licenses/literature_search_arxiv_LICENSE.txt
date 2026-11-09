@@ -1,0 +1,2 @@
+arXiv API & Source Retrieval Notice (2026-11-09T16:50:00-05:00):
+Please check the arXiv API terms of use at https://info.arxiv.org/help/api/index.html and verify the license of any papers retrieved.

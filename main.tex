@@ -1,0 +1,98 @@
+% 2026 University of Pennsylvania PhD Dissertation LaTeX Template
+\documentclass[11pt]{report}
+\usepackage{upennstyle}
+
+% Citation and bibliography commands
+\usepackage[nonamebreak,round]{natbib}
+\bibliographystyle{plainnat}
+
+% Unified mathematical macros and packages
+\input{macros}
+
+\graphicspath{%
+  {figures/}%
+  {figures/ch02/}%
+  {figures/ch03/}%
+  {figures/ch04/}%
+  {figures/ch05/}%
+  {figures/ch06/}%
+  {figures/ch07/}%
+  {figures/ch08/}%
+  {figures/ch08/Figures/}%
+}
+
+%%%%% PRELIMINARY PAGES %%%%%
+\title{STATISTICAL AND COMPUTATIONAL EFFICIENCY IN SEQUENTIAL DECISION MAKING}
+\author{Kevin Tan}
+\gradgroup{Statistics and Data Science}
+\date{2026}
+\supervisor{Giles Hooker}
+\supervisortitle{Professor of Statistics and Data Science}
+\cosupervisor{Yuting Wei}
+\cosupervisortitle{Associate Professor of Statistics and Data Science}
+\gradchair{Bhaswar B. Bhattacharya}
+\gradchairtitle{Associate Professor of Statistics and Data Science}
+\committee{Enric Boix-Adser\`a, Assistant Professor of Statistics and Data Science}
+
+%%%% OPTIONAL COPYRIGHT NOTICE
+\authorlegal{Kevin Tan}
+
+%%%% OPTIONAL DEDICATION
+\dedication{To my family, mentors, and collaborators.}
+
+%%%% OPTIONAL ACKNOWLEDGMENT
+\acknowledgment{%
+I am deeply grateful to my co-advisors, Giles Hooker and Yuting Wei, for their generosity, patience, and technical guidance throughout my doctoral studies at the University of Pennsylvania. Working with them shaped how I think about statistics, reinforcement learning, and scientific computing. I also thank Enric Boix-Adser\`a for serving on my dissertation committee and for his insightful feedback on this work.
+
+The research presented in this dissertation is the product of close collaborations with wonderful coauthors across institutions: Ziping Xu, Wei Fan, Chinmaya Kausik, Ambuj Tewari, Max Qiushi Lin, Reza Asad, Haque Ishfaq, Csaba Szepesv\'ari, Sharan Vaswani, Zhihan Huang, Haimo Fang, Jonathan Pipping, A.~J.~Abkemeier, Kunyang He, and Edward L.~Ionides. Each chapter credits the joint work from which it is drawn.
+
+Finally, I thank my friends and colleagues in the Department of Statistics and Data Science at the Wharton School and at the University of Michigan, as well as my family, for their constant encouragement and support.%
+}
+
+%%%% ABSTRACT
+\abstract{%
+Sequential decision making and dynamical systems inference require balancing two distinct budgets: the statistical cost of collecting informative observations from an environment, and the computational cost of representing, updating, and optimizing models, beliefs, and policies once data are in hand. Treating either budget in isolation can mask the dominant source of error in practice. A statistically optimal algorithm that maintains an implicitly growing policy class or searches an exponential belief tree may be computationally intractable, while a computationally convenient approximation in policy parameterization, ensemble construction, or particle filtering introduces structural bias and optimization variance that alter the statistical guarantee.
+
+This dissertation studies how the representation and use of information determine both the statistical and computational costs of sequential learning, inference, and control across seven research chapters. Chapter~2 studies hybrid reinforcement learning from combined offline and online data, showing first how optimism over general function classes automatically directs online exploration toward state--action regions under-covered by the offline dataset, and then how two specialized algorithms in linear Markov decision processes break sample-size barriers faced by purely offline or purely online learning without requiring global offline coverage. Chapter~3 turns to heterogeneous offline data across multiple tasks in linear latent contextual bandits, where naive empirical moment estimation fails when per-user trajectories are short, and develops a moment-corrected spectral estimator that recovers the shared low-dimensional subspace so that online regret for a new user scales with the subspace dimension rather than the ambient dimension. Chapter~4 examines actor--critic methods, identifying why standard critic targets cause policy-class covering numbers to grow with the episode count, resolving this statistical barrier via rare-switching optimistic critics targeting the optimal action-value function with uniform actor resets, and then making the actor representation computationally constant-time per step via weighted least-squares logit matching on a $G$-optimal coreset coupled with Langevin Monte Carlo critic exploration. Chapter~5 extends policy optimization to continuous-action diffusion policies, analyzing denoising policy gradients, initial-noise reparameterized deterministic denoising natural policy gradients, and forward-noising score-matching behavior cloning of an optimistic critic. Chapter~6 investigates iterative functional ensemble building in gradient boosting and explainable boosting machines, showing how integrating moving-average shrinkage with tree dropout, parallel leave-one-out residual updates, or cyclic univariate updates yields central limit theorems that support asymptotically valid confidence intervals, prediction intervals, and hypothesis tests. Chapters~7 and~8 make hidden-state inference itself part of the sequential loop under partial observability: Chapter~7 introduces a fixed-ancestor weight-discounted differentiable particle filter and a warm-started optimization framework for plug-and-play parameter estimation in partially observed Markov processes, and Chapter~8 combines online model estimation, bootstrap particle filtering, and finite-depth Monte Carlo belief-tree planning with a state-value leaf bootstrap to decompose control regret into estimation, filtering, rollout, and structural depth errors.%
+}
+
+\begin{document}
+\maketitle
+\setcounter{page}{2}
+
+\makecopyright
+\makededication
+\makeacknowledgment
+\makeabstract
+\tableofcontents
+
+\clearpage \phantomsection \addcontentsline{toc}{chapter}{LIST OF TABLES} \begin{singlespacing} \listoftables \end{singlespacing}
+\clearpage \phantomsection \addcontentsline{toc}{chapter}{LIST OF ILLUSTRATIONS} \begin{singlespacing} \listoffigures \end{singlespacing}
+
+%%%%% MAIN TEXT %%%%%
+\begin{mainf}
+\include{chapters/ch01-introduction}
+\include{chapters/ch02-hybrid-rl}
+\include{chapters/ch03-latent-bandits}
+\include{chapters/ch04-actor-critic}
+\include{chapters/ch05-diffusion-policies}
+\include{chapters/ch06-boosting-inference}
+\include{chapters/ch07-pomp-estimation}
+\include{chapters/ch08-pomdp-control}
+\include{chapters/ch09-conclusion}
+\end{mainf}
+
+%%%%% APPENDICES %%%%%
+\begin{append}
+\include{appendices/app02-hybrid-rl}
+\include{appendices/app03-latent-bandits}
+\include{appendices/app04-actor-critic}
+\include{appendices/app05-diffusion-policies}
+\include{appendices/app06-boosting-inference}
+\include{appendices/app07-pomp-estimation}
+\include{appendices/app08-pomdp-control}
+\end{append}
+\begin{bibliof}
+\bibliography{references}
+\end{bibliof}
+\end{document}
