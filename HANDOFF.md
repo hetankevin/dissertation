@@ -3,8 +3,17 @@
 ## Current State
 
 - **Title**: *Statistical and Computational Efficiency in Sequential Decision Making*
-- **Template**: Official 2026 University of Pennsylvania Ph.D. Dissertation LaTeX template ([`upennstyle.sty`](./upennstyle.sty), [`main.tex`](./main.tex), [`macros.tex`](./macros.tex), [`references.bib`](./references.bib)).
+- **Template**: Official 2026 University of Pennsylvania Ph.D. Dissertation LaTeX template ([`upennstyle.sty`](./upennstyle.sty), [`main.tex`](./main.tex), [`macros.tex`](./macros.tex), [`references.bib`](./references.bib)), configured for Wharton's Statistics and Data Science Ph.D. specialization (`\specialization{Statistics and Data Science}`, `\gradgroup{Managerial Science and Applied Economics}`, `\makespecializationtitle`, Graduate Group Chairperson `Nancy Zhang, Ge Li and Ning Zhao Professor, Professor of Statistics and Data Science`).
 - **GitHub Repository**: `https://github.com/hetankevin/dissertation` (`main` branch).
+- **Build & Verification**:
+  - Compile cleanly via `/opt/homebrew/bin/tectonic main.tex` (with `\RequirePackage[T1]{fontenc}` disabled in [`upennstyle.sty`](./upennstyle.sty) for XeTeX/Tectonic compatibility and `\clearpage\input{...}` used in [`main.tex`](./main.tex)).
+  - Inspect rendered PDF layout and pagination via `/tmp/pdf_inspect main.pdf <startPage> <endPage> [outPngDir]`.
+- **Recent Formatting & Content Fixes**:
+  - Updated [`main.tex`](./main.tex) title page to use `\makespecializationtitle` (`A DISSERTATION in Statistics and Data Science / For the Graduate Group in Managerial Science and Applied Economics`) and updated Graduate Group Chairperson to **Nancy Zhang** (`Ge Li and Ning Zhao Professor, Professor of Statistics and Data Science`) per UPenn Provost and Wharton Doctoral-Inside checklists.
+  - Condensed the AI-drafted abstract in [`main.tex`](./main.tex) to ~289 body words (~305 words including header block) so it strictly satisfies the UPenn 350-word limit and fits on a single page (`v`).
+  - Standardized all chapter and appendix headings (`chapters/ch01`–`ch09`, `appendices/app02`–`app08`) to uppercase (`\chapter{...}`) matching UPenn's `sampledissertation.tex` and `dissformat.pdf`.
+  - Fixed recursive/duplicate `\aigen{...}` algorithm-name replacements in [`chapters/ch04-actor-critic.tex`](./chapters/ch04-actor-critic.tex), [`appendices/app04-actor-critic.tex`](./appendices/app04-actor-critic.tex), [`chapters/ch07-pomp-estimation.tex`](./chapters/ch07-pomp-estimation.tex), [`appendices/app07-pomp-estimation.tex`](./appendices/app07-pomp-estimation.tex), [`figures/ch07/imgs/precise_table.tex`](./figures/ch07/imgs/precise_table.tex), [`figures/ch07/imgs/daphnia/daphnia_table.tex`](./figures/ch07/imgs/daphnia/daphnia_table.tex), and [`chapters/ch08-pomdp-control.tex`](./chapters/ch08-pomdp-control.tex).
+  - Fixed out-of-order float counter hacks (`\addtocounter{figure}{1}` / `-1`) and `1.1\linewidth` margin overflow on Figures 6.9–6.11 in [`chapters/ch06-boosting-inference.tex`](./chapters/ch06-boosting-inference.tex), and fixed Table E.14 and Table E.16 (`Assumption~\ref{aspt:kernel-spec}`) captions in [`appendices/app06-boosting-inference.tex`](./appendices/app06-boosting-inference.tex).
 - **Draft Markup Mode (`\draftmarkuptrue` in [`macros.tex`](./macros.tex))**:
   - **Black text**: Verbatim manuscript text from the underlying papers.
   - **Green text (`\aigen{...}` and `\begin{aigenblock}...\end{aigenblock}`)**: AI-generated prose (Chapter 1 Introduction, Chapter 9 Conclusion, chapter-opening coauthorship/bridge paragraphs, multi-paper transition sections in Chapters 2, 4, and 6, Chapter 8 camera-ready experimental additions, and all plain/numbered algorithm replacements `Algorithm 1`, `Algorithm 2`, `Algorithm 3`).
@@ -38,8 +47,8 @@
 
 1. **Front Matter ([`main.tex`](./main.tex))**:
    - Replace placeholder Dedication and Acknowledgment with personal text.
-   - Verify full committee member list and titles on the Title Page (currently Co-Supervisors Giles Hooker and Yuting Wei, Committee Member Enric Boix-Adserà, Graduate Group Chair Bhaswar B. Bhattacharya).
-   - Review the AI-drafted dissertation abstract (rendered in green).
+   - Verify full committee member list and titles on the Title Page (currently Co-Supervisors Giles Hooker and Yuting Wei, Committee Member Enric Boix-Adserà, Graduate Group Chairperson Nancy Zhang).
+   - Review the AI-drafted dissertation abstract (rendered in green, < 350 words).
 2. **Chapter 1 & Chapter 9 ([`chapters/ch01-introduction.tex`](./chapters/ch01-introduction.tex), [`chapters/ch09-conclusion.tex`](./chapters/ch09-conclusion.tex))**:
    - Review AI-drafted synthesis and chapter transitions (rendered in green).
 3. **Chapter 3 ([`chapters/ch03-latent-bandits.tex`](./chapters/ch03-latent-bandits.tex))**:

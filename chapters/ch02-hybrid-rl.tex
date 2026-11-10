@@ -1,4 +1,4 @@
-\chapter{Learning from Offline and Online Data}
+\chapter{LEARNING FROM OFFLINE AND ONLINE DATA}
 \label{ch:hybrid-rl}
 
 \todoresolve{CHAPTER 2 COMBINES TWO HYBRID RL PAPERS (SECTIONS 2.1-2.3: TAN AND XU 2024; SECTIONS 2.4-2.10: TAN, FAN, AND WEI 2024). AI-WRITTEN CHAPTER OVERVIEW, BRIDGE PARAGRAPHS, AND ALGORITHM-NAME REPLACEMENTS ARE IN GREEN.}
@@ -285,7 +285,7 @@ While \aigen{Algorithm~\ref{alg:ch02-alg1}} applies to any Bellman-complete func
 
 \begin{table}[htbp]
 \centering
-\scalebox{0.88}{
+\resizebox{\linewidth}{!}{
 \begin{tabular}{ccccc}
 \toprule
 Work & Function Class & Single-Policy Concentrability & Beats Pure Lower Bounds? & Guarantee \\
@@ -305,7 +305,7 @@ Algorithms~\ref{alg:ch02-alg2} and~\ref{alg:ch02-alg3} \citep{tan2024hybrid} & L
 
 \begin{table}[htbp]
 \centering
-\scalebox{0.85}{
+\resizebox{\linewidth}{!}{
 \begin{tabular}{c|c|c}
 \toprule
 Setting & Upper Bound & Lower Bound \\
@@ -470,7 +470,7 @@ To prove Theorem~\ref{thm:ch02-hybridonline}, we decompose the exploration bonus
 \begin{equation}
     \Reg(T) \lesssim \sqrt{H^3 T \log(H/\delta)} + \beta \sum_{t=1}^T \sum_{h=1}^H \|\boldsymbol{\Sigma}_{t,h}^{-1/2}\phi_h(s_h^{(t)},a_h^{(t)})\mathbbm{1}_{\gX_{\off}}\|_2 + \beta \sum_{t=1}^T \sum_{h=1}^H \|\boldsymbol{\Sigma}_{t,h}^{-1/2}\phi_h(s_h^{(t)},a_h^{(t)})\mathbbm{1}_{\gX_{\on}}\|_2.
 \end{equation}
-On the offline partition $\gX_{\off}$, since $\mSigma_{t,h} \succeq \mSigma_{\off, h} + \lambda \mathbf{I}$, the sum of bonuses is bounded by $\sum_{h=1}^H \sqrt{d (N_{\on}^2 / N_{\off}) \max_{\phi_h \in \Phi_{\off}} \phi_h^\top \bar{\mSigma}_{\off, h}^{-1} \phi_h}$ (Lemma~\ref{lem:ch02-hybridoffline-sumbonuses}). Controlling $\bar{\mSigma}_{\off, h}^{-1}$ with $H^3$ rather than $H^4$ or $H^8$ requires ruling out the trajectories $n \in \gI_2 \subset [N_{\off}]$ where the leverage-score floor $4 d^6 H^4 \|\phi_{n,h}\|_{\mSigma_{n,h}^{-1}}$ dominates $\bar{\sigma}_{n,h}^2$. Using the elliptical potential lemma, we show $|\gI_2| \lesssim d^{13} H^5 \log(1 + N/d) = \tilde{o}(N_{\off})$, and then apply the variance-truncation lemma (Lemma~\ref{lem:ch02-total-variance-concentration}) together with the total variance bound $\frac{1}{N_{\off}}\sum_{n,h} \sigma_{n,h}^2 = \tilde{\gO}(H^2)$ on the remaining good trajectories $\gI_1$ (Lemma~\ref{lem:ch02-hybridoffline-concentrability}). On the online partition $\gX_{\on}$, we establish a projected subspace elliptical potential bound (Lemma~\ref{lem:ch02-zhou2022-B1-modified}) using thin-SVD projection $U_{\on} U_{\on}^\top$ inside the matrix inverse (Lemma~\ref{lem:ch02-hole-digging}), reducing the dimension factor in the variance-weighted bonus sum from $d$ to $d_{\on}$ (Lemma~\ref{lem:ch02-hybridonline-sumbonuses-xon}).
+On the offline partition $\gX_{\off}$, since $\mSigma_{t,h} \succeq \mSigma_{\off, h} + \lambda \mathbf{I}$, Lemma~\ref{lem:ch02-hybridoffline-sumbonuses} bounds the sum of bonuses by $\sum_{h=1}^H \sqrt{d (N_{\on}^2 / N_{\off})} \sqrt{\max_{\phi_h \in \Phi_{\off}} \phi_h^\top \bar{\mSigma}_{\off, h}^{-1} \phi_h}$. Controlling $\bar{\mSigma}_{\off, h}^{-1}$ with $H^3$ rather than $H^4$ or $H^8$ requires ruling out the trajectories $n \in \gI_2 \subset [N_{\off}]$ where the leverage-score floor $4 d^6 H^4 \|\phi_{n,h}\|_{\mSigma_{n,h}^{-1}}$ dominates $\bar{\sigma}_{n,h}^2$. Using the elliptical potential lemma, we show $|\gI_2| \lesssim d^{13} H^5 \log(1 + N/d) = \tilde{o}(N_{\off})$, and then apply the variance-truncation bound in Lemma~\ref{lem:ch02-total-variance-concentration} together with the total variance bound $\frac{1}{N_{\off}}\sum_{n,h} \sigma_{n,h}^2 = \tilde{\gO}(H^2)$ on the remaining good trajectories $\gI_1$ in Lemma~\ref{lem:ch02-hybridoffline-concentrability}. On the online partition $\gX_{\on}$, we establish a projected subspace elliptical potential bound in Lemma~\ref{lem:ch02-zhou2022-B1-modified} using thin-SVD projection $U_{\on} U_{\on}^\top$ inside the matrix inverse (Lemma~\ref{lem:ch02-hole-digging}), reducing the dimension factor in the variance-weighted bonus sum from $d$ to $d_{\on}$ in Lemma~\ref{lem:ch02-hybridonline-sumbonuses-xon}.
 
 \section{Numerical Experiments in Linear MDPs}
 \label{sec:ch02-lin-sims}

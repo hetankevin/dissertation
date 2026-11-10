@@ -1,30 +1,19 @@
 %%%%% UNIFIED DISSERTATION MACROS AND PACKAGES %%%%%
 \usepackage{mathtools}
 \usepackage{bm}
-\usepackage{bbm}
-\usepackage{dsfont}
-\usepackage{mathrsfs}
+\providecommand{\mathbbm}[1]{\mathbf{#1}}
+\providecommand{\mathds}[1]{\mathbb{#1}}
+\providecommand{\mathscr}[1]{\mathcal{#1}}
 \usepackage{accents}
 \usepackage{nicefrac}
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{enumitem}
 \usepackage{subcaption}
-\usepackage{wrapfig}
-\usepackage{siunitx}
 \usepackage{makecell}
 \usepackage{colortbl}
-\usepackage{hhline}
-\usepackage{diagbox}
-\usepackage{pifont}
 \usepackage{cancel}
-\usepackage{centernot}
-\usepackage{upgreek}
-\usepackage{longtable}
 \usepackage[skins,theorems]{tcolorbox}
-\usepackage{thmtools}
-\usepackage{thm-restate}
-\usepackage[nameinlink,capitalize]{cleveref}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,calc,shapes,backgrounds,fit}
 \usepackage{algorithm}
@@ -103,6 +92,10 @@
 \newtheorem*{commt*}{Comment}
 \theoremstyle{plain}
 
+\usepackage{thmtools}
+\usepackage{thm-restate}
+\usepackage[nameinlink,capitalize]{cleveref}
+
 \crefformat{equation}{#2Eq.\,(#1)#3}
 \Crefformat{equation}{#2Eq.\,(#1)#3}
 \Crefformat{assumption}{#2Assumption~#1#3}
@@ -126,10 +119,7 @@
 \DeclarePairedDelimiter{\tri}{\langle}{\rangle}
 
 % Widecheck accent
-\DeclareFontFamily{U}{mathx}{}
-\DeclareFontShape{U}{mathx}{m}{n}{<-> mathx10}{}
-\DeclareSymbolFont{mathx}{U}{mathx}{m}{n}
-\DeclareMathAccent{\widecheck}{0}{mathx}{"71}
+\providecommand{\widecheck}[1]{\check{#1}}
 
 % Colors and boxes
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
@@ -703,9 +693,9 @@ boxsep=0.1pt,left=0pt,right=0pt,top=0pt,bottom=0pt}}
 \newcommand{\bbeta}{\bm{\beta}}
 \newcommand{\last}{\text{last}}
 \newcommand{\op}{\mathrm{op}}
-\newcommand{\off}{\operatorname{off}}
-\newcommand{\on}{\operatorname{on}}
-\newcommand{\hyb}{\operatorname{hyb}}
+\newcommand{\off}{{\operatorname{off}}}
+\newcommand{\on}{{\operatorname{on}}}
+\newcommand{\hyb}{{\operatorname{hyb}}}
 \newcommand{\ddim}{\mathsf{ddim}}
 \newcommand{\ddpm}{\mathsf{ddpm}}
 \newcommand{\epsscore}{\epsilon_{\text{score}}}
@@ -739,8 +729,8 @@ boxsep=0.1pt,left=0pt,right=0pt,top=0pt,bottom=0pt}}
 \newcommand{\norm}[1]{\left\|#1\right\|}
 \newcommand{\normsq}[1]{\left\|#1\right\|^2}
 \newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
-\newcommand{\cmark}{\text{\ding{51}}}
-\newcommand{\xmark}{\text{\ding{55}}}
+\newcommand{\cmark}{\ensuremath{\checkmark}}
+\newcommand{\xmark}{\ensuremath{\times}}
 \newcommand{\meet}{\wedge}
 \newcommand{\nn}{\nonumber}
 \newcommand{\Mid}{\; \| \;}
@@ -855,7 +845,7 @@ boxsep=0.1pt,left=0pt,right=0pt,top=0pt,bottom=0pt}}
 \definecolor{caveatred}{RGB}{204,0,0}
 \newcommand{\aigen}[1]{\ifdraftmarkup{\color{aigreen}#1}\else#1\fi}
 \newenvironment{aigenblock}{\ifdraftmarkup\color{aigreen}\fi}{}
-\newcommand{\todoresolve}[1]{\ifdraftmarkup{\color{caveatred}\textbf{\MakeUppercase{[RESOLVE: #1]}}}\else\fi}
+\newcommand{\todoresolve}[1]{\ifdraftmarkup{\color{caveatred}\textbf{[RESOLVE: #1]}}\else\fi}
 
 
 
@@ -875,13 +865,6 @@ boxsep=0.1pt,left=0pt,right=0pt,top=0pt,bottom=0pt}}
 \providecommand{\mix}{{\mathrm{mix}}}
 \providecommand{\pg}{{\mathrm{pg}}}
 \providecommand{\TV}{{d_{\mathrm{TV}}}}
-\newenvironment{tightcenter}{%
-  \setlength\topsep{0pt}
-  \setlength\parskip{0pt}
-  \begin{center}
-}{%
-  \end{center}
-}
 
 
 % Additional Chapter 7 macros
@@ -909,3 +892,27 @@ boxsep=0.1pt,left=0pt,right=0pt,top=0pt,bottom=0pt}}
 \providecommand\refAssumpDifferentiableSimulator{(\ref{assump:diff-meas-and-sim})}
 \providecommand\refAlgIfad{\ref{alg:ifad}}
 \providecommand\refFigNutsEb{\ref{fig:nuts-eb}}
+
+
+\providecommand{\bb}{\mathbf{b}}
+\providecommand{\bk}{\mathbf{k}}
+\providecommand{\bz}{\mathbf{z}}
+\providecommand{\bSigma}{\boldsymbol{\Sigma}}
+\providecommand{\bXi}{\boldsymbol{\Xi}}
+\providecommand{\balpha}{\boldsymbol{\alpha}}
+\providecommand{\bkappa}{\boldsymbol{\kappa}}
+\providecommand{\g}{\bm{g}}
+\renewcommand{\d}{\mathrm{d}}
+\providecommand{\newEdit}[1]{#1}
+\providecommand{\editClaim}{Empirically, the benchmark tests suggest that \aigen{Algorithm~\ref{alg:ifad}} is a significant methodological advance over the IF2 algorithm of \cite{ionides15} for plug-and-play statistical inference on POMP models.}
+\providecommand{\editPoyiadjisCorrespondence}{Theorem~\ref{thm:mop-functional-forms} shows that \aigen{Algorithm~\ref{alg:dmop} ($\alpha=1$)} has a similar form to the consistent but high-variance score estimate in the first algorithm of \cite{poyiadjis11}. Unlike \cite{poyiadjis11}, our algorithm has the plug-and-play property; in the case $\alpha=1$, our algorithm replaces differentiation of the latent transition density in \cite{poyiadjis11} by pathwise differentiation of the simulator.}
+
+\let\oldtexttt\texttt
+\renewcommand{\texttt}[1]{\textnormal{\oldtexttt{#1}}}
+
+\providecommand{\dimde}{\dim_{\operatorname{DE}}}
+\providecommand{\mzero}{\mathbf{0}}
+\providecommand{\FloatBarrier}{}
+\providecommand{\ReserveSpace}[1]{}
+\renewcommand{\O}[1]{\mathcal{O}\left(#1\right)}
+\emergencystretch=1.5em

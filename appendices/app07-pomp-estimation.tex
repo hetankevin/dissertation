@@ -1,4 +1,4 @@
-\chapter{Proofs and Supplementary Details for Chapter~\ref{ch:pomp-estimation}}
+\chapter{PROOFS AND SUPPLEMENTARY DETAILS FOR CHAPTER~\ref{ch:pomp-estimation}}
 \label{app:pomp-estimation}
 
 \aigen{This appendix contains the complete proofs of Theorems~\ref{thm:mop-functional-forms}--\ref{thm:mop-biasvar}, the Feynman--Kac triangular-array strong law of large numbers and central limit theorem, the sharper bias--variance expansion, supplementary Bayesian posterior figures, algorithmic hyperparameter tables, and the \emph{Daphnia} population dynamics case study for Chapter~\ref{ch:pomp-estimation}.}
@@ -1020,7 +1020,7 @@ We state Lemma~\ref{lem:change-measure-proper-weights} assuming multinomial resa
     with resampling probabilities proportional to $p_{n,j}$, therefore also targets $\pi_n$.
 \end{proof}
 
-\begin{prop}[\aigen{Algorithm~\ref{alg:mop}}-1 Targets the Filtering Distribution]
+\begin{prop}[\aigen{Algorithm~\ref{alg:mop} ($\alpha=1$)} Targets the Filtering Distribution]
     When $\alpha=1$ or $\phi=\theta$, \aigen{Algorithm~\ref{alg:mop}} targets the filtering distribution. 
 \end{prop}
 \begin{proof}[Proof.]
@@ -1028,7 +1028,7 @@ We state Lemma~\ref{lem:change-measure-proper-weights} assuming multinomial resa
 
     When $\alpha=1$, and $\theta\neq\phi,$ the proof is identical to that of \ref{thm:off-parameter-targeting}. Recursively applying Lemmas \ref{lem:change-measure-proper-weights}, \ref{lem:marginal-proper-weights}, and \ref{lem:posterior-proper-weights}, we obtain that 
     %to step~\ref{mop:step1}, Lemma~2 step~ {mop:weight:update} and Lemma~3 to step~\ref{mop:step2} we obtain that
-    the \aigen{Algorithm~\ref{alg:mop}}-1 filter targets the posterior.
+    the \aigen{Algorithm~\ref{alg:mop} ($\alpha=1$)} filter targets the posterior.
     Specifically, suppose inductively that $\big\{\big(X^{F,\theta}_{n-1,j},w^{F,\theta}_{n-1,j}\big)\big\}$ is properly weighted for $f_{X_{n-1}|Y_{1:n-1}}(x_{n-1}|y^*_{1:n-1};\theta)$.
     Then, Lemma \ref{lem:marginal-proper-weights} tells us that $\big\{\big(X^{P,\theta}_{n,j},w^{P,\theta}_{n,j}\big)\big\}$ targets $f_{X_{n}|Y_{1:n-1}}(x_{n}|y^*_{1:n-1};\theta)$.
     Lemma \ref{lem:posterior-proper-weights} tells us that $\big\{\big(X^{P,\theta}_{n,j},w^{P,\theta}_{n,j} \, g^\theta_{n,j} \big)\big\}$ therefore targets  $f_{X_{n}|Y_{1:n}}(x_{n}|y^*_{1:n};\theta)$.
@@ -1088,7 +1088,7 @@ L^{A,\theta} = \prod_{n=1}^N \left( L^\phi_n \, \frac{\sum_{j=1}^J w^{F,\theta}_
 \end{equation}
 Since $w^{F,\theta}_{n,j}=w^{P,\theta}_{n+1,j}$, this is a telescoping product. The remaining terms are
 $\sum_{j=1}^J w^{F,\theta}_{0,j} = J$ on the denominator and $\sum_{j=1}^J w^{F,\theta}_{N,j}$ on the numerator.
-This derives the \aigen{Algorithm~\ref{alg:mop}}-1 likelihood estimates.
+This derives the \aigen{Algorithm~\ref{alg:mop} ($\alpha=1$)} likelihood estimates.
 
 
 $L^{B,\theta}$ should generally be preferred in practice, since there is no reason to include the extra variability from resampling when calculating the conditional log likelihood, but it lacks the nice telescoping product that lets us derive exact expressions for the gradient in Theorem~\thmMopFunctionalForms.
@@ -4547,9 +4547,10 @@ Parameters are transformed to a unit scale, for example by taking logarithms or 
 
 \begin{table}[H]
 \centering
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{p{4.5cm}cccc}
 \toprule
-\textbf{Hyperparameter} & \textbf{Standard IF2} & \textbf{\aigen{Algorithm~\ref{alg:ifad}}-0} & \textbf{\aigen{Algorithm~\ref{alg:ifad}}-0.97} & \textbf{\aigen{Algorithm~\ref{alg:ifad}}-1} \\
+\textbf{Hyperparameter} & \textbf{Standard IF2} & \textbf{\aigen{Alg.~\ref{alg:ifad} ($\alpha=0$)}} & \textbf{\aigen{Alg.~\ref{alg:ifad} ($\alpha=0.97$)}} & \textbf{\aigen{Alg.~\ref{alg:ifad} ($\alpha=1$)}} \\
 \midrule
 Number of Particles ($J$) & 5,000 & 5,000 & 5,000 & 5,000 \\
 Warm-start Iterations & 1,950 & 60 & 175 & 60 \\
@@ -4564,13 +4565,14 @@ Initial LR ($\eta_0$) & --- & 0.1 & 0.1 & 0.1 \\
 Warm-up Steps & --- & 10 & 10 & 10 \\
 Eval. Particles / Reps & 5,000 / 36 & 5,000 / 36 & 5,000 / 36 & 5,000 / 36 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \caption{Algorithmic parameters for the global search benchmarking on the Dhaka cholera model.}
 \label{table:algparams}
 \end{table}
 
-Following some experimentation, \aigen{Algorithm~\ref{alg:ifad}} was implemnenteed by plugging the \aigen{Algorithm~\ref{alg:dmop}} gradient estimate into the Adam optimizer \citep{kingma15}.
-The momentum parameter in Adam was turned off for \aigen{Algorithm~\ref{alg:ifad}}-0, since this low-variance estimate did not reqquire it.
+Following some experimentation, \aigen{Algorithm~\ref{alg:ifad}} was implemented by plugging the \aigen{Algorithm~\ref{alg:dmop}} gradient estimate into the Adam optimizer \citep{kingma15}.
+The momentum parameter in Adam was turned off for \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0$)}, since this low-variance estimate did not require it.
 Decreasing the learning rate (LR) was found to be helpful, and we selected the commonly used cosine decay.
 Warm-up steps were taken with Adam to stabilize its initial performance and avoid noisy 
 
@@ -4672,9 +4674,10 @@ We used the same learning-rate schedule for $\alpha=0$ and $\alpha=1$.
 
 \begin{table}[htbp!]
 \centering
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{p{4.5cm}cccc}
 \toprule
-\textbf{Hyperparameter} & \textbf{MPIF} & \textbf{\aigen{Algorithm~\ref{alg:ifad}}-0} & \textbf{\aigen{Algorithm~\ref{alg:ifad}}-0.97} & \textbf{\aigen{Algorithm~\ref{alg:ifad}}-1} \\
+\textbf{Hyperparameter} & \textbf{MPIF} & \textbf{\aigen{Alg.~\ref{alg:ifad} ($\alpha=0$)}} & \textbf{\aigen{Alg.~\ref{alg:ifad} ($\alpha=0.97$)}} & \textbf{\aigen{Alg.~\ref{alg:ifad} ($\alpha=1$)}} \\
 \midrule
 Particles per mesocosm ($J$) & 1,000 & 1,000 & 1,000 & 1,000 \\
 MPIF Iterations & 680 & 200 & 200 & 200 \\
@@ -4686,7 +4689,8 @@ Learning-rate Scale & --- & 0.01 & 0.01 & 0.01 \\
 Warm-up Steps & --- & 10 & 10 & 10 \\
 Eval. Particles / Reps & 2,000 / 10 & 2,000 / 10 & 2,000 / 10 & 2,000 / 10 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \caption{Algorithmic parameters for the Daphnia experiment. Particle numbers are per mesocosm; the cooling factor is the multiplier over 50 iterations.}
 \label{tab:daphnia-settings}
 \end{table}
@@ -4695,7 +4699,7 @@ All reported log-likelihoods were evaluated independently of optimization using 
 Likelihood estimates were averaged within each mesocosm before taking logarithms, and the eight mesocosm log-likelihoods were then summed.
 Each method's best parameter vector was then held fixed and re-evaluated with ten fresh replicates at the same particle count, using the same model and Pypomp version on a CPU.
 The same evaluation method was used for the final results and for intermediate saved parameter vectors.
-The progress plot uses 25, 27, 26, and 22 saved parameter vectors per search for \aigen{Algorithm~\ref{alg:ifad}}-0, \aigen{Algorithm~\ref{alg:ifad}}-0.97, \aigen{Algorithm~\ref{alg:ifad}}-1, and MPIF, respectively, including the final evaluations.
+The progress plot uses 25, 27, 26, and 22 saved parameter vectors per search for \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0$)}, \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)}, \aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)}, and MPIF, respectively, including the final evaluations.
 Time is assigned in proportion to iteration number within each stage, using the measured total optimization time for that stage.
 Each set of 50 searches ran on one Tesla V100 16 GB GPU, with two searches per batch.
 Optimization times are summed over the 25 batches and include initial compilation but exclude the additional particle filter evaluations.
@@ -4703,9 +4707,9 @@ Optimization times are summed over the 25 batches and include initial compilatio
 \subsection{Results}
 
 Our findings are summarized in Table~\ref{tab:daphnia-results} and Figures~\ref{fig:daphnia-progress} and~\ref{fig:daphnia-raincloud}.
-\aigen{Algorithm~\ref{alg:ifad}}-0.97 and \aigen{Algorithm~\ref{alg:ifad}}-1 attained maximum log-likelihoods of $-858.48$ and $-858.27$, respectively, each with a Monte Carlo standard error (MCSE) of approximately 0.17.
+\aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} attained maximum log-likelihoods of $-858.48$ and $-858.27$, respectively, each with a Monte Carlo standard error (MCSE) of approximately 0.17.
 The maximum for MPIF was $-860.06$, with MCSE 0.16.
-\aigen{Algorithm~\ref{alg:ifad}}-0 attained $-860.36$ and had a median log-likelihood close to that of MPIF.
+\aigen{Algorithm~\ref{alg:ifad} ($\alpha=0$)} attained $-860.36$ and had a median log-likelihood close to that of MPIF.
 
 \begin{table}[htbp!]
 \centering
@@ -4714,12 +4718,12 @@ The maximum for MPIF was $-860.06$, with MCSE 0.16.
 \label{tab:daphnia-results}
 \end{table}
 
-Comparing searches from the same starting points, \aigen{Algorithm~\ref{alg:ifad}}-0.97 and \aigen{Algorithm~\ref{alg:ifad}}-1 each attained a higher final log-likelihood than MPIF in 49 of the 50 searches.
+Comparing searches from the same starting points, \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} each attained a higher final log-likelihood than MPIF in 49 of the 50 searches.
 The median paired differences were 2.86 and 2.79 log-likelihood units, respectively.
-The distributions of the final log-likelihoods for \aigen{Algorithm~\ref{alg:ifad}}-0.97 and \aigen{Algorithm~\ref{alg:ifad}}-1 were similar, which may be due to the short time series in each mesocosm.
+The distributions of the final log-likelihoods for \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} were similar, which may be due to the short time series in each mesocosm.
 
 \citet{yang26daphniacode} report a maximum log-likelihood of $-863.03$ in the revised Table~S3.
-Our MPIF searches attained a higher value, and \aigen{Algorithm~\ref{alg:ifad}}-0.97 and \aigen{Algorithm~\ref{alg:ifad}}-1 improved on this further.
+Our MPIF searches attained a higher value, and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} improved on this further.
 
 \begin{figure}[htbp!]
 \centering
@@ -4736,7 +4740,7 @@ The plot shows log-likelihoods above $-890$; all searches contribute to the perc
 \includegraphics[width=0.95\textwidth]{figures/ch07/imgs/daphnia/daphnia_violin.pdf}
 \caption{Raincloud plot of the searches for the Daphnia model.
 The half-violin plots show the distributions of all 50 final log-likelihood estimates for each method, the boxplots show the medians and quartiles, and each point represents one search.
-\aigen{Algorithm~\ref{alg:ifad}}-0.97 and \aigen{Algorithm~\ref{alg:ifad}}-1 have similar distributions, with generally higher log-likelihoods than MPIF and \aigen{Algorithm~\ref{alg:ifad}}-0.}
+\aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} have similar distributions, with generally higher log-likelihoods than MPIF and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0$)}.}
 \label{fig:daphnia-raincloud}
 \end{figure}
 

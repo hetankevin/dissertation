@@ -1,4 +1,4 @@
-\chapter{Proofs and Supplementary Details for Chapter~\ref{ch:boosting-inference}}
+\chapter{PROOFS AND SUPPLEMENTARY DETAILS FOR CHAPTER~\ref{ch:boosting-inference}}
 \label{app:boosting-inference}
 
 \aigen{This appendix provides the matrix sketching guarantees, stochastic contraction proofs, conditional and unconditional central limit theorem derivations, and additional experimental results for Part~I (Section~\ref{sec:app06-part1}) and Part~II (Section~\ref{sec:app06-part2}) of Chapter~\ref{ch:boosting-inference}.}
@@ -789,17 +789,17 @@ The hyperparameters chosen by Optuna are listed below:
     \toprule
     Hyperparameter               & GBT    & XGBoost & LightGBM & RF     & \aigen{Algorithm~\ref{alg:random-dropout}} & Boulevard & \aigen{Algorithm~\ref{alg:structured-dropout}} & ElasticNet \\
     \midrule
-    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & —          \\
-    \texttt{learning\_rate}      & 0.0213 & 0.0249  & 0.0108   & —      & 0.5476 & 0.5750    & 0.2724 & —          \\
-    \texttt{max\_depth}          & 3      & 3       & 9        & 11     & 10     & 16        & 3      & —          \\
-    \texttt{subsample}           & —      & 0.6332  & —        & —      & —      & —         & —      & —          \\
-    \texttt{num\_leaves}         & —      & —       & 37       & —      & —      & —         & —      & —          \\
-    \texttt{alpha}               & —      & —       & —        & —      & —      & —         & —      & 0.1299     \\
-    \texttt{l1\_ratio}           & —      & —       & —        & —      & —      & —         & —      & 0.3753     \\
-    \texttt{min\_samples\_split} & —      & —       & —        & —      & 43     & 42        & 5     & —          \\
-    \texttt{subsample\_rate}     & —      & —       & —        & —      & 0.5071 & 0.5133    & 0.6266 & —          \\
-    \texttt{dropout\_rate}       & —      & —       & —        & —      & 0.4766 & 0.0000    & —      & —          \\
-    \texttt{n\_trees\_per\_group}& —      & —       & —        & —      & —      & —         & 16      & —          \\
+    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & ---          \\
+    \texttt{learning\_rate}      & 0.0213 & 0.0249  & 0.0108   & ---      & 0.5476 & 0.5750    & 0.2724 & ---          \\
+    \texttt{max\_depth}          & 3      & 3       & 9        & 11     & 10     & 16        & 3      & ---          \\
+    \texttt{subsample}           & ---      & 0.6332  & ---        & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{num\_leaves}         & ---      & ---       & 37       & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{alpha}               & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.1299     \\
+    \texttt{l1\_ratio}           & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.3753     \\
+    \texttt{min\_samples\_split} & ---      & ---       & ---        & ---      & 43     & 42        & 5     & ---          \\
+    \texttt{subsample\_rate}     & ---      & ---       & ---        & ---      & 0.5071 & 0.5133    & 0.6266 & ---          \\
+    \texttt{dropout\_rate}       & ---      & ---       & ---        & ---      & 0.4766 & 0.0000    & ---      & ---          \\
+    \texttt{n\_trees\_per\_group}& ---      & ---       & ---        & ---      & ---      & ---         & 16      & ---          \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -812,17 +812,17 @@ The hyperparameters chosen by Optuna are listed below:
     \toprule
     Hyperparameter               & GBT    & XGBoost & LightGBM & RF     & \aigen{Algorithm~\ref{alg:random-dropout}} & Boulevard & \aigen{Algorithm~\ref{alg:structured-dropout}} & ElasticNet \\
     \midrule
-    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & —          \\
-    \texttt{learning\_rate}      & 0.2019 & 0.2153  & 0.2341   & —      & 0.9411 & 0.1416    & 0.5671 & —          \\
-    \texttt{max\_depth}          & 3      & 3       & 8        & 14     & 6      & 11        & 3     & —          \\
-    \texttt{subsample}           & —      & 0.9850  & —        & —      & —      & —         & —      & —          \\
-    \texttt{num\_leaves}         & —      & —       & 37       & —      & —      & —         & —      & —          \\
-    \texttt{alpha}               & —      & —       & —        & —      & —      & —         & —      & 0.3634     \\
-    \texttt{l1\_ratio}           & —      & —       & —        & —      & —      & —         & —      & 0.1386     \\
-    \texttt{min\_samples\_split} & —      & —       & —        & —      & 23     & 9         & 30     & —          \\
-    \texttt{subsample\_rate}     & —      & —       & —        & —      & 0.9368 & 0.9899    & 0.7344 & —          \\
-    \texttt{dropout\_rate}       & —      & —       & —        & —      & 0.2145 & 0.0000    & —      & —          \\
-    \texttt{n\_trees\_per\_group}& —      & —       & —        & —      & —      & —         & 16     & —          \\
+    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & ---          \\
+    \texttt{learning\_rate}      & 0.2019 & 0.2153  & 0.2341   & ---      & 0.9411 & 0.1416    & 0.5671 & ---          \\
+    \texttt{max\_depth}          & 3      & 3       & 8        & 14     & 6      & 11        & 3     & ---          \\
+    \texttt{subsample}           & ---      & 0.9850  & ---        & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{num\_leaves}         & ---      & ---       & 37       & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{alpha}               & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.3634     \\
+    \texttt{l1\_ratio}           & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.1386     \\
+    \texttt{min\_samples\_split} & ---      & ---       & ---        & ---      & 23     & 9         & 30     & ---          \\
+    \texttt{subsample\_rate}     & ---      & ---       & ---        & ---      & 0.9368 & 0.9899    & 0.7344 & ---          \\
+    \texttt{dropout\_rate}       & ---      & ---       & ---        & ---      & 0.2145 & 0.0000    & ---      & ---          \\
+    \texttt{n\_trees\_per\_group}& ---      & ---       & ---        & ---      & ---      & ---         & 16     & ---          \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -836,17 +836,17 @@ The hyperparameters chosen by Optuna are listed below:
     \toprule
     Hyperparameter               & GBT    & XGBoost & LightGBM & RF     & \aigen{Algorithm~\ref{alg:random-dropout}} & Boulevard & \aigen{Algorithm~\ref{alg:structured-dropout}} & ElasticNet \\
     \midrule
-    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & —          \\
-    \texttt{learning\_rate}      & 0.0224 & 0.0379  & 0.0215   & —      & 0.6904 & 0.5772    & 0.3578 & —          \\
-    \texttt{max\_depth}          & 6      & 3       & 5        & 16     & 15     & 16        & 4     & —          \\
-    \texttt{subsample}           & —      & 0.5375  & —        & —      & —      & —         & —      & —          \\
-    \texttt{num\_leaves}         & —      & —       & 20       & —      & —      & —         & —      & —          \\
-    \texttt{alpha}               & —      & —       & —        & —      & —      & —         & —      & 3.8079     \\
-    \texttt{l1\_ratio}           & —      & —       & —        & —      & —      & —         & —      & 0.9556     \\
-    \texttt{min\_samples\_split} & —      & —       & —        & —      & 35     & 49        & 5     & —          \\
-    \texttt{subsample\_rate}     & —      & —       & —        & —      & 0.7385 & 0.7209    & 0.5148 & —          \\
-    \texttt{dropout\_rate}       & —      & —       & —        & —      & 0.1903 & 0.0000    & —      & —          \\
-    \texttt{n\_trees\_per\_group}& —      & —       & —        & —      & —      & —         & 11      & —          \\
+    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & ---          \\
+    \texttt{learning\_rate}      & 0.0224 & 0.0379  & 0.0215   & ---      & 0.6904 & 0.5772    & 0.3578 & ---          \\
+    \texttt{max\_depth}          & 6      & 3       & 5        & 16     & 15     & 16        & 4     & ---          \\
+    \texttt{subsample}           & ---      & 0.5375  & ---        & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{num\_leaves}         & ---      & ---       & 20       & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{alpha}               & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 3.8079     \\
+    \texttt{l1\_ratio}           & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.9556     \\
+    \texttt{min\_samples\_split} & ---      & ---       & ---        & ---      & 35     & 49        & 5     & ---          \\
+    \texttt{subsample\_rate}     & ---      & ---       & ---        & ---      & 0.7385 & 0.7209    & 0.5148 & ---          \\
+    \texttt{dropout\_rate}       & ---      & ---       & ---        & ---      & 0.1903 & 0.0000    & ---      & ---          \\
+    \texttt{n\_trees\_per\_group}& ---      & ---       & ---        & ---      & ---      & ---         & 11      & ---          \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -860,17 +860,17 @@ The hyperparameters chosen by Optuna are listed below:
     \toprule
     Hyperparameter               & GBT    & XGBoost & LightGBM & RF     & \aigen{Algorithm~\ref{alg:random-dropout}} & Boulevard & \aigen{Algorithm~\ref{alg:structured-dropout}} & ElasticNet \\
     \midrule
-    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & —          \\
-    \texttt{learning\_rate}      & 0.0731 & 0.1139  & 0.1186   & —      & 0.8396 & 0.8905    & 0.8200 & —          \\
-    \texttt{max\_depth}          & 10     & 10      & 16       & 20     & 15     & 15        & 16     & —          \\
-    \texttt{subsample}           & —      & 0.6980  & —        & —      & —      & —         & —      & —          \\
-    \texttt{num\_leaves}         & —      & —       & 42       & —      & —      & —         & —      & —          \\
-    \texttt{alpha}               & —      & —       & —        & —      & —      & —         & —      & 3.8079     \\
-    \texttt{l1\_ratio}           & —      & —       & —        & —      & —      & —         & —      & 0.9556     \\
-    \texttt{min\_samples\_split} & —      & —       & —        & —      & 4      & 2         & 13     & —          \\
-    \texttt{subsample\_rate}     & —      & —       & —        & —      & 0.7317 & 0.7431    & 0.6669 & —          \\
-    \texttt{dropout\_rate}       & —      & —       & —        & —      & 0.2762 & 0.0000    & —      & —          \\
-    \texttt{n\_trees\_per\_group}& —      & —       & —        & —      & —      & —         & 10     & —          \\
+    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & ---          \\
+    \texttt{learning\_rate}      & 0.0731 & 0.1139  & 0.1186   & ---      & 0.8396 & 0.8905    & 0.8200 & ---          \\
+    \texttt{max\_depth}          & 10     & 10      & 16       & 20     & 15     & 15        & 16     & ---          \\
+    \texttt{subsample}           & ---      & 0.6980  & ---        & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{num\_leaves}         & ---      & ---       & 42       & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{alpha}               & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 3.8079     \\
+    \texttt{l1\_ratio}           & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.9556     \\
+    \texttt{min\_samples\_split} & ---      & ---       & ---        & ---      & 4      & 2         & 13     & ---          \\
+    \texttt{subsample\_rate}     & ---      & ---       & ---        & ---      & 0.7317 & 0.7431    & 0.6669 & ---          \\
+    \texttt{dropout\_rate}       & ---      & ---       & ---        & ---      & 0.2762 & 0.0000    & ---      & ---          \\
+    \texttt{n\_trees\_per\_group}& ---      & ---       & ---        & ---      & ---      & ---         & 10     & ---          \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -883,17 +883,17 @@ The hyperparameters chosen by Optuna are listed below:
     \toprule
     Hyperparameter               & GBT    & XGBoost & LightGBM & RF     & \aigen{Algorithm~\ref{alg:random-dropout}} & Boulevard & \aigen{Algorithm~\ref{alg:structured-dropout}} & ElasticNet \\
     \midrule
-    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & —          \\
-    \texttt{learning\_rate}      & 0.0177 & 0.1836  & 0.0218   & —      & 0.9256 & 0.8698    & 0.9824 & —          \\
-    \texttt{max\_depth}          & 3      & 5       & 5        & 11     & 3      & 9         & 3     & —          \\
-    \texttt{subsample}           & —      & 0.5780  & —        & —      & —      & —         & —      & —          \\
-    \texttt{num\_leaves}         & —      & —       & 38       & —      & —      & —         & —      & —          \\
-    \texttt{alpha}               & —      & —       & —        & —      & —      & —         & —      & 0.4855     \\
-    \texttt{l1\_ratio}           & —      & —       & —        & —      & —      & —         & —      & 0.1373     \\
-    \texttt{min\_samples\_split} & —      & —       & —        & —      & 39     & 32        & 48     & —          \\
-    \texttt{subsample\_rate}     & —      & —       & —        & —      & 0.8418 & 0.5249    & 0.5964 & —          \\
-    \texttt{dropout\_rate}       & —      & —       & —        & —      & 0.1230 & 0.0000    & —      & —          \\
-    \texttt{n\_trees\_per\_group}& —      & —       & —        & —      & —      & —         & 13     & —          \\
+    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & ---          \\
+    \texttt{learning\_rate}      & 0.0177 & 0.1836  & 0.0218   & ---      & 0.9256 & 0.8698    & 0.9824 & ---          \\
+    \texttt{max\_depth}          & 3      & 5       & 5        & 11     & 3      & 9         & 3     & ---          \\
+    \texttt{subsample}           & ---      & 0.5780  & ---        & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{num\_leaves}         & ---      & ---       & 38       & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{alpha}               & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.4855     \\
+    \texttt{l1\_ratio}           & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.1373     \\
+    \texttt{min\_samples\_split} & ---      & ---       & ---        & ---      & 39     & 32        & 48     & ---          \\
+    \texttt{subsample\_rate}     & ---      & ---       & ---        & ---      & 0.8418 & 0.5249    & 0.5964 & ---          \\
+    \texttt{dropout\_rate}       & ---      & ---       & ---        & ---      & 0.1230 & 0.0000    & ---      & ---          \\
+    \texttt{n\_trees\_per\_group}& ---      & ---       & ---        & ---      & ---      & ---         & 13     & ---          \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -906,17 +906,17 @@ The hyperparameters chosen by Optuna are listed below:
     \toprule
     Hyperparameter               & GBT    & XGBoost & LightGBM & RF     & \aigen{Algorithm~\ref{alg:random-dropout}} & Boulevard & \aigen{Algorithm~\ref{alg:structured-dropout}} & ElasticNet \\
     \midrule
-    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & —          \\
-    \texttt{learning\_rate}      & 0.1905 & 0.0916  & 0.0834   & —      & 0.2487 & 0.5382    & 0.3643 & —          \\
-    \texttt{max\_depth}          & 7      & 7       & 16       & 16     & 16     & 16        & 11     & —          \\
-    \texttt{subsample}           & —      & 0.8121  & —        & —      & —      & —         & —      & —          \\
-    \texttt{num\_leaves}         & —      & —       & 25       & —      & —      & —         & —      & —          \\
-    \texttt{alpha}               & —      & —       & —        & —      & —      & —         & —      & 0.2182     \\
-    \texttt{l1\_ratio}           & —      & —       & —        & —      & —      & —         & —      & 0.1200     \\
-    \texttt{min\_samples\_split} & —      & —       & —        & —      & 3      & 3         & 4     & —          \\
-    \texttt{subsample\_rate}     & —      & —       & —        & —      & 0.6466 & 0.7153    & 0.5595 & —          \\
-    \texttt{dropout\_rate}       & —      & —       & —        & —      & 0.8079 & 0.0000    & —      & —          \\
-    \texttt{n\_trees\_per\_group}& —      & —       & —        & —      & —      & —         & 4     & —          \\
+    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & ---          \\
+    \texttt{learning\_rate}      & 0.1905 & 0.0916  & 0.0834   & ---      & 0.2487 & 0.5382    & 0.3643 & ---          \\
+    \texttt{max\_depth}          & 7      & 7       & 16       & 16     & 16     & 16        & 11     & ---          \\
+    \texttt{subsample}           & ---      & 0.8121  & ---        & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{num\_leaves}         & ---      & ---       & 25       & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{alpha}               & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.2182     \\
+    \texttt{l1\_ratio}           & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.1200     \\
+    \texttt{min\_samples\_split} & ---      & ---       & ---        & ---      & 3      & 3         & 4     & ---          \\
+    \texttt{subsample\_rate}     & ---      & ---       & ---        & ---      & 0.6466 & 0.7153    & 0.5595 & ---          \\
+    \texttt{dropout\_rate}       & ---      & ---       & ---        & ---      & 0.8079 & 0.0000    & ---      & ---          \\
+    \texttt{n\_trees\_per\_group}& ---      & ---       & ---        & ---      & ---      & ---         & 4     & ---          \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -929,17 +929,17 @@ The hyperparameters chosen by Optuna are listed below:
     \toprule
     Hyperparameter               & GBT    & XGBoost & LightGBM & RF     & \aigen{Algorithm~\ref{alg:random-dropout}} & Boulevard & \aigen{Algorithm~\ref{alg:structured-dropout}} & ElasticNet \\
     \midrule
-    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & —          \\
-    \texttt{learning\_rate}      & 0.0177 & 0.0226  & 0.0108   & —      & 0.8519 & 0.9137    & 0.3010 & —          \\
-    \texttt{max\_depth}          & 3      & 3       & 9        & 5      & 4      & 4         & 4     & —          \\
-    \texttt{subsample}           & —      & 0.7530  & —        & —      & —      & —         & —      & —          \\
-    \texttt{num\_leaves}         & —      & —       & 37       & —      & —      & —         & —      & —          \\
-    \texttt{alpha}               & —      & —       & —        & —      & —      & —         & —      & 3.8079     \\
-    \texttt{l1\_ratio}           & —      & —       & —        & —      & —      & —         & —      & 0.9556     \\
-    \texttt{min\_samples\_split} & —      & —       & —        & —      & 12     & 27        & 46     & —          \\
-    \texttt{subsample\_rate}     & —      & —       & —        & —      & 0.5335 & 0.7374    & 0.5342 & —          \\
-    \texttt{dropout\_rate}       & —      & —       & —        & —      & 0.3421 & 0.0000    & —      & —          \\
-    \texttt{n\_trees\_per\_group}& —      & —       & —        & —      & —      & —         & 3      & —          \\
+    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & ---          \\
+    \texttt{learning\_rate}      & 0.0177 & 0.0226  & 0.0108   & ---      & 0.8519 & 0.9137    & 0.3010 & ---          \\
+    \texttt{max\_depth}          & 3      & 3       & 9        & 5      & 4      & 4         & 4     & ---          \\
+    \texttt{subsample}           & ---      & 0.7530  & ---        & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{num\_leaves}         & ---      & ---       & 37       & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{alpha}               & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 3.8079     \\
+    \texttt{l1\_ratio}           & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.9556     \\
+    \texttt{min\_samples\_split} & ---      & ---       & ---        & ---      & 12     & 27        & 46     & ---          \\
+    \texttt{subsample\_rate}     & ---      & ---       & ---        & ---      & 0.5335 & 0.7374    & 0.5342 & ---          \\
+    \texttt{dropout\_rate}       & ---      & ---       & ---        & ---      & 0.3421 & 0.0000    & ---      & ---          \\
+    \texttt{n\_trees\_per\_group}& ---      & ---       & ---        & ---      & ---      & ---         & 3      & ---          \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -953,17 +953,17 @@ The hyperparameters chosen by Optuna are listed below:
     \toprule
     Hyperparameter               & GBT    & XGBoost & LightGBM & RF     & \aigen{Algorithm~\ref{alg:random-dropout}} & Boulevard & \aigen{Algorithm~\ref{alg:structured-dropout}} & ElasticNet \\
     \midrule
-    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & —          \\
-    \texttt{learning\_rate}      & 0.0289 & 0.0167  & 0.1836   & —      & 0.7616 & 0.6558    & 0.9864 & —          \\
-    \texttt{max\_depth}          & 5      & 3       & 1        & 20     & 3      & 3         & 3     & —          \\
-    \texttt{subsample}           & —      & 0.6988  & —        & —      & —      & —         & —      & —          \\
-    \texttt{num\_leaves}         & —      & —       & 24       & —      & —      & —         & —      & —          \\
-    \texttt{alpha}               & —      & —       & —        & —      & —      & —         & —      & 3.8079     \\
-    \texttt{l1\_ratio}           & —      & —       & —        & —      & —      & —         & —      & 0.9556     \\
-    \texttt{min\_samples\_split} & —      & —       & —        & —      & 4      & 4         & 9     & —          \\
-    \texttt{subsample\_rate}     & —      & —       & —        & —      & 0.5055 & 0.5438    & 0.6371 & —          \\
-    \texttt{dropout\_rate}       & —      & —       & —        & —      & 0.2395 & 0.0000    & —      & —          \\
-    \texttt{n\_trees\_per\_group}& —      & —       & —        & —      & —      & —         & 2     & —          \\
+    \texttt{n\_estimators}       & 500    & 500     & 500      & 500    & 500    & 500       & 500    & ---          \\
+    \texttt{learning\_rate}      & 0.0289 & 0.0167  & 0.1836   & ---      & 0.7616 & 0.6558    & 0.9864 & ---          \\
+    \texttt{max\_depth}          & 5      & 3       & 1        & 20     & 3      & 3         & 3     & ---          \\
+    \texttt{subsample}           & ---      & 0.6988  & ---        & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{num\_leaves}         & ---      & ---       & 24       & ---      & ---      & ---         & ---      & ---          \\
+    \texttt{alpha}               & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 3.8079     \\
+    \texttt{l1\_ratio}           & ---      & ---       & ---        & ---      & ---      & ---         & ---      & 0.9556     \\
+    \texttt{min\_samples\_split} & ---      & ---       & ---        & ---      & 4      & 4         & 9     & ---          \\
+    \texttt{subsample\_rate}     & ---      & ---       & ---        & ---      & 0.5055 & 0.5438    & 0.6371 & ---          \\
+    \texttt{dropout\_rate}       & ---      & ---       & ---        & ---      & 0.2395 & 0.0000    & ---      & ---          \\
+    \texttt{n\_trees\_per\_group}& ---      & ---       & ---        & ---      & ---      & ---         & 2     & ---          \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -1019,7 +1019,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 
 \begin{figure}[H]
     \centering
-    \todoresolve{MISSING IMAGE FILE IN ARXIV 2509.23127 TARBALL: plots/ne_100_lr_0.3_md_4_sr_0.6_dr_0.6.png}
+    \todoresolve{MISSING IMAGE FILE IN ARXIV 2509.23127 TARBALL: plots/ne\_100\_lr\_0.3\_md\_4\_sr\_0.6\_dr\_0.6.png}
     \caption{High coverage, underfitting.}
     \subcaption{Ensemble Size: 100; Learning Rate: 0.3; Maximum Depth: 4; Subsampling Rate: 0.6; Dropout rate: 0.6}
     \label{fig:1d-under-fit}
@@ -1202,7 +1202,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
     $\|\jmat\Kmatk\jmat - P_k\|_{\mathrm{op}}\le \varepsilon_{n,k}\to 0$. \\
     \bottomrule
     \end{tabular}
-    \caption{Additive subspaces and projectors; Assumption~\ref{aspt:proj-orth}). }
+    \caption{Additive subspaces and projectors (Assumption~\ref{aspt:proj-orth}).}
     \label{tab:notation_proj}
 \end{table}
 
@@ -1466,7 +1466,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 	
 	
 	
-	\paragraph{Bin–space compression (for the norm).}
+	\paragraph{Bin--space compression (for the norm).}
     \begin{lemma}[Bin-space norm computation]
         Let \(\mathbf{c}^{(k)}:=\mathbf{Z}_n^{(k)\top}\mathbf{1}_n\in\mathbb{R}^{m_k}\) be the bin counts. Also define
         $$
@@ -1977,10 +1977,10 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 		= \left(\frac{b}{b+1}\mathbf{I}_{np} + \frac{1}{b+1}\mathbf{L}\right)\mathbf{D}_b,
 		\]
 		where $\mathbf{L}$ is the $np\times np$ block matrix with diagonal blocks equal to $0$
-		and off–diagonal blocks given by $\E\Smatk$, multiplied by the averaging operator $(I-\frac{1}{n^2}\mathbf{1}\mathbf{1}^\top)$.
+		and off--diagonal blocks given by $\E\Smatk$, multiplied by the averaging operator $(I-\frac{1}{n^2}\mathbf{1}\mathbf{1}^\top)$.
 		
-		The Partition Distinctness assumption implies that each off–diagonal block of $\mathbf{L}$ 
-		has operator norm at most $c_3$, so by a Schur–type bound
+		The Partition Distinctness assumption implies that each off--diagonal block of $\mathbf{L}$ 
+		has operator norm at most $c_3$, so by a Schur--type bound
 		\[
 		\|\mathbf{L}\|\;\le\;(p-1)c_3 < 1
 		\]
@@ -2045,7 +2045,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
     \begin{table}[H]
     \centering
     \small
-    \caption{Empirical verification of Assumption 4.9 across real and synthetic datasets.
+    \caption{Empirical verification of Assumption~\ref{aspt:kernel-spec} across real and synthetic datasets.
     All experiments use \texttt{learning\_rate=0.1}, \texttt{max\_rounds=200},
     \texttt{subsample\_rate=0.7}, \texttt{truncation=3.0}.}
     \label{tab:kernel_distinctness}
@@ -2125,7 +2125,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 	\paragraph{Expected Feature Tree Kernels}
 	\begin{lemma}[Spectrum of $\Kmatk$]
 		\label{lem:spec-of-K}
-		For any feature $k$, the expected structure matrix $\Kmatk=\E[\Smatk]$ is a symmetric operator on $\R^n$ with spectrum contained in $[0,1]$. It always holds that $\Kmatk \bone=\bone$, so $1$ is an eigenvalue with eigenvector $\bone$. Restricting to the mean–zero subspace $\mathsf H_0=\{v:\bone^\top v=0\}$, the supremum of the spectrum is bounded by
+		For any feature $k$, the expected structure matrix $\Kmatk=\E[\Smatk]$ is a symmetric operator on $\R^n$ with spectrum contained in $[0,1]$. It always holds that $\Kmatk \bone=\bone$, so $1$ is an eigenvalue with eigenvector $\bone$. Restricting to the mean--zero subspace $\mathsf H_0=\{v:\bone^\top v=0\}$, the supremum of the spectrum is bounded by
 		$$
 		\sup\{\lambda:\lambda\in\sigma(\Kmatk|_{\mathsf H_0})\} \;=\; \rho_k \;<\;1,
 		$$
@@ -2166,7 +2166,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 	
 	\begin{lemma}
 		\label{lem:agg-K}
-		Work on the mean–zero subspace $\mathsf H_0=\{v\in\R^n:\bone^\top v=0\}$. The aggregated kernel
+		Work on the mean--zero subspace $\mathsf H_0=\{v\in\R^n:\bone^\top v=0\}$. The aggregated kernel
 		$$
 		\mathcal{K} \;:=\; \sum_{k=1}^{p}(\bI-\Kmatk)^{-1}\jmat\Kmatk
 		$$
@@ -2189,7 +2189,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 	
 	\begin{lemma}[Eigenvalues of $\bP_2$]
 		\label{lem:spec-P2}
-		Work on the mean–zero subspace $\mathsf H_0=\{v\in\R^n:\,\bone^\top v=0\}$. Define
+		Work on the mean--zero subspace $\mathsf H_0=\{v\in\R^n:\,\bone^\top v=0\}$. Define
 		$$
 		\bP \;:=\; (\bI-\Kmatk)^\dagger\Big(\bI-\tfrac{1}{n}\bone\bone^\top\Big)\Big[\bI-(\bI+\mathcal{K})^\dagger\mathcal{K}\Big],
 		\qquad
@@ -2337,7 +2337,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 		so $\mathcal{K} \beta = 0$ and likewise $(I-\tfrac{1}{n}\bone\bone^\top)\beta = 0$. With subsampling, the whole inner product will go to 0 at rate $O(\frac{1}{n})$ since $\norm{\kveck}_1 = 1 - O(\frac{1}{n})$.
 		Thus the entire product vanishes.
 		
-		Next we show for Algorithm \ref{alg:brebm_ident}.Row–stochasticity gives $\Smat^{(k)}\bone=\bone+O(\frac{1}{n})\bone$ for all $k$, hence $\E[\Smat^{(k)}]\bone=\bone+O(\frac{1}{n})\bone$.
+		Next we show for Algorithm \ref{alg:brebm_ident}.Row--stochasticity gives $\Smat^{(k)}\bone=\bone+O(\frac{1}{n})\bone$ for all $k$, hence $\E[\Smat^{(k)}]\bone=\bone+O(\frac{1}{n})\bone$.
 		Because $(I+\jmat\bK)$ maps $\bbeta$ to itself, its inverse (which exists since
 		$(I+\jmat\bK)$ is the identity on $\mathrm{span}\{\bone\}$ and equals $(I+\bK_0)$ on the orthogonal complement, with $\bK_0:=\jmat\bK\jmat\succeq 0$) maps $\bbeta$ back to $\bbeta$:
 		\(
@@ -2349,9 +2349,9 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 	
 	\paragraph{Same-feature Bias for Algorithm \ref{alg:brebm_ident}}
 	
-	\begin{lemma}[Same–feature Bias for Algorithm \ref{alg:brebm_ident}]
+	\begin{lemma}[Same--feature Bias for Algorithm \ref{alg:brebm_ident}]
 		\label{lem:samefeature1} 
-		Let $\f^{(k)}$ be $L$–Lipschitz in its argument, and let $A_n(\bx)$ denote the (feature-$k$)
+		Let $\f^{(k)}$ be $L$--Lipschitz in its argument, and let $A_n(\bx)$ denote the (feature-$k$)
 		leaf containing $\bx$.Then
 		$$
 		\norm{\rveck_E(\bx)^\top \f^{(k)}(\bX^{(k)}) - \frac{\lambda}{1+\lambda}\f^{(k)}(\bx^{(k)})} = O(\frac{1}{n})
@@ -2376,10 +2376,10 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 	
 	
 	\paragraph{Same-feature Bias for Algorithm \ref{alg:ebm_bratp}}
-	\begin{lemma}[Same–feature Bias for Algorithm \ref{alg:ebm_bratp}]
+	\begin{lemma}[Same--feature Bias for Algorithm \ref{alg:ebm_bratp}]
 		\label{lem:samefeature2}
-		Let $f^{(k)}$ be $L$–Lipschitz in its argument and let $A_n(\bx)$ be the
-		(feature–$k$) leaf containing $\bx$. Denote
+		Let $f^{(k)}$ be $L$--Lipschitz in its argument and let $A_n(\bx)$ be the
+		(feature--$k$) leaf containing $\bx$. Denote
 		$$
 		\mathbf{r}^{(k)}_{B}(\bx)^{\!\top}
 		:=\;\E[\mathbf{s}^{(k)}(\bx)]^{\top}\,(\mathbf{I}-\Kmat^{(k)})^{-1}
@@ -2405,7 +2405,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 		$$
 		\bP_k \;=\; \sum_{s\ge 0} (\Kmat^{(k)})^s \;\jmat\; \sum_{t\ge 0} (-1)^t \mathcal{K}^t .
 		$$
-		Left–multiply by $\bone^\top$ to take column sums. Since $\bone^\top\jmat=0$, the $s=0$ term vanishes. For $s\ge1$, the near–stochasticity yields
+		Left--multiply by $\bone^\top$ to take column sums. Since $\bone^\top\jmat=0$, the $s=0$ term vanishes. For $s\ge1$, the near--stochasticity yields
 		$\bone^\top (\Kmat^{(k)})^s = \bone^\top + O\!\left(\tfrac{1}{n}\right)$,
 		and multiplying by the uniformly bounded $\jmat(\bI+\mathcal{K})^{-1}$ preserves the $O\!\left(\tfrac{s}{n}\right)$ size. Summing the geometric tail over $s$ gives an $O\!\left(\tfrac{1}{n}\right)$ remainder. Thus
 		$\bone^\top \bP_k = \bone^\top + O\!\left(\tfrac{1}{n}\right)^\top$,
@@ -2557,7 +2557,7 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 		
 	\end{proof}
 	
-	Collecting Lemmas~\ref{lem:baseline}–\ref{lem:rateofleakage-2} and the  
+	Collecting Lemmas~\ref{lem:baseline}--\ref{lem:rateofleakage-2} and the  
 	we conclude that the random-design bias terms vanish in probability. Together with the conditional CLT for the noise term, Slutsky’s theorem implies the full estimator is asymptotically normal (formalized in the next subsection).
 	
 	
@@ -2648,8 +2648,8 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 		$$
 		Since $\by_i=f(\bx_i)+\epsilon_i$ with $\E[\epsilon_i]=0$ and $\text{Var}(\epsilon_i)=\sigma^2<\infty$,
 		we have $\E[\by_i]=\bbeta$.
-		Because the $\{\by_i\}$ are i.i.d.\ sub–Gaussian with finite variance,
-		the Lindeberg–Feller central limit theorem applies, yielding
+		Because the $\{\by_i\}$ are i.i.d.\ sub--Gaussian with finite variance,
+		the Lindeberg--Feller central limit theorem applies, yielding
 		$$
 		\sqrt{n}\,(\widehat\bbeta-\bbeta) 
 		= \frac{1}{\sqrt{n}}\sum_{i=1}^n (\by_i-\E[\by_i])
@@ -2666,8 +2666,8 @@ As an extension of Section \ref{sec:coverage-experiments}, we display more visua
 		$$
 		Since $\by_i=f(\bx_i)+\epsilon_i$ with $\E[\epsilon_i]=0$ and $\text{Var}(\epsilon_i)=\sigma^2<\infty$,
 		we have $\E[\by_i]=\beta$.
-		Because the $\{\by_i\}$ are i.i.d.\ sub–Gaussian with finite variance,
-		the Lindeberg–Feller central limit theorem applies, yielding
+		Because the $\{\by_i\}$ are i.i.d.\ sub--Gaussian with finite variance,
+		the Lindeberg--Feller central limit theorem applies, yielding
 		$$
 		\sqrt{n}\,(\widehat\bbeta-\bbeta) 
 		= \frac{1}{\sqrt{n}}\sum_{i=1}^n (\by_i-\E[\by_i])

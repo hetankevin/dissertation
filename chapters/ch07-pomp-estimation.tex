@@ -1,4 +1,4 @@
-\chapter{Parameter Estimation under Partial Observability}
+\chapter{PARAMETER ESTIMATION UNDER PARTIAL OBSERVABILITY}
 \label{ch:pomp-estimation}
 
 \aigen{\emph{This chapter is based on joint work with A.~J.~Abkemeier, Kunyang He, Giles Hooker, and Edward L.~Ionides \citep{tan2024accelerated}: Kevin Tan, A.~J.~Abkemeier, Kunyang He, Giles Hooker, and Edward L.~Ionides, ``Automatic Differentiation to Improve Parameter Estimation for Partially Observed Markov Processes,'' working paper (revise and resubmit at Journal of the Royal Statistical Society: Series B), arXiv:2407.03085, 2024.}}
@@ -75,7 +75,7 @@ Mathematically and computationally, we can permit $\omega_n$ to be vector valued
 
 \section{Off-Parameter Particle Filters}
 
-The {\it Measurement Off-Parameter with discount factor} $\alpha$ (\aigen{Algorithm~\ref{alg:mop}}), particle filter is defined by the pseudocode in Algorithm~\ref{alg:mop}.
+The {\it Measurement Off-Parameter with discount factor} $\alpha$ particle filter is defined by the pseudocode in \aigen{Algorithm~\ref{alg:mop}}.
 Note that this algorithm has the plug-and-play property.
 We suppose that the simulator is a differentiable function of $\theta$ for every fixed $\omega$.
 This condition is equivalent to the {\it reparameterization trick} \citep{corenflos21}; by writing the generated random numbers as parameter-dependent transformation from a reference distribution---e.g., the quantile transform of a uniform random variable---we can differentiate their values, and hence the simulation, with respect to parameters.
@@ -89,7 +89,7 @@ When $\theta = \phi$, we have $w_{n,j}^{P,\theta} = w_{n-1,j}^{F,\theta} = 1$ an
 One can think of \aigen{Algorithm~\ref{alg:mop}} as reconstructing local smooth approximations of the discontinuous likelihood estimates produced by a particle filter for a fixed number of particles $J$ and fixed seed $\omega$.
 These approximate the likelihood at $\theta$ in a neighborhood around $\phi$, with the intent that differentiating these smooth log-likelihood reconstructions yields a score estimate.
 
-\aigen{Algorithm~\ref{alg:dmop}} (Algorithm~\ref{alg:dmop}) computes the fixed-seed derivative of the likelihood estimate obtained by \aigen{Algorithm~\ref{alg:mop}} at $\theta=\phi$.
+\aigen{Algorithm~\ref{alg:dmop}} computes the fixed-seed derivative of the likelihood estimate obtained by \aigen{Algorithm~\ref{alg:mop}} at $\theta=\phi$.
 To better understand the implementation in \aigen{Algorithm~\ref{alg:dmop}}, we review some background for AD.
  Standard AD consists of two evaluation passes: a forward pass in which the function is evaluated and a graph built of the evaluation process, followed by a backward pass where the derivative is evaluated by recursive use of the chain rule on the computation graph \citep{griewank08}.  
   The two evaluation passes in \aigen{Algorithm~\ref{alg:mop}} at $\phi$ and $\theta$ correspond to the two AD evaluation passes in \aigen{Algorithm~\ref{alg:dmop}}.
@@ -241,7 +241,7 @@ As such, the use of the stop-gradient in \cite{scibior21} can be seen as the \ai
 \section{From Gradients to Maximum Likelihood Estimation}
 
 To design an effective procedure for likelihood maximization using \aigen{Algorithm~\ref{alg:dmop}}, we carry out iterated filtering then automatic differentiation (\aigen{Algorithm~\ref{alg:ifad}}). 
-A basic \aigen{Algorithm~\ref{alg:ifad}} approach is presented in Algorithm~\ref{alg:ifad}.
+\aigen{A basic version of this approach is presented in} Algorithm~\ref{alg:ifad}.
 The second stage uses a symmetric positive-definite curvature matrix $B_m$ whose
 eigenvalues are kept in a fixed interval $[c,C]$.  A raw particle Hessian or a
 quasi-Newton matrix may be spectrally clipped to this interval; the choice
@@ -374,16 +374,16 @@ We tested \aigen{Algorithm~\ref{alg:ifad}} with $\alpha = 0$, $\alpha=0.97$ and 
 For each method, we performed 100 searches, initialized with 100 starting parameter vectors drawn uniformly from the same wide bounding box used by \cite{ionides15}. 
 To ensure a fair comparison under comparable computational effort, we ran each method for a similar amount of time.
 For each method, we chose algorithmic parameters that maximized the log-likelihood well for that method while finishing within the allotted time. 
-We ran IF2 for 1950 iterations, while \aigen{Algorithm~\ref{alg:ifad}}-0.97 is run using a short IF2 warm-start of 175 iterations followed by the Adam optimizer for 400 iterations.
-\aigen{Algorithm~\ref{alg:ifad}}-0 and \aigen{Algorithm~\ref{alg:ifad}}-1 were run for 60 IF2 iterations followed by 410 and 425 Adam iterations, respectively.
+We ran IF2 for 1950 iterations, while \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} is run using a short IF2 warm-start of 175 iterations followed by the Adam optimizer for 400 iterations.
+\aigen{Algorithm~\ref{alg:ifad} ($\alpha=0$)} and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} were run for 60 IF2 iterations followed by 410 and 425 Adam iterations, respectively.
 The cooling rate used for IF2 was slower than that used for the warm start in \aigen{Algorithm~\ref{alg:ifad}}. 
-To assess whether other methods can catch up to \aigen{Algorithm~\ref{alg:ifad}}-0.97 given more time, we separately ran the IF2-only approach for 4 times as many iterations and the \aigen{Algorithm~\ref{alg:ifad}} variants with 4 times as many Adam iterations, slowing the cooling rate for each as well.
+To assess whether other methods can catch up to \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} given more time, we separately ran the IF2-only approach for 4 times as many iterations and the \aigen{Algorithm~\ref{alg:ifad}} variants with 4 times as many Adam iterations, slowing the cooling rate for each as well.
 A summary of the optimization settings is provided in the supplement (Section~\suppSecAlgorithmicParameters), and the complete source code to reproduce the numerical results is available at \href{https://github.com/pypomp/dmop}{https://github.com/pypomp/dmop}.
 
 \begin{table}[htbp!]
 \centering
 \input{figures/ch07/imgs/precise_table}
-\caption{Maximum log-likelihood found by IF2 and \aigen{Algorithm~\ref{alg:ifad}} under both comparable and extended computational effort. The maximum is the largest of the 100 searches, and is biased upward by the winner's curse; the re-evaluated column gives a fresh particle filter evaluation of that same search, which removes the selection bias at the cost of being a single noisy evaluation. Where the searches cluster tightly, as they do for \aigen{Algorithm~\ref{alg:ifad}}-0.97 under extended effort, the re-evaluation regresses toward the median. \aigen{Algorithm~\ref{alg:ifad}}-0.97 performs the best among all methods.}
+\caption{Maximum log-likelihood found by IF2 and \aigen{Algorithm~\ref{alg:ifad}} under both comparable and extended computational effort. The maximum is the largest of the 100 searches, and is biased upward by the winner's curse; the re-evaluated column gives a fresh particle filter evaluation of that same search, which removes the selection bias at the cost of being a single noisy evaluation. Where the searches cluster tightly, as they do for \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} under extended effort, the re-evaluation regresses toward the median. \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} performs the best among all methods.}
 \arxiv{}{\vspace*{-7mm}}
 \label{table:mle}
 \end{table}
@@ -392,9 +392,9 @@ Our findings are summarized in Table \ref{table:mle} and Figures \ref{fig:boxplo
 Because estimating the log-likelihoods at every iteration of IF2 with particle filtering for Figure \ref{fig:optim} lengthens the computation time and thus compromises the fair comparison between methods, we obtained the times in Table \ref{table:mle} and Figure \ref{fig:optim} by running the methods again without the extra calls to the particle filter. 
 Every other value displayed for the Dhaka results comes from the runs with the extra particle filter calls. 
 
-Examining Table \ref{table:mle}, \aigen{Algorithm~\ref{alg:ifad}}-0.97 attained a log-likelihood of -3743.68, which surpassed IF2 even when IF2 ran for 4 times as long.
-\aigen{Algorithm~\ref{alg:ifad}}-1 sometimes came close to \aigen{Algorithm~\ref{alg:ifad}}-0.97, but its additional noise gave it worse median performance.
-\aigen{Algorithm~\ref{alg:ifad}}-1 needed to be run for an extended time for the median log-likelihood to start catching up with \aigen{Algorithm~\ref{alg:ifad}}-0.97.
+Examining Table \ref{table:mle}, \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} attained a log-likelihood of -3743.68, which surpassed IF2 even when IF2 ran for 4 times as long.
+\aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} sometimes came close to \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)}, but its additional noise gave it worse median performance.
+\aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} needed to be run for an extended time for the median log-likelihood to start catching up with \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)}.
 
 \begin{figure}[ht]
     \centering
@@ -406,7 +406,7 @@ Examining Table \ref{table:mle}, \aigen{Algorithm~\ref{alg:ifad}}-0.97 attained 
     \captiona\ Comparable computational effort. 
     \captionb\ Extended computational effort. 
     Log-likelihoods lower than -3800 are omitted. 
-    \aigen{Algorithm~\ref{alg:ifad}}-0.97 outperforms all other methods.
+    \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} outperforms all other methods.
     The dotted red line shows the best-known maximized log-likelihood.}
     \label{fig:boxplot}
     \arxiv{}{\vspace*{-5mm}}
@@ -435,20 +435,20 @@ Examining Table \ref{table:mle}, \aigen{Algorithm~\ref{alg:ifad}}-0.97 attained 
 \end{figure}
 
  
-\aigen{Algorithm~\ref{alg:ifad}}-0 fell nearly 5 log-units short of \aigen{Algorithm~\ref{alg:ifad}}-0.97 even with extended time, presumably due to its high bias. 
-Based on Figure \ref{fig:optim}, \aigen{Algorithm~\ref{alg:ifad}}-0 and IF2-only plateau heavily after being run for long enough and could not catch up to \aigen{Algorithm~\ref{alg:ifad}}-0.97 within a reasonable timeframe.
+\aigen{Algorithm~\ref{alg:ifad} ($\alpha=0$)} fell nearly 5 log-units short of \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} even with extended time, presumably due to its high bias. 
+Based on Figure \ref{fig:optim}, \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0$)} and IF2-only plateau heavily after being run for long enough and could not catch up to \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} within a reasonable timeframe.
 
 Previously, a maximized log-likelihood of $-3748.6$ for this model and data was reported by \cite{king16}.
 This MLE was obtained with much computational effort, using many global and local IF2 searches and with the assistance of likelihood profiling, 8 years after the model was first proposed by \cite{king08}.
 Meanwhile, \cite{ionides15} only achieve a maximum log-likelihood of $-3768.6$, and \cite{king08} only $-3793.4$.
-Using the improved computational efficiency of Pypomp (elaborated upon in Section \ref{sec:efficiency}), IF2 alone surpasses all of these previous results within a wall clock time of about an hour, while \aigen{Algorithm~\ref{alg:ifad}}-0.97 does so in under 16 minutes and holds the record at $-3743.53$.
+Using the improved computational efficiency of Pypomp (elaborated upon in Section \ref{sec:efficiency}), IF2 alone surpasses all of these previous results within a wall clock time of about an hour, while \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} does so in under 16 minutes and holds the record at $-3743.53$.
 
 
-Notably, the log-likelihood and parameter estimates for \aigen{Algorithm~\ref{alg:ifad}}-0.97 frequently exhibit much less Monte~Carlo variance than that of the other methods, as can be seen in Figures~\ref{fig:boxplot} and~\ref{fig:density}. 
+Notably, the log-likelihood and parameter estimates for \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} frequently exhibit much less Monte~Carlo variance than that of the other methods, as can be seen in Figures~\ref{fig:boxplot} and~\ref{fig:density}. 
 \aigen{Algorithm~\ref{alg:ifad}} in general exhibits less Monte~Carlo variance than IF2, especially for the parameter estimates. 
-\aigen{Algorithm~\ref{alg:ifad}}-0 has the second-lowest Monte~Carlo variance for most parameter estimates, although it has the lowest for the initial state proportions $S_0$, $I_0$ and $R_{1,0}$.
-That said, the choice $\alpha=0$ is also known to have the greatest bias, and \aigen{Algorithm~\ref{alg:ifad}}-1 agrees more closely with \aigen{Algorithm~\ref{alg:ifad}}-0.97. 
-Because multiple searches are employed to mitigate the effects of Monte~Carlo variance, the lower Monte~Carlo variance of \aigen{Algorithm~\ref{alg:ifad}}-0.97 suggests that fewer searches are needed when running \aigen{Algorithm~\ref{alg:ifad}}-0.97 to obtain a log-likelihood close to the maximum. 
+\aigen{Algorithm~\ref{alg:ifad} ($\alpha=0$)} has the second-lowest Monte~Carlo variance for most parameter estimates, although it has the lowest for the initial state proportions $S_0$, $I_0$ and $R_{1,0}$.
+That said, the choice $\alpha=0$ is also known to have the greatest bias, and \aigen{Algorithm~\ref{alg:ifad} ($\alpha=1$)} agrees more closely with \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)}. 
+Because multiple searches are employed to mitigate the effects of Monte~Carlo variance, the lower Monte~Carlo variance of \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} suggests that fewer searches are needed when running \aigen{Algorithm~\ref{alg:ifad} ($\alpha=0.97$)} to obtain a log-likelihood close to the maximum. 
 Lowering the Monte~Carlo variance also narrows the width of Monte-Carlo-adjusted profile confidence intervals \citep{ionides17}.
 
 %\subsection{\aigen{Algorithm~\ref{alg:ifad}} Outperforms Both IF2 and \aigen{Algorithm~\ref{alg:dmop}} Alone}
@@ -823,7 +823,7 @@ In that case, one requires access to the transition densities, or at least their
 This algorithm may be better suited to large discrete state spaces than either \aigen{Algorithm~\ref{alg:dmop}} or differentiation of the Baum-Welch algorithm.
 
 Discounting the weights by some $\alpha \in [0,1]$ is not the only way to interpolate between the estimators of \cite{naesseth18} and \cite{poyiadjis11}. 
-As the proof of Theorem \ref{thm:mop-biasvar} implies, we can also truncate the weights at a fixed lag, corresponding to the \aigen{Algorithm~\ref{alg:mop}}-$(1,k)$ algorithm mentioned. 
+As the proof of Theorem \ref{thm:mop-biasvar} implies, we can also truncate the weights at a fixed lag, corresponding to the \aigen{fixed-lag $(1,k)$ variant of Algorithm~\ref{alg:mop}} mentioned. 
 The analysis is similar, with comparable rates but with a slightly less convenient implementation. 
 
 

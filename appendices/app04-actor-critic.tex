@@ -1,4 +1,4 @@
-\chapter{Proofs and Supplementary Details for Chapter~\ref{ch:actor-critic}}
+\chapter{PROOFS AND SUPPLEMENTARY DETAILS FOR CHAPTER~\ref{ch:actor-critic}}
 \label{app:actor-critic}
 
 \aigen{This appendix contains the complete proofs, hybrid RL extensions, ablation analyses, and supplementary experimental details for Part~I (Section~\ref{sec:app04-part1}) and Part~II (Section~\ref{sec:app04-part2}) of Chapter~\ref{ch:actor-critic}.}
@@ -2867,15 +2867,15 @@ In this section, we introduce various methods of experimental design to bound $\
     &\text{s.t.} \quad G = \sum_{(s, a) \in \gD_{\exp}} \rho_{\exp}(s, a) \, \varphi(s, a) \, \varphi(s, a)^\top \,.
 \end{align}
 
-In~\cref{subsec:kiefer_wolfowitz}, we consider constructing a coreset for the policy features. The Kiefer–Wolfowitz theorem guarantees that there exists a coreset that can ensure that $\ol{\varphi}_G$ is bounded, and that such a coreset has a small $O(d)$ size. Such a coreset can be formed using G-experimental design. In~\cref{subsec:exploratory_policy}, we consider using the linear MDP features as the policy features and constructing $\gD_{\exp}$ through limited interaction with the environment.
+In~\cref{subsec:kiefer_wolfowitz}, we consider constructing a coreset for the policy features. The Kiefer--Wolfowitz theorem guarantees that there exists a coreset that can ensure that $\ol{\varphi}_G$ is bounded, and that such a coreset has a small $O(d)$ size. Such a coreset can be formed using G-experimental design. In~\cref{subsec:exploratory_policy}, we consider using the linear MDP features as the policy features and constructing $\gD_{\exp}$ through limited interaction with the environment.
 
-\subsubsection{Kiefer–Wolfowitz Theorem and G-Experimental Design}
+\subsubsection{Kiefer--Wolfowitz Theorem and G-Experimental Design}
 \label{subsec:kiefer_wolfowitz}
 
-We first introduce the Kiefer–Wolfowitz theorem~\citep{kiefer1960equivalence} which guarantees that there exists a coreset $\gD_{\exp}$ and its corresponding distribution $\rho_{\exp}$ that can be used to bound $\ol{\varphi}_G$.
+We first introduce the Kiefer--Wolfowitz theorem~\citep{kiefer1960equivalence} which guarantees that there exists a coreset $\gD_{\exp}$ and its corresponding distribution $\rho_{\exp}$ that can be used to bound $\ol{\varphi}_G$.
 
-\begin{proposition}[Kiefer–Wolfowitz]
-\label{prop:kiefer–wolfowitz}
+\begin{proposition}[Kiefer--Wolfowitz]
+\label{prop:kiefer--wolfowitz}
 Let $G \coloneq \sum_{(s, a) \in \gD_{\exp}} \rho_{\exp}(s, a) \, \varphi(s, a) \, \varphi(s, a)^\top$ be the covariance matrix for any $\gD_{\exp} \subset \gS \times \gA$ and $\rho \in \Delta(\gD_{\exp})$. There exists a coreset $\gD_{\exp}$ and a distribution $\rho_{\exp}$ such that 
 \begin{align}
     \sup_{(s, a) \in \gD_{\exp}} \nrm*{\varphi(s, a)}_{G^{-1}} \leq 2 \, d_{\va} \quad \text{and} \quad |\gD_{\exp}| \leq 4 d_{\va} \log \log (d_{\va} + 4) + 28\,.
@@ -3643,7 +3643,7 @@ Using~\cref{lem:on_policy_self_normalized_concentration}, we can instantiate~\cr
     \begin{align}
         \gF_{i, h}^{\mathrm{on}} = \crl*{(s_\tau^i, a_\tau^i)}_{\tau \in [h-1]} \,,
     \end{align}
-    such that $\E \brk*{ \gM_{i, h}^{\mathrm{on}} \mid \gF_{i, h}^{\mathrm{on}} } = 0$, where the expectation is with respect to the randomness in the policy and the environment at step $h$. Since $|\gM_{i, h}^{\mathrm{on}}| \leq 1$, we can apply the Azuma–Hoeffding inequality and obtain that
+    such that $\E \brk*{ \gM_{i, h}^{\mathrm{on}} \mid \gF_{i, h}^{\mathrm{on}} } = 0$, where the expectation is with respect to the randomness in the policy and the environment at step $h$. Since $|\gM_{i, h}^{\mathrm{on}}| \leq 1$, we can apply the Azuma--Hoeffding inequality and obtain that
     \begin{align}
         \Pr \prn*{ \sum_{i=1}^N \sum_{h=1}^H \gM_{i, h}^{\mathrm{on}} \geq m} \geq \exp \prn*{ \frac{- m^2}{ 2 \, H \, N}} \,.
     \end{align}
@@ -3852,7 +3852,7 @@ This concludes the proof.
         \begin{align}
             \gF_{t, h}^{\mathrm{off}} = \crl*{(s^i_{\tau}, a^i_{\tau})}_{(i, \tau) \in [t-1] \times [H]} \cup \crl*{(s^t_{\tau}, a^t_{\tau})}_{\tau \in [h-1]} \,,
         \end{align}
-        such that $\E \brk*{ \gM_{t, h}^{\mathrm{off}} \mid \gF_{t, h}^{\mathrm{off}} } = 0$. Since $|\gM_{i, h}^{\mathrm{off}}| \leq 1$, we can apply the Azuma–Hoeffding inequality and obtain that
+        such that $\E \brk*{ \gM_{t, h}^{\mathrm{off}} \mid \gF_{t, h}^{\mathrm{off}} } = 0$. Since $|\gM_{i, h}^{\mathrm{off}}| \leq 1$, we can apply the Azuma--Hoeffding inequality and obtain that
         \begin{align}
             \Pr \prn*{ \sum_{t=1}^T \sum_{h=1}^H \gM_{t, h}^{\mathrm{off}} \geq m} \geq \exp \prn*{ \frac{- m^2}{ 2 \, H \, T }} \,.
         \end{align}
@@ -3961,7 +3961,7 @@ To implement our proposed algorithm, we need to conduct the experimental design 
 \end{algorithm}
 
 \paragraph{Algorithms and Hyperparameters}
-We denote by \aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)} our proposed algorithm with an explicit log-linear policy parameterization that uses $\LMC$ for policy evaluation and projected $\NPG$ for policy optimization over the obtained coreset. We denote by \aigen{projected NPG with LMC critic (implicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (implicit coreset)}} in figures)} an idealized variant of $\NPG$ that does not have an explicit policy parameterization and maintains an implicit policy by storing all parameterized $Q$ functions (and hence requires significantly more memory). As a baseline, we also consider the value-based algorithm $\LMC$~\citep{ishfaq2024provable}.
+We denote by \aigen{projected NPG with LMC critic (explicit coreset)} our proposed algorithm with an explicit log-linear policy parameterization that uses $\LMC$ for policy evaluation and projected $\NPG$ for policy optimization over the obtained coreset. We denote by \aigen{projected NPG with LMC critic (implicit coreset)} an idealized variant of $\NPG$ that does not have an explicit policy parameterization and maintains an implicit policy by storing all parameterized $Q$ functions (and hence requires significantly more memory). As a baseline, we also consider the value-based algorithm $\LMC$~\citep{ishfaq2024provable}.
 
 In~\cref{tab:hyperparams}, we list the hyperparameters used across all experiments. For log-linear policies, the actor loss in~\cref{eq:actor_loss} admits a closed-form solution, allowing us to avoid tuning of the actor learning rate $\alpha_{\va}$ and the number of actor updates $K_t$, by minimizing the objective exactly. In general, for non-linear models, inexact optimization (e.g., stochastic gradient descent) is usually required to optimize the actor loss.
 
@@ -3993,23 +3993,23 @@ Horizon Length ($H$) & \multicolumn{3}{c|}{$100$} \\
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.42\linewidth]{figures/ch04/figures/lmc_vs_npg_d_critic_100_d_actor_100.png}
-\caption{Comparison of \aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)} (our proposed framework), \aigen{projected NPG with LMC critic (implicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (implicit coreset)}} in figures)} (memory-intensive variant), and $\LMC$ (value-based baseline) in the Deep Sea environment.}
+\caption{Comparison of \aigen{projected NPG with LMC critic (explicit coreset)} (our proposed framework), \aigen{projected NPG with LMC critic (implicit coreset)} (memory-intensive variant), and $\LMC$ (value-based baseline) in the Deep Sea environment.}
 \label{fig:deep_sea}
 \end{figure}
 
-For the Random MDP,~\cref{fig:random_mdp} indicates that \aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)} closely matches \aigen{projected NPG with LMC critic (implicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (implicit coreset)}} in figures)} while outperforming the value-based baseline, $\LMC$. For the linear MDP version of Deep Sea,~\cref{fig:deep_sea} showcases that \aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)} can achieve comparable performance with \aigen{projected NPG with LMC critic (implicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (implicit coreset)}} in figures)} and $\LMC$. 
+For the Random MDP,~\cref{fig:random_mdp} indicates that \aigen{projected NPG with LMC critic (explicit coreset)} closely matches \aigen{projected NPG with LMC critic (implicit coreset)} while outperforming the value-based baseline, $\LMC$. For the linear MDP version of Deep Sea,~\cref{fig:deep_sea} showcases that \aigen{projected NPG with LMC critic (explicit coreset)} can achieve comparable performance with \aigen{projected NPG with LMC critic (implicit coreset)} and $\LMC$. 
 
 \subsubsection{Ablation Studies}
 \label{subsec:ablation_studies}
 
 \paragraph{Ablation on Exploration}
 \label{subsubsec:ablation_exploration}
-To study the impact of the exploration mechanism, $\texttt{LMC}$, in our proposed algorithm, we perform an ablation in the linear MDP variant of Deep Sea. For the baseline without exploration, we consider the same algorithm design as \aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)} and simply do not inject any noise into the LMC update. The results in~\cref{fig:lmc-npg-exp-exploration-ablation} indicate that when the feature dimensions of the critic and the actor are relatively small, the exploration mechanism is crucial for our proposed algorithm to achieve decent performance.
+To study the impact of the exploration mechanism, $\texttt{LMC}$, in our proposed algorithm, we perform an ablation in the linear MDP variant of Deep Sea. For the baseline without exploration, we consider the same algorithm design as \aigen{projected NPG with LMC critic (explicit coreset)} and simply do not inject any noise into the LMC update. The results in~\cref{fig:lmc-npg-exp-exploration-ablation} indicate that when the feature dimensions of the critic and the actor are relatively small, the exploration mechanism is crucial for our proposed algorithm to achieve decent performance.
 
 \begin{figure*}[!ht]
 \centering
 \includegraphics[width=\linewidth]{figures/ch04/figures/lmc_npg_exploration_ablation_15_15_grid.png}
-\caption{Ablation of the exploration mechanism for \texttt{LMc-NPG-EXP}.}
+\caption{Ablation of the exploration mechanism for \aigen{projected NPG with LMC critic (explicit coreset)}.}
 \label{fig:lmc-npg-exp-exploration-ablation}
 \end{figure*}
 
@@ -4029,7 +4029,7 @@ We study the sensitivity of our algorithm to the inverse temperature hyperparame
 \begin{figure*}[!ht]
 \centering
 \includegraphics[width=\linewidth]{figures/ch04/figures/lmc_npg_exp_inv_temp_sensitivity.png}
-\caption{\aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)} exhibits robustness to different choices of $\zeta^{-1}$.}
+\caption{\aigen{Projected NPG with LMC critic (explicit coreset)} exhibits robustness to different choices of $\zeta^{-1}$.}
 \label{fig:deep_sea_inv_temp_ablation}
 \end{figure*}
 
@@ -4040,7 +4040,7 @@ We further study the effect of the number of critic samples, $M$, in the Deep Se
 \begin{figure*}[!ht]
 \centering
 \includegraphics[width=\linewidth]{figures/ch04/figures/lmc_npg_exp_M_sensitivity.png}
-\caption{\aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)} exhibits robustness to different choices of $M$.}
+\caption{\aigen{Projected NPG with LMC critic (explicit coreset)} exhibits robustness to different choices of $M$.}
 \label{fig:deep_sea_M_ablation}
 \end{figure*}
 \subsubsection{Experiments Beyond Linear MDPs: Atari}
@@ -4048,7 +4048,7 @@ We further study the effect of the number of critic samples, $M$, in the Deep Se
 
 \paragraph{Extension to Deep RL Applications}
 
-Compared to our theoretical results in the finite-horizon linear MDP setting, the Atari benchmark requires handling discounted problems with complex nonlinear function approximation. Consequently, starting from our theoretically principled algorithm, we make three mild changes and follow the same protocol as the practical version of \texttt{LMC} in~\citet{ishfaq2024provable}. Since we are not in the finite-horizon setting, we compute the value functions and $Q$ functions in a forward fashion ($h = 1, \ldots$) rather than backwards ($h = H, \ldots, 1$), which changes how the critic loss is formed in~\cref{alg:lmc}. Moreover, instead of using stochastic gradient descent to optimize the \texttt{LMC} critic loss, we follow~\citet{ishfaq2024provable} and use the practical version of \texttt{LMC} that integrates Adam. Finally, rather than relying on the experimental design, at iteration $t$, we roll out the current policy to store state–action pairs in a buffer $\cD^t$ and minimize the actor objective over (a subset of) it. Following such changes, we can extend our proposed algorithm beyond the linear function approximation and empirically test its performance against other commonly used algorithms.
+Compared to our theoretical results in the finite-horizon linear MDP setting, the Atari benchmark requires handling discounted problems with complex nonlinear function approximation. Consequently, starting from our theoretically principled algorithm, we make three mild changes and follow the same protocol as the practical version of \texttt{LMC} in~\citet{ishfaq2024provable}. Since we are not in the finite-horizon setting, we compute the value functions and $Q$ functions in a forward fashion ($h = 1, \ldots$) rather than backwards ($h = H, \ldots, 1$), which changes how the critic loss is formed in~\cref{alg:lmc}. Moreover, instead of using stochastic gradient descent to optimize the \texttt{LMC} critic loss, we follow~\citet{ishfaq2024provable} and use the practical version of \texttt{LMC} that integrates Adam. Finally, rather than relying on the experimental design, at iteration $t$, we roll out the current policy to store state--action pairs in a buffer $\cD^t$ and minimize the actor objective over (a subset of) it. Following such changes, we can extend our proposed algorithm beyond the linear function approximation and empirically test its performance against other commonly used algorithms.
 
 \paragraph{Environment Setups and Hyperparameters}
 \label{subsec:atari_hyperparams}
@@ -4064,7 +4064,7 @@ As illustrated in~\cref{fig:atari_lmc_vs_ppo}, our algorithm can achieve compara
 \resizebox{0.7\linewidth}{!}{
 \begin{tabular}{|l|c|c|}
 \hline
-\textbf{Hyperparameter} & \textbf{$\aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)}$} & \textbf{$\texttt{PPO}$} \\ 
+\textbf{Hyperparameter} & \textbf{\aigen{projected NPG with LMC critic (explicit coreset)}} & \textbf{\texttt{PPO}} \\ 
 \hline
 Reward normalization & \xmark & \xmark \\
 Observation normalization & \xmark & \xmark \\
@@ -4099,7 +4099,7 @@ Confidence interval for plot runs & \multicolumn{2}{c|}{$\sim 95\%$} \\
 \resizebox{0.7\linewidth}{!}{
 \begin{tabular}{|l|c|c|}
 \hline
-\textbf{Hyperparameter} & \textbf{$\aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)}$} & \textbf{$\texttt{DQN}$} \\ 
+\textbf{Hyperparameter} & \textbf{\aigen{projected NPG with LMC critic (explicit coreset)}} & \textbf{\texttt{DQN}} \\ 
 \hline
 Reward normalization & \xmark & \xmark \\
 Observation normalization & \xmark & \xmark \\
@@ -4128,14 +4128,14 @@ Confidence interval for plot runs & \multicolumn{2}{c|}{$\sim 95\%$} \\
 \begin{figure*}[!ht]
 \centering
 \includegraphics[width=\linewidth]{figures/ch04/figures/lmc_npg_vs_ppo.png}
-\caption{In the on-policy setting, $\aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)}$ achieves comparable or better performance compared to \texttt{PPO}.}
+\caption{In the on-policy setting, \aigen{projected NPG with LMC critic (explicit coreset)} achieves comparable or better performance compared to \texttt{PPO}.}
 \label{fig:atari_lmc_vs_ppo}
 \end{figure*}
 
 \begin{figure*}[!ht]
 \centering
 \includegraphics[width=\linewidth]{figures/ch04/figures/lmc_npg_vs_dqn.png}
-\caption{In the off-policy setting, $\aigen{projected NPG with LMC critic (explicit exploratory coreset, labeled \texttt{\aigen{projected NPG with LMC critic (explicit coreset)}} in figures)}$ achieves comparable or better performance compared to \texttt{DQN}.}
+\caption{In the off-policy setting, \aigen{projected NPG with LMC critic (explicit coreset)} achieves comparable or better performance compared to \texttt{DQN}.}
 \label{fig:atari_lmc_vs_dqn}
 \end{figure*}
 

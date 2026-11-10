@@ -1,4 +1,4 @@
-\chapter{Proofs and Supplementary Details for Chapter~\ref{ch:hybrid-rl}}
+\chapter{PROOFS AND SUPPLEMENTARY DETAILS FOR CHAPTER~\ref{ch:hybrid-rl}}
 \label{app:ch02}
 
 This appendix contains the complete proofs, unabridged algorithmic descriptions, technical lemmas, and supplementary experimental figures for Chapter~\ref{ch:hybrid-rl}, organized into two parts corresponding to Sections~\ref{sec:ch02-gfa-setup}--\ref{sec:ch02-gfa-sims} \citep{tan2024natural} and Sections~\ref{sec:ch02-lin-intro}--\ref{sec:ch02-lin-discussion} \citep{tan2024hybrid}.
@@ -378,7 +378,14 @@ Because $[\mathbb{V}_h V^\star_{h+1}](\cdot, \cdot) \in [1, H^2]$, we have $(\mS
 \begin{equation}
     V_1^\star(s)-V_1^{\widehat{\pi}}(s) \lesssim \sqrt{\frac{c_{\off}(\gX_{\off})dH^{4}}{N_{\off}}} + \sqrt{\frac{d_{\on}dH^{4}}{N_{\on}}}.
 \end{equation}
-By Lemma~\ref{lem:ch02-optcov-correct}, the exploration phase terminates within $\max\{(N_{\off}/c_{\off}(\gX_{\off}))^{4/5}, (N_{\on}/d_{\on})^{4/5}\}\max\{N^\star(\tau), \operatorname{poly}(d, H, c_{\off}(\gX_{\off}), \log(1/\delta))\}$ episodes, which is satisfied whenever $N \geq \max\{\alpha_{\on}^4 d_{\on}^{-4}, \alpha_{\off}^4 c_{\off}(\gX_{\off})^{-4}\}\max\{N^\star(\tau), \operatorname{poly}(d, H, c_{\off}(\gX_{\off}), \log(1/\delta))\}$.
+By Lemma~\ref{lem:ch02-optcov-correct}, the exploration phase terminates within
+\[
+\max\{(N_{\off}/c_{\off}(\gX_{\off}))^{4/5}, (N_{\on}/d_{\on})^{4/5}\}\max\{N^\star(\tau), \operatorname{poly}(d, H, c_{\off}(\gX_{\off}), \log(1/\delta))\}
+\]
+episodes, which is satisfied whenever
+\[
+N \geq \max\{\alpha_{\on}^4 d_{\on}^{-4}, \alpha_{\off}^4 c_{\off}(\gX_{\off})^{-4}\}\max\{N^\star(\tau), \operatorname{poly}(d, H, c_{\off}(\gX_{\off}), \log(1/\delta))\}.
+\]
 
 Third, to obtain the $H^3$ bound in Equation~\eqref{eqn:ch02-rappel-res2}, the total variance lemma \citep[Lemma C.5]{jin2018q} implies
 \begin{equation}
@@ -434,7 +441,7 @@ where $\beta = \gO(H \sqrt{d \lambda} + \sqrt{d \log^2(1 + d N H / (\delta \lamb
 \label{lem:ch02-hybridoffline-sumbonuses}
 For any partition $\gX_{\off}, \gX_{\on}$, with $\bar{\mSigma}_{\off,h} = (\mSigma_{\off,h}+\lambda\mathbf{I})/N_{\off}$ and $T = N_{\on}$, we have
 \begin{equation}
-    \Reg_{\off}(T) \lesssim \sum_{h=1}^{H} \sqrt{\frac{dN_{\on}^2}{N_{\off}}\max_{\phi_h \in \Phi_{\off}} \phi_h^{\top}{\boldsymbol{\bar{\Sigma}}}_{\off,h}^{-1}\phi_h}.
+    \Reg_{\off}(T) \lesssim \sum_{h=1}^{H} \sqrt{\frac{dN_{\on}^2}{N_{\off}}\max_{\phi_h \in \Phi_{\off}} \phi_h^{\top}\bar{\boldsymbol{\Sigma}}_{\off,h}^{-1}\phi_h}.
 \end{equation}
 \end{lem}
 
@@ -444,7 +451,7 @@ Since $\mSigma_{t,h} \succeq \mSigma_{\off, h} + \lambda \mathbf{I}$ for all $t 
     \sum_{t=1}^T \beta\big\|\boldsymbol{\Sigma}_{t,h}^{-1/2}\phi_h(s_h^{(t)},a_h^{(t)})\mathbbm{1}_{\gX_{\off}}\big\|_2
     &\leq \beta \sum_{t=1}^T \sqrt{\phi_h(s_h^{(t)}, a_h^{(t)})^{\top}(\boldsymbol{\Sigma}_{\off,h}+\lambda\mathbf{I})^{-1}\phi_h(s_h^{(t)}, a_h^{(t)}) \mathbbm{1}_{\gX_{\off}}} \nonumber\\
     &\leq \beta N_{\on} \sqrt{\max_{\phi_h \in \Phi_{\off}} \phi_h^{\top}(\boldsymbol{\Sigma}_{\off,h}+\lambda\mathbf{I})^{-1}\phi_h} \nonumber\\
-    &\lesssim \sqrt{\frac{d N_{\on}^2}{N_{\off}}\max_{\phi_h \in \Phi_{\off}} \phi_h^{\top}{\boldsymbol{\bar{\Sigma}}}_{\off,h}^{-1}\phi_h}.
+    &\lesssim \sqrt{\frac{d N_{\on}^2}{N_{\off}}\max_{\phi_h \in \Phi_{\off}} \phi_h^{\top}\bar{\boldsymbol{\Sigma}}_{\off,h}^{-1}\phi_h}.
 \end{align}
 Summing over $h \in [H]$ completes the proof.
 \end{proof}
@@ -453,7 +460,7 @@ Summing over $h \in [H]$ completes the proof.
 \label{lem:ch02-hybridoffline-concentrability}
 For any partition $\gX_{\off}, \gX_{\on}$, when $N_{\on}, N_{\off} \geq \tilde{\Omega}(d^{13}H^{14})$, we have
 \begin{equation}
-    \sum_{h=1}^{H}\max_{\phi_h \in \Phi_{\off}} \sqrt{\phi_h^{\top}{\boldsymbol{\bar{\Sigma}}}_{\off,h}^{-1}\phi_h }\lesssim \sqrt{c_{\off}(\gX_{\off})^2 H^3}.
+    \sum_{h=1}^{H}\max_{\phi_h \in \Phi_{\off}} \sqrt{\phi_h^{\top}\bar{\boldsymbol{\Sigma}}_{\off,h}^{-1}\phi_h }\lesssim \sqrt{c_{\off}(\gX_{\off})^2 H^3}.
 \end{equation}
 \end{lem}
 
@@ -478,7 +485,7 @@ Applying Lemma~\ref{lem:ch02-total-variance-concentration} on $\Phi_{\off}$ with
 \begin{equation}
     \sum_{h=1}^{H}\max_{\phi_h \in \Phi_{\off}} \sqrt{\phi_h^{\top}{\boldsymbol{\Sigma}}_{\off,h}^{-1}\phi_h }\lesssim \frac{c_{\off}(\gX_{\off})H}{N_{\off}}\sqrt{N_{\off}H} = \sqrt{\frac{c_{\off}(\gX_{\off})^2 H^3}{N_{\off}}},
 \end{equation}
-and multiplying by $\sqrt{N_{\off}}$ yields $\sum_{h=1}^{H}\max_{\phi_h \in \Phi_{\off}} \sqrt{\phi_h^{\top}{\boldsymbol{\bar{\Sigma}}}_{\off,h}^{-1}\phi_h }\lesssim\sqrt{c_{\off}(\gX_{\off})^2 H^3}$.
+and multiplying by $\sqrt{N_{\off}}$ yields $\sum_{h=1}^{H}\max_{\phi_h \in \Phi_{\off}} \sqrt{\phi_h^{\top}\bar{\boldsymbol{\Sigma}}_{\off,h}^{-1}\phi_h }\lesssim\sqrt{c_{\off}(\gX_{\off})^2 H^3}$.
 \end{proof}
 
 Combining Lemmas~\ref{lem:ch02-hybridoffline-sumbonuses} and~\ref{lem:ch02-hybridoffline-concentrability} immediately gives

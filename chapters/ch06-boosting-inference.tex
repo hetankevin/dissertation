@@ -1,4 +1,4 @@
-\chapter{Statistical Inference for Boosted Regression and Additive Models}
+\chapter{STATISTICAL INFERENCE FOR BOOSTED REGRESSION AND ADDITIVE MODELS}
 \label{ch:boosting-inference}
 
 \aigen{\emph{This chapter is based on joint work with Haimo Fang and Giles Hooker \citep{fang2025statistical} (Part~I: Haimo Fang, Kevin Tan, and Giles Hooker, ``Statistical Inference for Gradient Boosting Regression,'' Advances in Neural Information Processing Systems 38, 2025) and joint work with Haimo Fang, Jonathan Pipping, and Giles Hooker \citep{fang2026statistical} (Part~II: Haimo Fang, Kevin Tan, Jonathan Pipping, and Giles Hooker, ``Statistical Inference for Explainable Boosting Machines,'' in Proceedings of the 29th International Conference on Artificial Intelligence and Statistics (AISTATS), PMLR 300, 2026).}}
@@ -319,7 +319,7 @@ As promised, we now formally present guarantees for convergence and asymptotic n
 
 \vspace{-1ex}
 \paragraph{Finite-sample convergence to KRR.} We now show that our algorithms achieve finite-sample convergence to kernel ridge regression as the number of boosting rounds increases. At first glance, this is surprising -- greedy split selection and sequential ensemble construction create a highly nonlinear and time-dependent mapping. Fortunately, the regularization procedure of \cite{zhou2022boulevard} provides a way forward. 
-For the special case of $p=0$ within Algorithm \ref{alg:random-dropout}, they show convergence to a kernel ridge regression via the stochastic contraction framework of \cite{almudevar2022stochasticcontractionmappingtheorem}, utilizing Assumptions \ref{aspt:svi} (structure–value isolation) and \ref{aspt:non-adaptivity} (non-adaptivity) to ensure stagewise stability. 
+For the special case of $p=0$ within Algorithm \ref{alg:random-dropout}, they show convergence to a kernel ridge regression via the stochastic contraction framework of \cite{almudevar2022stochasticcontractionmappingtheorem}, utilizing Assumptions \ref{aspt:svi} (structure--value isolation) and \ref{aspt:non-adaptivity} (non-adaptivity) to ensure stagewise stability. 
 A key novelty within our analysis lies in showing that this convergence extends to Algorithms \ref{alg:random-dropout} and \ref{alg:structured-dropout}, even with the added complexity introduced by dropout and parallelism respectively. Despite these added sources of stochasticity and dependence, our use of the same regularization mechanism ensures that both algorithms inherit the stability required for convergence:
 \begin{thm}[Finite Sample Convergence to KRR]
 \label{thm:krrconv}
@@ -373,7 +373,7 @@ These conditions allow for uniform control over both leaf sizes and tree complex
 \end{thm}
 \vspace{-1ex}
 We prove this in two stages. In the first, with proof deferred to Appendix \ref{app:conditional-clt}, we show asymptotic normality of the predictions around the noiseless KRR predictions $\langle \br_n^{D,P}(\bx), \f(\bX_n)\rangle$, conditional on the training data $\bX_n, \by_n$ and test point $\bx$, by applying the Lindeberg-Feller CLT to \(\langle\mathbf{r}_n^{D,P}(\bx), \varepsilon\rangle\). 
-Next, we show that $\langle \br_n^{D,P}(\bx), \f(\bX_n)\rangle$ converges to the underlying ground truth function at a sufficiently fast rate in Appendices \ref{app:random-clt} and \ref{app:main-theorem}. For Algorithm \ref{alg:random-dropout}, although $\br_n^D$ now involves $[\frac1\lambda \bI+q\bK_n]^{-1}$, this still preserves the rate $\|\br_n\|_2\asymp n^{-1/(2(d+1))}$, allowing us to show $\langle \br_n,f(\bX_n)\rangle-\frac{\lambda q}{1+\lambda q} \f(\bx)=o_p(\|\br_n\|_2)$. The Lindeberg–Feller verification then proceeds identically to the non‑dropout case. However, to give a CLT for Algorithm \ref{alg:structured-dropout}, controlling the influence from distant training points is challenging, though we show that Assumption \ref{aspt:median-trees} is sufficient to do so. 
+Next, we show that $\langle \br_n^{D,P}(\bx), \f(\bX_n)\rangle$ converges to the underlying ground truth function at a sufficiently fast rate in Appendices \ref{app:random-clt} and \ref{app:main-theorem}. For Algorithm \ref{alg:random-dropout}, although $\br_n^D$ now involves $[\frac1\lambda \bI+q\bK_n]^{-1}$, this still preserves the rate $\|\br_n\|_2\asymp n^{-1/(2(d+1))}$, allowing us to show $\langle \br_n,f(\bX_n)\rangle-\frac{\lambda q}{1+\lambda q} \f(\bx)=o_p(\|\br_n\|_2)$. The Lindeberg--Feller verification then proceeds identically to the non‑dropout case. However, to give a CLT for Algorithm \ref{alg:structured-dropout}, controlling the influence from distant training points is challenging, though we show that Assumption \ref{aspt:median-trees} is sufficient to do so. 
 
 \vspace{-1ex}
 \paragraph{Understanding the result.} 
@@ -450,7 +450,7 @@ In light of this, we present a series of numerical experiments to justify our al
 \begin{figure}[t]
     \makebox[\textwidth][c]{\includegraphics[width=1.1\linewidth]{figures/ch06/plots_gb/mse_tests.png}}
     \vspace{-5ex}
-    \caption[Size & power / MSE races]{%
+    \caption[Size \& power / MSE races]{%
       \textbf{Left:} Type I and Type II error of the hypothesis test for variable importance against training set size. Test set is of the same size. Error rates computed over 30 trials.
       \textbf{Right:} Comparison of MSE achieved by various machine learning algorithms on different datasets, with hyperparameters tuned for each by Optuna. Shaded area depicts two standard deviations over 5 trials.
     }
@@ -508,7 +508,7 @@ Variance grows with shrinkage \(1/\lambda\) and falls as dropout \(p\) increases
 \label{sec:discussions}
 We incorporate dropout and parallel boosting into the regularization procedure of \cite{zhou2022boulevard}, allowing for increased signal recovery and improved asymptotic variance. With the CLTs our algorithms enjoy, we construct confidence and prediction intervals, and hypothesis tests for variable importance. Numerical experiments empirically validate our algorithms and statistical procedures.
 
-Our theoretical guarantees depend on structure–value isolation, non‑adaptivity, and tree regularity assumptions. Relaxing these -- e.g., via honesty‐based splitting or quantifying mild adaptivity -- would broaden applicability. Extending inference beyond regression (to classification, survival, or structured outputs) also poses new challenges: non‑quadratic losses, different tree behavior, and the need for new CLTs. Doing so under weaker assumptions is a welcome direction for future work.
+Our theoretical guarantees depend on structure--value isolation, non‑adaptivity, and tree regularity assumptions. Relaxing these -- e.g., via honesty‐based splitting or quantifying mild adaptivity -- would broaden applicability. Extending inference beyond regression (to classification, survival, or structured outputs) also poses new challenges: non‑quadratic losses, different tree behavior, and the need for new CLTs. Doing so under weaker assumptions is a welcome direction for future work.
 
 
 % \kevin{Placeholder title. There are a bunch of half-baked papers on uncertainty quantification in boosting: https://arxiv.org/pdf/2006.10562, https://arxiv.org/abs/2304.11732, and some less half baked papers like https://arxiv.org/abs/1910.03225. Ultimately previous work has neither asymptotic nor finite-sample guarantees on the coverage of any confidence intervals on the predictions generated, save for e.g. boulevard. Note that you can get a prediction interval via quantile regression, but this is not a CI. We are also interested in confidence intervals for the prediction $\widehat y$ (reproduction intervals, V-stat paper, but this term is not commonly used), not the outcome $y$. Can get intervals for $f$ in KRR world, but that's a stronger assumption (we may need this to call it statistical inference). }
@@ -618,8 +618,8 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 		$$
 		y \;=\; \bbeta \;+\; \sum_{k=1}^p \mathbf{f}^{(k)}(\mathbf{x}^{(k)}) \;+\; \epsilon : = \f(\bx) + \epsilon,
 		$$
-		where $y, \bbeta \in\mathbb{R}$, $\mathbf{x}=(\bx^{(1)},\dots,\bx^{(p)})^\top\in\mathbb{R}^p$, and $\varepsilon$ are i.i.d.\ sub–Gaussian errors with mean zero and variance $\sigma^2<\infty$.  
-		Assume the covariates have a bounded density on their support: $0<c_1\leq \mu(\mathbf{x}) \leq c_2<\infty$.  Each component function $\f^{(k)}:\mathbb{R}\to\mathbb{R}$ is mean–zero with respect to the marginal of $\bx^{(k)}$, and is $L$-Lipschitz. The intercept $\bbeta$ is defined as the unconditional mean of the response: $\bbeta := \E_{\bx, \epsilon}[y] = \int y \, d\mu_{\bx}(x)\, d\mu_\epsilon(\epsilon).$
+		where $y, \bbeta \in\mathbb{R}$, $\mathbf{x}=(\bx^{(1)},\dots,\bx^{(p)})^\top\in\mathbb{R}^p$, and $\varepsilon$ are i.i.d.\ sub--Gaussian errors with mean zero and variance $\sigma^2<\infty$.  
+		Assume the covariates have a bounded density on their support: $0<c_1\leq \mu(\mathbf{x}) \leq c_2<\infty$.  Each component function $\f^{(k)}:\mathbb{R}\to\mathbb{R}$ is mean--zero with respect to the marginal of $\bx^{(k)}$, and is $L$-Lipschitz. The intercept $\bbeta$ is defined as the unconditional mean of the response: $\bbeta := \E_{\bx, \epsilon}[y] = \int y \, d\mu_{\bx}(x)\, d\mu_\epsilon(\epsilon).$
 	\end{assumption}
 	
 	\paragraph{Boulevard Regularization.}\cite{zhou2019boulevardregularizedstochasticgradient} replace the usual additive update with a moving average. Instead of adding the next tree: $\widehat{\f}_b \leftarrow \f_{b-1}+\lambda\bt_b$, they average over all previous trees: $\widehat{\f}_b \leftarrow \frac{b-1}{b}\f_{b-1}+\frac{\lambda}{b}\bt_b$. This idea of shrinking the previous ensemble as also been adopted by \cite{ustimenko2022sglbstochasticgradientlangevin, ustimenko2023gradientboostingperformsgaussian}. This ensures convergence to a kernel ridge regression in the limit of infinite boosting rounds, and that the resulting predictions are asymptotically normal.\footnote{A particular advantage of Boulevard regularization is that it is robust to overfitting \cite{fang2025gradient}. Figure \ref{fig:overfit_mse} shows this behavior for Algorithm \ref{alg:brebm_ident}. EBM achieves this here via tiny learning rates when cycling through features in sequence. We do this while fitting to features in parallel.}
@@ -899,7 +899,7 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
     \end{itemize}
     \vspace{-2ex}
     Recall that $\rveck_E(\bx)$ denotes the per-feature influence vector. Under Assumption~\ref{aspt:proj-orth}, $\lVert\sum_{k=1}^p \rveck_E(\bx)\rVert_2^2
-    =\sum_{k=1}^p \lVert{\rveck_E(\bx)}\rVert_2^2,$ so the variance contribution is the sum of feature-wise terms. Without Assumption~\ref{aspt:proj-orth}, this replacement is conservative by Cauchy–Schwarz.
+    =\sum_{k=1}^p \lVert{\rveck_E(\bx)}\rVert_2^2,$ so the variance contribution is the sum of feature-wise terms. Without Assumption~\ref{aspt:proj-orth}, this replacement is conservative by Cauchy--Schwarz.
 
     \cite{fang2025gradient} examines two further variants that are immediately implementable:
     \vspace{-1ex}
@@ -924,13 +924,11 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 
     \paragraph{Practical Guidance.} In practice, Algorithm \ref{alg:brebm_ident} relies on conditional orthogonality; we recommend monitoring simple convergence diagnostics, and if convergence appears unstable, falling back to Algorithm \ref{alg:ebm_bratp}. In our experiments, the number of boosting rounds $B$ in the range 100--300 worked well. A smaller learning rate $\lambda$ typically improves finite-sample stability but can yield slightly wider intervals. Subsample rates in $[0.5,0.8]$ were robust. For binning, we found that using either the usual EBM defaults (e.g., 64 or 255 bins) or scaling the bin count as $m\asymp n^{1/3}$ works well; the latter matches our assumptions.
 
-    \addtocounter{figure}{1}
     \begin{figure*}[ht!]
         \centering\includegraphics[width=0.85\linewidth]{figures/ch06/plots_ebm/optuna_mse.png}\vspace{-2ex}
         \caption{MSE horse races on UCI machine learning repository datasets. All hyperparameters tuned by Optuna.}
         \label{fig:mse-horse-races}
     \end{figure*}
-    \addtocounter{figure}{-1}
     
 	\subsection{Numerical Experiments}
     \label{ch06b:sec:experiments}
@@ -950,19 +948,17 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
     
     Figure \ref{fig:highdim-real-table} shows that on real datasets with $p\approx 110$--$130$, Algorithm~\ref{alg:ebm_bratp} maintains near-nominal $95\%$ coverage ($0.948$--$0.956$), achieves RMSE comparable to the baselines, and is substantially faster than vanilla EBM. Relative to BRATD, it attains similar RMSE with lower training time on three of the four datasets, especially on the largest example.
 
-    \addtocounter{figure}{-1}
-	\begin{figure}[H]
-		\hspace{-3ex}\includegraphics[width=1.1\linewidth]{figures/ch06/plots_ebm/overfit_combined.png}
+	\begin{figure}[ht!]
+		\centering\includegraphics[width=\linewidth]{figures/ch06/plots_ebm/overfit_combined.png}
 		\caption{RMSE for Algorithm \ref{alg:brebm_ident} and benchmarks with 2 s.e. bands over 50 trials, on $f(x) = \sin(4\pi x)$ and the diabetes dataset from \cite{Efron_2004}. Both EBM and Algorithm \ref{alg:brebm_ident} are highly resistant to overfitting.}
 		\label{fig:overfit_mse}
 	\end{figure}
-    \addtocounter{figure}{1}
 
     \subsection{Conclusion}
 	Explainable boosting machines have been an important tool for producing glass-box models, used both to establish insight into the underlying patterns that generate data, and to diagnose potential non-causal behavior prior to deployment. The understanding presented by such methods must be qualified by appropriate uncertainty quantification. Current UQ for EBMs relies on bootstrapping which is both computationally intensive and lacks theoretical backing.
     
-    \begin{figure}[H]
-        \hspace{-3ex}\includegraphics[width=1.0\linewidth]{figures/ch06/plots_ebm/coverage_rates.png}
+    \begin{figure}[ht!]
+        \centering\includegraphics[width=\linewidth]{figures/ch06/plots_ebm/coverage_rates.png}
         \caption{Coverage and width of our intervals over $50$ trials, $n=2000$, on the same function as Figure \ref{fig:feature-coverage}.}
         \label{fig:coverage-rates}
     \end{figure}
