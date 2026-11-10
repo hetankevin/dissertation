@@ -21,7 +21,7 @@ All proofs, sketching analyses, and supplementary empirical results are presente
 \subsection{Introduction}
 \vspace{-1ex}
 
-Gradient boosting \citep{friedman2000greedy}, particularly through widely used implementations such as XGBoost \citep{chen2016xgboost}, LightGBM \citep{ke2017lightgbm}, and CatBoost \citep{catboost2018}, has become one of the most powerful and widely adopted methods for supervised learning, especially on tabular data. However, this flexibility and predictive accuracy come at a cost. Unlike their base learners -- such as decision trees or linear models -- boosting methods are typically far less interpretable, and uncertainty quantification for their predictions is far from straightforward. While point estimates may 
+Gradient boosting \citep{friedman2001greedy}, particularly through widely used implementations such as XGBoost \citep{chen2016xgboost}, LightGBM \citep{ke2017lightgbm}, and CatBoost \citep{catboost2018}, has become one of the most powerful and widely adopted methods for supervised learning, especially on tabular data. However, this flexibility and predictive accuracy come at a cost. Unlike their base learners -- such as decision trees or linear models -- boosting methods are typically far less interpretable, and uncertainty quantification for their predictions is far from straightforward. While point estimates may 
 suffice for ad hoc prediction tasks, they overlook randomness inherent in both the data and the 
 algorithm itself. Uncertainty quantification therefore asks a central question: \emph{if a new dataset were collected 
 and models retrained, how different would the resulting predictions be?}
@@ -40,15 +40,7 @@ A principled route to uncertainty quantification is through statistical inferenc
 In the frequentist setting, \cite{zhou2022boulevard} propose a regularization scheme yielding a central limit theorem for boosting via convergence to kernel ridge regression. However, they do not provide proper confidence or prediction intervals, and their method recovers at most half the true signal (rescaling is suggested, but this amplifies errors). Despite these limitations, their framework remains the only foundation for frequentist inference in boosting, which we extend here.
 
 \vspace{-1ex}
-\paragraph{Other literature. } 
-Recent advances for random forests yield principled statistical methods for uncertainty quantification via the construction of valid confidence intervals \citep{wager2014rfci, wager2017estimationinferenceheterogeneoustreatment, athey2018generalizedrandomforests, mentch2016randomforestci}, and interpretability via hypothesis tests for variable importance \citep{mentch2016formalhypothesistestsadditive, mentch2022rfhyptest}. 
-Much of this is achieved through viewing a random forest as an adaptive kernel method \citep{friedberg2021locallinearforests, athey2018generalizedrandomforests}. 
-This also holds for various incarnations of boosting \citep{zhou2022boulevard, ustimenko2023gradientboostingperformsgaussian}. 
-Despite these findings, the literature on uncertainty quantification and statistical inference for boosting is far sparser -- a gap we fill by exploiting this equivalence.
-
-
-% To do so, we integrate dropout or parallel training into the regularization procedure of \cite{zhou2022boulevard}. This achieves increased signal recovery and performance, as well as a similar CLT that allows for statistical inference and uncertainty quantification. We use this CLT to construct built-in confidence intervals, prediction intervals, and rigorous hypothesis tests for assessing variable importance and interactions. 
-
+\aigen{A broader discussion of related work connecting adaptive kernel representations of random forests \citep{wager2014rfci, athey2018generalizedrandomforests, mentch2016randomforestci} and gradient boosting \citep{zhou2022boulevard, ustimenko2023gradientboostingperformsgaussian} is provided in \citet{fang2025statistical}.}
 Motivated by this gap, we study frequentist inference for uncertainty quantification in boosting under supervised nonparametric regression: \(y = \f(\bx) + \epsilon\), with subgaussian noise $\sigma^2$. Our goal is to develop principled, statistically sound procedures for uncertainty quantification, outlined below.
 \vspace{-2.5ex}
 \paragraph{Methodological contributions.} In detail, we provide the following methodological contributions:
@@ -58,7 +50,6 @@ Motivated by this gap, we study frequentist inference for uncertainty quantifica
     \item \emph{Parallel boosting:} We construct a novel leave-one-out procedure for parallel boosting (Algorithm \ref{alg:structured-dropout}) that, when coupled with the above regularization procedure, improves in the ARE by at least a factor of $4$, and enjoys increased signal recovery by at least a factor of $2$.
     \item \emph{Prediction, confidence, and reproduction intervals:} We leverage the central limit theorems our procedures enjoy to construct a variety of procedures for statistical inference. 
     First, we conduct predictive inference via constructing prediction intervals on (potentially unseen) labels $\by$. We then construct confidence intervals for the underlying ground truth function $\f$. Lastly, to quantify uncertainty within the learning algorithm, we provide reproduction intervals \citep{zhou2022boulevard} for another booster $\widehat{\f}$ trained on an independent realization of the training set. 
-    %We perform statistical inference on the underlying ground-truth function $\f$ by constructing confidence intervals  for $\f(\bX)$ given $\bX$. We perform predictive inference by , prediction intervals on the labels $\by$, and quantify the reproduction intervals on predictions $\widehat\f$.
     \item \emph{Hypothesis testing:} We construct a chi-squared hypothesis test for variable importance, extending the work of \cite{mentch2016randomforestci} for random forests to the boosting setting. 
     \item \emph{Computational efficiency:} Unlike prior approaches to statistical inference for random forests and boosting, we utilize the Nystr\"{o}m approximation of \cite{musco2017recursivenystrom}. This allows our tests and intervals to scale linearly with the number of data points.
 \end{enumerate}
@@ -67,16 +58,10 @@ Motivated by this gap, we study frequentist inference for uncertainty quantifica
     \centering
     \includegraphics[width=0.9\linewidth]{figures/ch06/plots_gb/1d_coverage.png}
     \vspace{-2ex}
-    \caption{Demonstration of confidence, prediction, and reproduction intervals on $\f(x)=\sin 2\pi x + \frac{1}{2} x^2$. Conformal baseline. $200$ trees, learning rate $0.6$, depth $8$, subsampling and dropout $0.6$.}
+    \caption[Confidence, prediction, and reproduction intervals on a 1D test function]{Demonstration of confidence, prediction, and reproduction intervals on $\f(x)=\sin 2\pi x + \frac{1}{2} x^2$. Conformal baseline. $200$ trees, learning rate $0.6$, depth $8$, subsampling and dropout $0.6$.}
     \label{fig:1d-coverage}
     \vspace{-2ex}
 \end{figure}
-
-\vspace{-1ex}
-\textbf{Theoretical contributions.} Our primary theoretical contributions are central limit theorems (CLTs) for boosting with dropout (Algorithm \ref{alg:random-dropout}) and parallel training (Algorithm \ref{alg:structured-dropout}) -- the first such results for these settings to our knowledge. These extend the theoretical arguments of \cite{zhou2022boulevard}. In analyzing boosting with dropout, the stochasticity introduced into ensemble construction must be accounted for -- in addition to randomness from data subsampling. To address this, we establish a weak law for finite-sample convergence in the stochastic contraction framework of \cite{almudevar2022stochasticcontractionmappingtheorem}. 
-The arguments for parallel boosting are more challenging. Inspired by classical backfitting methods \citep{breiman1985backfitting}, we develop a delayed averaging scheme that enables parallelism while preserving convergence guarantees. To achieve central limit theorems that hold unconditionally on the data $\bX$, we show a bound on the maximal leaf size is sufficient to limit the influence of distant points and promote balanced splits, enabling rigorous distributional results.
-
-\textbf{Numerical experiments.} We establish the efficacy of our methods on both a simulation study and real-world datasets. Our numerical experiments showcase that our algorithms can be tuned to interpolate between regularized boosting and random forests, and are highly competitive in terms of MSE. These also demonstrate the correctness, coverage, and computational efficiency of the statistical procedures we construct via the central limit theorems our algorithms enjoy.
 
 
 % First, we are concerned with predictive inference via constructing prediction intervals on (potentially unseen) labels $\by$. Second, we perform statistical inference on the underlying ground truth function $\f$ by constructing confidence intervals for $\f(\bX)$ given $\bX$. Third, we wish to quantify the aleatoric uncertainty within the boosting procedure by constructing what is called reproduction intervals \citep{zhou2022boulevard} for another realization of $\widehat{\f}$ given another independent realization of the training set. Lastly, we also wish to perform hypothesis testing for variable importance (can we omit a feature?) and feature interactions. In summary:
@@ -95,13 +80,13 @@ Consider boosting for nonparametric regression with squared error loss. Given ra
     $\textstyle{b=1,...,B-1, \text{ instead of } \widehat{\f}^{(b+1)} \gets \widehat{\f}^{(b)} + \lambda \bt^{(b)}, \text{ they update } \widehat{\f}^{(b+1)} \gets \frac{b-1}{b} \widehat{\f}^{(b)} + \frac{\lambda}{b} \bt^{(b)}}$
 \end{tightcenter}
 \vspace{-1.2ex}
-for the current function estimate $\widehat{\f}^{(b)}$, built tree $\bt^{(b)}$, and learning rate $\lambda \in [0,1)$. As this is equivalent to updating $\widehat{\f}^{(b+1)} \gets \frac{\lambda}{b} \sum_{i=1}^b \bt^{(i)}$, the resulting ensemble is an average of trees. This observation, along with assumptions on tree adaptivity, allows them to prove that Boulevard predictions are asymptotically normal, though they do not construct confidence or prediction intervals. Additionally, this regularization comes at a cost. It turns out that $\widehat{\f}_n^{(b)}$ converges only to $\frac{\lambda}{1+\lambda} \f \leq \f / 2$ as $n,b \to \infty$, and so \emph{Boulevard recovers at most half the signal}. Still, this is the only method available for frequentist inference for gradient boosting, and so we seek to improve upon it in this paper.
+for the current function estimate $\widehat{\f}^{(b)}$, built tree $\bt^{(b)}$, and learning rate $\lambda \in [0,1)$. As this is equivalent to updating $\widehat{\f}^{(b+1)} \gets \frac{\lambda}{b} \sum_{i=1}^b \bt^{(i)}$, the resulting ensemble is an average of trees. This observation, along with assumptions on tree adaptivity, allows them to prove that Boulevard predictions are asymptotically normal, though they do not construct confidence or prediction intervals. Additionally, this regularization comes at a cost. It turns out that $\widehat{\f}_n^{(b)}$ converges only to $\frac{\lambda}{1+\lambda} \f \leq \f / 2$ as $n,b \to \infty$, and so \emph{Boulevard recovers at most half the signal}. Still, this is the only method available for frequentist inference for gradient boosting, and so we seek to improve upon it in this chapter.
 \vspace{-2ex}
 \begin{figure}[H]
 \centering
     \includegraphics[width=0.49\linewidth]{figures/ch06/plots_gb/camera/mse.png}\includegraphics[width=0.32\linewidth]{figures/ch06/plots_gb/camera/qqplot.png}
     \vspace{-1ex}
-    \caption{An added benefit of Boulevard regularization is that it renders early stopping unnecessary. Because the procedure converges to a fixed point, one can (in theory) boost indefinitely without encountering overfitting. It also produces asymptotically normal predictions (see the Q-Q plot).}
+    \caption[Test MSE trajectory and Q-Q plot under Boulevard regularization]{An added benefit of Boulevard regularization is that it renders early stopping unnecessary. Because the procedure converges to a fixed point, one can (in theory) boost indefinitely without encountering overfitting. It also produces asymptotically normal predictions (see the Q-Q plot).}
     \label{fig:no-need-early-stopping}
 \end{figure}
 \vspace{-2ex}
@@ -150,9 +135,9 @@ These are required for theoretical guarantees. In practice, the first can be imp
 \vspace{-1ex}
 
 To address the limitations of Boulevard regularization while retaining its statistical guarantees, we propose two improvements that achieve enhanced signal recovery and improved sample complexity:
-\begin{enumerate}[label=\textbf{Alg. \arabic*:}]
-    \item By incorporating random dropout \citep{rashmi2015dartdropoutsmeetmultiple} in the ensemble.
-    \item By growing trees in parallel within each round with a leave-one-out procedure.
+\begin{enumerate}
+    \item \textbf{Algorithm~\ref{alg:random-dropout}:} By incorporating random dropout \citep{rashmi2015dartdropoutsmeetmultiple} in the ensemble.
+    \item \textbf{Algorithm~\ref{alg:structured-dropout}:} By growing trees in parallel within each round with a leave-one-out procedure.
 \end{enumerate}
 The intuition is as follows. Surprisingly, increasing the dropout probability allows one to recover more of the signal. This is because each tree in the current ensemble is effectively downweighted during residual construction, and the new tree is fit on more of the signal. On the other hand, as the number of trees grown in parallel within each round grows, the resulting ensemble increasingly resembles the procedure of boosting random forests in sequence -- allowing each round to recover more signal than a single tree can. We present both algorithms and explain them in detail below.
 
@@ -235,7 +220,7 @@ The attentive reader may observe that we do not divide the final predictions by 
 \label{sec:statistics}
 \vspace{-1ex}
 
-We are now in a place to introduce our methods for conducting statistical inference for boosting; theoretical basis for these procedures is provided below. Our methods rest on the aforementioned convergence to a kernel ridge regression and central limit theorems that we formally prove later in Theorems \ref{thm:krrconv} and \ref{thm:main}. In the meantime, we provide the following asymptotically valid procedures.
+We are now in a place to introduce our methods for conducting statistical inference for boosting, whose theoretical basis is provided below. Our methods rest on the aforementioned convergence to a kernel ridge regression and central limit theorems that we formally prove later in Theorems \ref{thm:krrconv} and \ref{thm:main}. In the meantime, we provide the following asymptotically valid procedures.
 
 
 \vspace{-1ex}
@@ -270,14 +255,8 @@ Lastly, we estimate $\sigma^2$ with the residuals $\widehat{\sigma}^2 = \frac{1}
     \lambda^{-1}(1+\lambda q)\widehat{\f}_n^D(\bx) \pm z_{1-\alpha/2}\lambda^{-1}(1+\lambda q)\widehat{\sigma}\sqrt{1+\lVert\widehat{\br}_n^D(\bx)\rVert_2^2},\;\; \widehat{\f}_n^P(\bx) \pm z_{1-\alpha/2} \widehat{\sigma}\sqrt{1+\lVert\widehat{\br}_n^P(\bx)\rVert_2^2}.
     \label{eqn:prediction-intervals}
 \end{equation*}
-These prediction intervals have asymptotic pointwise coverage, conditional on the test point $\bx$. That is, $\prob(y \in \text{PI}(\bx) | \bx) \to 1-\alpha$ as $n \to \infty$, which holds as a corollary of the CLTs we present in the following section. Note that this conditional coverage guarantee is a stronger guarantee than is typically possible with conformal inference \citep{barber2020limitsdistributionfreeconditionalpredictive}. We compare our prediction intervals to conformal prediction intervals within our numerical experiments later in this paper.
+These prediction intervals have asymptotic pointwise coverage, conditional on the test point $\bx$. That is, $\prob(y \in \text{PI}(\bx) | \bx) \to 1-\alpha$ as $n \to \infty$, which holds as a corollary of the CLTs we present in the following section. Note that this conditional coverage guarantee is a stronger guarantee than is typically possible with conformal inference \citep{barber2020limitsdistributionfreeconditionalpredictive}. We compare our prediction intervals to conformal prediction intervals within our numerical experiments later in this section.
 
-
-\vspace{-1ex}
-\paragraph{Reproduction intervals for $\widehat{\f}$.} We now turn our attention towards computing reproduction intervals. That is, a confidence interval for another realization of $\widehat{\f}$ trained on another independent realization of the data. To do so, as \cite{zhou2022boulevard} suggest, it suffices to scale the width of the above confidence intervals for $\f$ by $\sqrt{2}$ as $X_1, X_2 \stackrel{i.i.d.}{\sim} \gN(0,\sigma^2) \implies X_1 - X_2 \sim \gN(0,2\sigma^2)$.
-Note that one can invert the above confidence, prediction, or reproduction intervals in order to test if the underlying function, another realization of the response, or average learner is equal to a given constant. This amounts to checking if the constant is contained in the interval of choice. 
-
-%\kevin{Ziang thinks that because our kernel is effectively a nearest neighbor kernel, our kernel method may inherit the same adaptiveness to intrinsic dimensionality that nearest neighbors does. See https://luc.devroye.org/Biau+Devroye-LecturesontheNearestNeighborMethod-2015.pdf.}
 
 \vspace{-1ex}
 \paragraph{Variable importance tests.} Suppose we wish to test for variable importance. Consider the possibility that there exists some subset of the feature space $[0,1]^d$ containing only $\widecheck{d} < d$ features, and let $\g : [0,1]^{\widecheck{d}} \to \R$ be the projection of $\f$ onto $\gL^2([0,1]^{\widecheck{d}})$. We test the possibility that $\f(\bx) = \g({\bx})$ by proxy. Consider a split of the training dataset $(\bX_n, \by_n)$ into $(\bX_{n,1}, \by_{n,1}), (\bX_{n,2}, \by_{n,2})$, where $\bX_{n,1} \in \R^{n/2, d}, \bX_{n,2} \in \R^{n/2,\widecheck{d}}$. Let $\widehat{\f}_{n,1}$ be the boosting learner trained on $(\bX_n, \by_n)$, and $\widehat{\f}_{n,2}$ be the same trained on $({\bX}_{n,2}, \by_{n,2})$. Given a hold-out dataset $(\bX_m, \by_m)$, we test the null:
@@ -287,25 +266,9 @@ $$\widehat{\d}_m = (\widehat{\br}^{D,P}_{n,1}(\bX_m) - \widehat{\br}^{D,P}_{n,2}
 with covariance matrix $\sigma^2 \widehat{\bXi}_n = \sigma^2 (\widehat{\br}^{D,P}_{n,1}(\bX_m) - \widehat{\br}^{D,P}_{n,2}(\bX_m))^\top (\widehat{\br}^{D,P}_{n,1}(\bX_m) - \widehat{\br}^{D,P}_{n,2}(\bX_m))$ estimated by plugging in $\widehat{\sigma}^2$. As such, we can conduct a chi-squared test with test statistic
 $$\widehat{\sigma}^{-2} \widehat{\d}_m^\top \widehat{\bXi}_n^{-1} \widehat{\d}_m \sim \chi_m^2 \text{ under the null}, \text{ rejecting the null if } \widehat{\sigma}^{-2} \widehat{\d}_m^\top \widehat{\bXi}_n^{-1} \widehat{\d}_m > \chi_{m,1-\alpha}^2.$$
 The test as presented runs in $O(n^3)$ time. In Appendix \ref{app:random-projections}, we present an accelerated version of the test that runs in 
-$O(ns(r+s) + r^3)$ time, where $s$ is the number of points subsampled for Nystr\"{o}m approximation and $r$ is the number of test points subsampled. 
+$O(ns(r+s) + r^3)$ time, where $s$ is the number of points subsampled for Nystr\"{o}m approximation and $r$ is the number of test points subsampled.
 
-%Our results extend the tests developed in \cite{mentch2016randomforestci} to the boosting setting, but unlike their tests, ours remain computationally efficient and run in linear time in the number of training points, and sublinear time in the number of test points.
-
-
-% \kevin{Procedure is to build a booster on original training set and another on the restricted training set. The vector of differences in predictions on the hold-out dataset is multivariate normal. Under the null, this is mean zero. The covariance of this vector is not straightforward, but is this given by the covariance of differences in predictions between each tree in the ensemble? That would be the case for a random forest. Not clear if this is the case for regularized boosting. Probably need to work this out in terms of the kernel regressions. }
-
-
-\vspace{-1ex}
-\paragraph{Matrix sketching.} Although he CLT reduces the problem of inference to kernel ridge regression (with the right kernel), computing \(\widehat{\bK}_n\) is an $O(n^3)$ problem -- intractable for large $n$. This is the chief difficulty that Zhou and Hooker (2022) face when constructing replication intervals for vanilla Boulevard.
-We bypass this issue, making our procedures practical and tractable via matrix sketching.
-
-We approximate \(\widehat{\bK}_n\) using the Nystr\"{o}m method \citep{williams2000nystromkernel}, via either uniform subsampling or the recursive approach of \cite{musco2017recursivenystrom}, producing an approximation \(\widetilde{\bK}_n \approx \widehat{\bK}_n\bS(\bS^\top \widehat{\bK}_n\bS)^{\dagger} \bS^\top \widehat{\bK}_n\), where \(\bS \in \mathbb{R}^{n \times s}\) is a random subsampling matrix. With the Nystrom method of Musco and Musco (2017), we can choose $s$ to near-linear in the effective dimension $d_{\text{eff}}^\mu$ of a ridge regression problem with regularization parameter $\mu$ on the kernel matrix: $s = \widetilde{O}(d_{\text{eff}}^\mu)$.
-
-This requires only $O(ns^2)$ time to precompute the kernel, and only $O(s^2)$ time for inference -- yielding practical statistical inference in near-linear time in the number of datapoints $n$. We adopt this approach in our experiments, allowing our procedures to run in linear time and remain practical, unlike previous work \citep{zhou2022boulevard, mentch2016randomforestci}. See Appendix \ref{app:random-projections}.
-
-
-
-
+\aigen{Reproduction intervals for an independent realization of $\widehat{\f}$ (obtained by scaling the confidence interval half-width by $\sqrt{2}$) and Nystr\"om matrix sketching approximations \citep{williams2000nystromkernel, musco2017recursivenystrom} that reduce kernel precomputation from $O(n^3)$ to $O(ns^2)$ time and per-query inference to $O(s^2)$ time with $s = \widetilde{O}(d_{\text{eff}}^\mu)$ (Appendix~\ref{app:random-projections}) are detailed in \citet{fang2025statistical}.}
 
 \vspace{-1ex}
 \subsection{Theoretical Guarantees}
@@ -386,58 +349,7 @@ Let $\mathbf{B}_n := \{i  : \norm{\bx-\bx_i}\leq d_n\}$ be the points within dis
     $
 \label{lem:rateofr}
 \end{lem}
-\begin{cor}
-\label{cor:asymptotic-risk}
-$
-\E[(\frac{1+\lambda q}{\lambda}\widehat{\f}^D_n(\bx)-\f(\bx))^2]
-\lesssim (\frac{1+\lambda q}{\lambda})^2\sigma^2 n^{-\frac{1}{d+1}}$ and $ 
-\E[(\widehat f^P_n(\bx)-f(\bx))^2]
-\lesssim \sigma^2 n^{-\frac{1}{d+1}}.
-$
-\end{cor}
-\begin{cor}
-\label{cor:non-asymptotic-risk}
-If $n \geq \Omega\left(\frac{\log(1/\delta)}{\epsilon^{d+1}}\right)$, $b \geq \Omega\left(\frac{n\lambda^2M^2}{\epsilon^{2}\delta}\right)$, then w.p. at least $1-\delta$, $|\widehat{\f}_n^{(b)}(\bx) - \f(\bx)| \leq \epsilon$.
-\end{cor}
-The first is an asymptotic risk bound, while the second is a nonasymptotic PAC guarantee. Recall that $M$ is the truncation level.
-The results above recover the minimax rate for nonparametric regression on $1/2$-Holder smooth functions \citep{stone1982} -- quadratically worse than the rate for Lipschitz functions (the setting we are in). We believe this can be improved -- trees should inherit adaptivity to the intrinsic dimension as an adaptive nearest neighbor method, but we leave this for future work.
-
-
-Furthermore, Theorem \ref{thm:main} yields asymptotic coverage of our intervals constructed in Section \ref{sec:statistics}:
-\begin{cor}
-    \label{cor:cov-rate}
-    The CIs, PIs and RIs achieve $1-\alpha$ almost sure pointwise coverage as $n,b \to \infty$.
-\end{cor}
-
-We show in Lemma \ref{lem:rateofr} that the rate at which $\lVert\br_n^{D,P}\rVert_2$ grows is the same for Algorithms \ref{alg:random-dropout} and \ref{alg:structured-dropout}. This shows that our methods achieve an asymptotic relative efficiency relative to \cite{zhou2022boulevard} by up to a factor of $4$ for Algorithm \ref{alg:random-dropout}, and at least a factor of $4$ for Algorithm \ref{alg:structured-dropout}:
-\begin{cor}[Asymptotic Relative Efficiency]
-    \label{cor:are}
-    Write $\widehat{\f}^B$ for the scaled predictions made by vanilla Boulevard \citep{zhou2022boulevard} with the same learning rate $\lambda \in (0,1]$ as Algorithm \ref{alg:random-dropout}. Then,
-    \begin{tightcenter}
-        $
-    {\text{Var}(\frac{1+\lambda}{\lambda}\widehat{\f}^B)}/{\text{Var}(\frac{1+\lambda q}{\lambda}\widehat{\f}^D)}=(\frac{1+\lambda}{1+\lambda q})^2 \in [1,4],
-    \; 
-    {\text{Var}(\frac{1+\lambda}{\lambda}\widehat{\f}^B)}/{\text{Var}(\widehat{\f}^P)}=\left(\frac{1+\lambda}{\lambda}\right)^2 \in [4,\infty).
-    $
-    \end{tightcenter}
-\end{cor}
-\vspace{-2ex}
-This has the implication that Algorithms \ref{alg:random-dropout} and \ref{alg:structured-dropout} achieve increased signal recovery in the square root of the ARE relative to vanilla Boulevard. The intuition for this improvement is as follows. For any choice of $\lambda$ within vanilla Boulevard, there exists a choice of $p$ within Algorithm \ref{alg:random-dropout} that requires a smaller rescaling. On the other hand, as Algorithm \ref{alg:structured-dropout} requires no rescaling, it can achieve an unbounded improvement in relative efficiency over vanilla Boulevard as we take $\lambda \to 0$.
-
-% \haimo{Write out the actual rate of $\norm{\br_n}$. Also need non-asymptotic risk }. \kevin{Potential extension to bounding the risk in terms of the intrinsic dimension of the data. Trees likely enjoy this property with the right splitting method. }
-% Another lemma on the ARE of both algorithms with respect to vanilla Boulevard \cite{zhou2022boulevard} can be shown.
-
-% Convenient inference tools allowed by our CLTs are confidence intervals, prediction intervals and reproduction intervals. \haimo{Should we also incorporate conformal here? Do we need to prove that? This seems straightforward cuz in the simulation the models are not only exchangeable but also independent.} \kevin{lol no. conformal is just something we use as a benchmark. it's very general anyway so guarantees should apply regardless of whether we prove anything or not. we expect it to have coverage but be a mile wide} Denote the variance made by our models as \(\sigma_D^2:=(\frac{1+\lambda q}{q})^2\norm{r_n^D}^2\sigma^2, \sigma_P^2=\norm{r_n^P}^2\sigma^2\). Given $\forall \bx \in [0,1]^d$. Formally, intervals are given by:
-% \begin{itemize}
-%     \item Confidence Interval: $[\widehat{f}^h(\bx)-\sigma_h,\widehat{f}^h(\bx)+\sigma_h]$
-%     \item Prediction Interval:$[\widehat{f}^h(\bx)-\sqrt{1+\norm{r_n^h}^2}\sigma,\widehat{f}^h(\bx)+\sqrt{1+\norm{r_n^h}^2}\sigma]$
-%     \item Reproduction Interval: $[\widehat{f}^h(\bx)-\sqrt{2}\sigma_h,\widehat{f}^h(\bx)+\sqrt{2}\sigma_h]$
-% \end{itemize}
-
-% \haimo{I included the complete pipeline for the proof to work here. But we can highligh part of them and delay the rest to the appendix. That depends on you guys' choice!}
-% \kevin{Only include the main results here. We have very limited space. It suffices to include convergence to KRR and the unconditional CLT.}
-% \haimo{Got it!}
-% \kevin{Also, very brief proof sketches only!}
+\aigen{As immediate consequences of Theorem~\ref{thm:main} and Lemma~\ref{lem:rateofr} (detailed in \citet{fang2025statistical} and Appendix~\ref{app:statistics}), both estimators achieve $O(\sigma^2 n^{-1/(d+1)})$ asymptotic risk\label{cor:asymptotic-risk}, nonasymptotic PAC sample complexity\label{cor:non-asymptotic-risk}, almost-sure $(1-\alpha)$ pointwise interval coverage as $n,b\to\infty$\label{cor:cov-rate}, and an asymptotic relative efficiency improvement over vanilla Boulevard \citep{zhou2022boulevard} of $(\frac{1+\lambda}{1+\lambda q})^2 \in [1,4]$ for Algorithm~\ref{alg:random-dropout} and $(\frac{1+\lambda}{\lambda})^2 \in [4,\infty)$ for Algorithm~\ref{alg:structured-dropout}\label{cor:are}.}
 
 \vspace{-2ex}
 \subsection{Numerical Experiments}
@@ -450,7 +362,7 @@ In light of this, we present a series of numerical experiments to justify our al
 \begin{figure}[t]
     \makebox[\textwidth][c]{\includegraphics[width=1.1\linewidth]{figures/ch06/plots_gb/mse_tests.png}}
     \vspace{-5ex}
-    \caption[Size \& power / MSE races]{%
+    \caption[Variable-importance test error rates and test MSE comparison across UCI datasets]{%
       \textbf{Left:} Type I and Type II error of the hypothesis test for variable importance against training set size. Test set is of the same size. Error rates computed over 30 trials.
       \textbf{Right:} Comparison of MSE achieved by various machine learning algorithms on different datasets, with hyperparameters tuned for each by Optuna. Shaded area depicts two standard deviations over 5 trials.
     }
@@ -458,21 +370,16 @@ In light of this, we present a series of numerical experiments to justify our al
     \vspace{1ex}
 \end{figure}
 
-% \kevin{Plot fhat over f for various K and q in order to demonstrate signal recovery}
-% \kevin{Show convergence to KRR via L2 error from it}
-% \kevin{Show experiments with and without integrity}
-
-
 \vspace{-2ex}
 \paragraph{Predictive accuracy.} The first, and most natural, thing to do is to examine the performance of our algorithms against a handful of competitors in terms of test MSE on nine datasets from the UCI Machine Learning Repository in Figure \ref{fig:mse-tests}. Our competitors include popular methods such as XGBoost \citep{chen2016xgboost}, LightGBM \citep{ke2017lightgbm}, as well as random forests and vanilla boosting. We also compare to vanilla Boulevard \citep{zhou2022boulevard}, and an elastic net regression as a baseline. All hyperparameters were tuned with Optuna \citep{optuna_2019}, reported in Appendix \ref{app:mse}. There is no clear winner in general, but XGBoost is a consistently strong performer, and random forests are clearly more suited to some datasets than others. Neither Algorithm \ref{alg:random-dropout} nor Algorithm \ref{alg:structured-dropout} consistently outperform each other, but Algorithm \ref{alg:structured-dropout} occasionally exhibits instability on some datasets. Regardless, both of our algorithms are competitive in terms of final MSE and rate of convergence, and exhibit the ability to be tuned to be closer to boosting (Wine Quality) or random forests (Air Quality), providing increased flexibility by interpolating between the two.
 
-Our results in Figure \ref{fig:mse-tests} are somewhat unfair to Algorithm 2, as the x-axis is in the ensemble size and not the number of boosting rounds. The number of boosting rounds that Algorithm 2 encounters can be as few as 31 on Abalone, in contrast to the 500 boosting rounds all other algorithms enjoy. Given the same number of boosting rounds, we would certainly expect an improvement.
+Our results in Figure \ref{fig:mse-tests} are somewhat unfair to Algorithm~\ref{alg:structured-dropout}, as the x-axis is in the ensemble size and not the number of boosting rounds. The number of boosting rounds that Algorithm~\ref{alg:structured-dropout} encounters can be as few as 31 on Abalone, in contrast to the 500 boosting rounds all other algorithms enjoy. Given the same number of boosting rounds, we would certainly expect an improvement.
 
 
 \begin{figure}[t]
     \makebox[\textwidth][c]{\includegraphics[width=1.1\linewidth]{figures/ch06/plots_gb/raincloud/npts_200_rep_30_epo_200_lr_0.6_sr_0.8_dr_0.3_md_4_nys_0.1_in_bag_False.png}}
     \vspace{-4ex}
-    \caption{Points in the first two rows represent one of $30$ models, depicting the fraction of test points that fell inside the interval generated by the model (marginal coverage) and average width for each model. Points in the last two represent one of $100$ test points, depicting the fraction of models with intervals containing the test point (conditional coverage) and average width for each point. Results from Algorithm \ref{alg:random-dropout} with $200$ trees, learning rate $0.6$, subsampling $0.8$, dropout $0.3$, max depth $4$.}
+    \caption[Marginal and conditional coverage raincloud plots on the Friedman function]{Points in the first two rows represent one of $30$ models, depicting the fraction of test points that fell inside the interval generated by the model (marginal coverage) and average width for each model. Points in the last two represent one of $100$ test points, depicting the fraction of models with intervals containing the test point (conditional coverage) and average width for each point. Results from Algorithm \ref{alg:random-dropout} with $200$ trees, learning rate $0.6$, subsampling $0.8$, dropout $0.3$, max depth $4$.}
     \label{fig:rainclouds}
 \end{figure}
     
@@ -481,74 +388,15 @@ Our results in Figure \ref{fig:mse-tests} are somewhat unfair to Algorithm 2, as
 \vspace{-2ex}  
 \paragraph{Coverage of intervals.}
 \label{sec:coverage-experiments}
-Other than the Nystr\"{o}m approximations for fast and practical interval computation in Appendix \ref{app:random-projections}, there is one more tweak that we encourage users to make in practice. We demonstrate in Corollary \ref{cor:cov-rate} that our intervals have asymptotic coverage, but this says nothing about its finite sample properties. Fortunately, \cite{candes2020adaptivecoverage} yields a simple enhancement. Since we estimate $\widehat{\sigma}$ through computing the residuals on a hold-out calibration set, we reuse the calibration set to adaptively grow or shrink our intervals according to the empirical prediction interval coverage on the calibration set. This procedure converges quickly (amounting to a doubling trick and binary search), and empirically is very helpful in increasing robustness and finite-sample performance.
+Other than the Nystr\"{o}m approximations for fast and practical interval computation in Appendix \ref{app:random-projections}, there is one more tweak that we encourage users to make in practice. We demonstrate in Section~\ref{sec:theory} that our intervals have asymptotic coverage, but this says nothing about its finite sample properties. Fortunately, \cite{candes2020adaptivecoverage} yields a simple enhancement. Since we estimate $\widehat{\sigma}$ through computing the residuals on a hold-out calibration set, we reuse the calibration set to adaptively grow or shrink our intervals according to the empirical prediction interval coverage on the calibration set. This procedure converges quickly (amounting to a doubling trick and binary search), and empirically is very helpful in increasing robustness and finite-sample performance.
 
-To examine the empirical performance of our intervals, we consider the Friedman function $\f(\bx) = 10\sin(\pi \bx_{1}\bx_{2})+20(\bx_{3}-0.5)^{2}+5\bx_{5}-10$ \citep{friedman2000greedy}. This is depicted as a raincloud plot in Figure \ref{fig:rainclouds}. Importantly, we consider two notions of coverage: marginal coverage, where coverage is averaged over test points, and conditional coverage, where the coverage is conditional on a test point. The first two rows depict the former, while the last two depict the latter. Our intervals perform reasonably well, attaining nominal coverage with the exception of the reproduction interval's coverage and the confidence interval's conditional coverage. In particular, the prediction interval performs very well after the adaptive coverage adjustment. Importantly, unlike the conformal benchmark that has a constant width at each point, our prediction intervals have different interval widths at each point, allowing users to identify `hard'' examples. See Appendix \ref{app:rain-clouds} for other hyperparameter choices.
-\vspace{-4ex}
-\paragraph{CI tuning.} 
-Reducing subsample rate \(\xi\) inflates variance proportionally, while deeper trees yield narrower intervals as finer splits yield sparser \(\bk_n(\bx)\) and smaller \(\|\br_n\|\).  
-Variance grows with shrinkage \(1/\lambda\) and falls as dropout \(p\) increases. Choosing moderate \(\lambda\) and increasing \(p\) yields stabler CIs. Setting $p \to 0$ empirically leads to wider intervals and less power in the hypothesis test for variable importance. This can be seen in Figure \ref{fig:dropout-tests}.
+To examine the empirical performance of our intervals, we consider the Friedman function $\f(\bx) = 10\sin(\pi \bx_{1}\bx_{2})+20(\bx_{3}-0.5)^{2}+5\bx_{5}-10$ \citep{friedman2001greedy}. This is depicted as a raincloud plot in Figure \ref{fig:rainclouds}. Importantly, we consider two notions of coverage: marginal coverage, where coverage is averaged over test points, and conditional coverage, where the coverage is conditional on a test point. The first two rows depict the former, while the last two depict the latter. Our intervals perform reasonably well, attaining nominal coverage with the exception of the reproduction interval's coverage and the confidence interval's conditional coverage. In particular, the prediction interval performs very well after the adaptive coverage adjustment. Importantly, unlike the conformal benchmark that has a constant width at each point, our prediction intervals have different interval widths at each point, allowing users to identify ``hard'' examples. \aigen{Ablation studies examining how the dropout probability $p$, subsample rate $\xi$, and tree depth affect test power and confidence interval width are reported in \citet{fang2025statistical} and Appendix~\ref{app:rain-clouds}.\label{fig:dropout-tests}}
 
-%This happens as we scale Algorithm 1 by $\frac{1+\lambda (1-p)}{\lambda}$ to correct the bias. As a result, the irreducible error will be scaled up as well -- but less so when $p$ is large. A higher dropout rate also introduces decorrelation between trees, suggesting a stabler variance estimate. 
-
-\vspace{-2ex}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.49\linewidth]{figures/ch06/plots_gb/camera/size_power_dr.png}
-    \includegraphics[width=0.49\linewidth]{figures/ch06/plots_gb/camera/ci_dropout_prob.png}
-    \vspace{-1ex}
-    \caption{Comparison of size and power of statistical inference procedures against dropout probability. Conformal adjustment is not performed (for clearer benchmarking, hence the under/overcovarage), and we plot the coverage and width across all datapoints and repetitions.}
-    \label{fig:dropout-tests}
-\end{figure}
-\vspace{-2ex}
-
-\vspace{-4ex}
 \subsection{Conclusions and Further Work}
-\vspace{-2ex}
 \label{sec:discussions}
 We incorporate dropout and parallel boosting into the regularization procedure of \cite{zhou2022boulevard}, allowing for increased signal recovery and improved asymptotic variance. With the CLTs our algorithms enjoy, we construct confidence and prediction intervals, and hypothesis tests for variable importance. Numerical experiments empirically validate our algorithms and statistical procedures.
 
-Our theoretical guarantees depend on structure--value isolation, non‑adaptivity, and tree regularity assumptions. Relaxing these -- e.g., via honesty‐based splitting or quantifying mild adaptivity -- would broaden applicability. Extending inference beyond regression (to classification, survival, or structured outputs) also poses new challenges: non‑quadratic losses, different tree behavior, and the need for new CLTs. Doing so under weaker assumptions is a welcome direction for future work.
-
-
-% \kevin{Placeholder title. There are a bunch of half-baked papers on uncertainty quantification in boosting: https://arxiv.org/pdf/2006.10562, https://arxiv.org/abs/2304.11732, and some less half baked papers like https://arxiv.org/abs/1910.03225. Ultimately previous work has neither asymptotic nor finite-sample guarantees on the coverage of any confidence intervals on the predictions generated, save for e.g. boulevard. Note that you can get a prediction interval via quantile regression, but this is not a CI. We are also interested in confidence intervals for the prediction $\widehat y$ (reproduction intervals, V-stat paper, but this term is not commonly used), not the outcome $y$. Can get intervals for $f$ in KRR world, but that's a stronger assumption (we may need this to call it statistical inference). }
-
-% \kevin{This looks like KRR with an adaptive kernel. Can use this for a kernelized conformal prediction interval! https://jmlr.csail.mit.edu/papers/volume22/18-558/18-558.pdf but for boosting. Conformal prediction interval but we weight by in-leaf proximity. For boosting, can use same calculation we used to get the CLT to get the weights for conformal inference. }
-
-% \kevin{So what will we have? Inference for $\widehat y$ and $f$. Provided via a few different ways, e.g. structure-value isolation (yhat and f and y as long as we can say something about the bias, i.e. need to build deep enough trees $\log n$ and analyze how large that is via the stefan wager paper (Theorem 5.3, when you scale it up it's unbiased within the existing theory, given strong assumptions made), built-in solution via KRR CIs), infinitesimal jackknife and combinations of models (only if we approx. a random forest, also just yhat, https://arxiv.org/pdf/2209.00147. Haimo says it works for f and y if depth is log n though), bootstrap (yhat and f and y, where the latter can be improved with a bootstrap bias correction, but this is the benchmark), and conformal (this can get you a prediction interval for a new draw of $y$). As well as variable importance and interactions via knockoffs (http://www.jmlr.org/papers/volume17/14-168/14-168.pdf, https://pmc.ncbi.nlm.nih.gov/articles/PMC6428414/pdf/nihms-1504775.pdf), where hypothesis testing is more needed (statistically principled variable importance)?}
-
-% \kevin{How will we test SVI? Test coverage and width of SVI CIs against bootstrap, IJ, and conformal. }
-
-% \kevin{How does this improve over vanilla boulevard? Vanilla boulevard converges to only half the signal, nothing more than a squashed sequential random forest. Dropout lets you recover bits of the signal so you converge to $1/(2-\rho)$ of the signal where $\rho$ is the dropout percentage. Why? When building the ensemble, even if we choose only a small percentage of trees, we still divide by the total number, oversquashing the partial ensemble and letting us recover more signal when building later trees. Hedging between current ensemble and future trees, in the sense that we think the current partial ensemble may not be right. This performs much better, and still looks like an average of trees, giving me a KRR limit to tailor. }
-
-% \kevin{Show how to do hypothesis testing via inverting the CIs. Also perform hypothesis testing for variable importance and interactions. Can we also test for SVI? Haimo thinks it might start holding after a few trees. }
-
-% \kevin{Would also be helpful to provide some PAC-style theory on boosting within this framework. This is just to cover our bases against a CS-style reviewer. The proofs are pretty textbook, at least for the classification case. }
-
-% Have to assume they have 0 background information:
-% 1. List all findings and position yourself. Come up with a good story. When does your algorithm work? What's missing in previous literature? 
-% - Do not make it seem like it was written by Giles or Yichen. You can maybe say that Boulevard is the only algorithm with asymptotic guarantees usable for inference, but the algorithm performs poorly and 
-% - We perform parallel boosting in minibatches, and incorporate dropout for regularization. The Boulevard averaging trick is used to obtain asymptotic guarantees, as it is the only one available in the literature. 
-% - Write paragraph on technical difficulty/theoretical novelty in the main paper
-% - Change notation, use boldface font for matrices and vectors
-
-% 2. Experiment reasonably good: simulation + real world dataset
-% (1) simulation: when your algo good and others bad (why you good, others bad)
-% (2) read world: UCI repo. prediction accuracy against benchmarks 
-% (3) real world: beijing housing. CI coverage plus prediction accuracy
-
-% 3. Contributions. You need three:
-% - We provide a modern boosting algorithm with built in uncertainty quantification. Produce confidence intervals, reproduction intervals, hypothesis tests, etc.
-% - Our algorithm interpolates between boosting and random forests. If you set the dropout rate to 1, we recover the random forest algorithm. 
-% - Extension to interpretable ML explainable boosting machines. Link between structured dropout and EBM -- apply this to EBM by boost decision stumps on each covariate to get an additive model. 
-
-% beijing is very big. hence you can divide up the dataset in say 40. 
-% break beijing up into 40 decent sized subsets, produces repetitions that you can compute coverage from
-% experiments should deal with prediction accuracy as well as CI coverage
-
-% proposal for next week. reorganize the experiment and tabulate the results.
-
-% literatures: 
+Our theoretical guarantees depend on structure--value isolation, non‑adaptivity, and tree regularity assumptions. Relaxing these -- e.g., via honesty‐based splitting or quantifying mild adaptivity -- would broaden applicability. Extending inference beyond regression (to classification, survival, or structured outputs) also poses new challenges: non‑quadratic losses, different tree behavior, and the need for new CLTs. Doing so under weaker assumptions is a welcome direction for future work. 
 
 
 
@@ -560,58 +408,25 @@ Our theoretical guarantees depend on structure--value isolation, non‑adaptivit
 While Part~I established pointwise asymptotic normality and sketched uncertainty quantification for general multidimensional regression trees, many scientific and high-stakes decision-making domains require interpretable generalized additive decompositions $f(\bx) = \mu + \sum_{k=1}^p f_k(x_k)$ together with componentwise confidence bands for each individual feature effect $f_k$. In Part~II, based on joint work with Haimo Fang, Jonathan Pipping, and Giles Hooker \citep{fang2026statistical}, we analyze cyclic univariate moving-average boosting (Algorithm~\ref{alg:brebm_ident}), establish finite-sample convergence to a block-structured backfitting fixed point and componentwise central limit theorems, and show that operating in histogram bin space reduces the per-query variance calculation from $O(n^3)$ to $O(M^3)$ where $M = \sum_{k=1}^p m_k \ll n$ is the total number of feature bins.
 \end{aigenblock}
 \subsection{Introduction}
-	Modern machine learning methods have proven to be highly successful, achieving impressively high performance even for complicated prediction tasks. Still, this comes at a cost. These methods have been critiqued for their lack of transparency, often described as ``black-box'' models. As such, much work has been done in an attempt to provide explanations for their behavior.\footnote{Popular methods include LIME \cite{ribeiro2016should}, SHAP \cite{lundberg2017unified}, ALE \cite{apley2020visualizing} and partial dependence \cite{friedman2001greedy} plots.}Another line of work attempts to convince practitioners to instead use inherently transparent models that are algebraically simple enough to be inspected by humans \cite{rudin2019stop}. Neither is optimal. Explaining black-box models is a difficult problem \cite{hooker2021unrestrictedpermutationforcesextrapolation, fryer2021shapleyvaluesfeatureselection}, and inherently interpretable models can sacrifice performance. 
-	
-	In light of this, Explainable Boosting Machines (EBM) \cite{yin2012intelligible, nori2019interpretmlunifiedframeworkmachine} have emerged as a popular ``glass-box'' model to strike a balance between both. An EBM learns a Generalized Additive Model (GAM) \cite{hastie1986gams}: $\f(\bx) = \sum_{k=1}^{p}\f^{(k)}(\bx^{(k)})$, where each $\f^{(k)}$ is assumed to be a univariate function of the $k$-th feature. However, instead of fitting splines, it instead fits a set of univariate gradient boosting regression trees. The tree-based boosting procedure attempts to recover the expressiveness of state-of-the-art algorithms \cite{chen2016xgboost, ke2017lightgbm}, while the decomposition into additive components allows the measurement of the marginal contribution of each feature like linear models.  While EBMs impose strong structural constraints on the resulting prediction, their ability to reproduce nonlinearities, along with appropriate choices of additive structure, provides comparable performance to SOTA boosting \cite{nori2019interpretmlunifiedframeworkmachine}. 
-	
-	
-	\begin{figure*}[ht!]
-    \vspace{-2ex}
-		\centering
-		\includegraphics[width=\linewidth]{figures/ch06/plots_ebm/obesity_feature_effects_wide.png}
-		\vspace{-4ex}
-		\caption{Example of the feature-specific confidence intervals generated by Algorithm \ref{alg:brebm_ident}, compared to the point estimates from EBM \cite{nori2019interpretmlunifiedframeworkmachine}. This visualizes centered feature effects on the UCI Machine Learning Reposity Obesity \cite{estimation_of_obesity_levels_based_on_eating_habits_and_physical_condition__544} dataset, when predicting weight as the response. }
-		\label{fig:ebm-effects-wide}
-        \vspace{-2ex}
-	\end{figure*}
-	
-	While EBMs provide a clear graphical representation for the effects of each feature, these are still point estimates. The central question we ask for uncertainty quantification can be phrased as this: \textit{Given a model design, if we collect a new dataset and retrain the model, how different would our new prediction be?} In response to this question, vanilla EBMs \cite{yin2012intelligible} compute variance estimates via bootstrapping, though this is computationally intensive and only heuristically justified. Our primary objective is hence \emph{well-calibrated frequentist uncertainty quantification} for EBMs while retaining their interpretability and scalability.
-
-	
-	A canonical alternative to bootstrapping is to construct confidence and prediction intervals using the asymptotic properties of the model. This is the case with GAMs fitted via the backfitting (but not boosting) algorithm, which enjoy a rich asymptotic theory that enables the construction of confidence and prediction intervals for them \cite{2f43af29-e27b-3b6f-9c3a-d7c3bd53adac}. Another widely used alternative for prediction intervals is conformal prediction, which provides finite-sample marginal coverage with minimal assumptions. However, conformal methods do not directly yield feature-wise confidence intervals for the GAM components, which we aim to explore in this work.
-	
-	Unfortunately, the asymptotic behavior of most gradient boosting algorithms (of which EBMs are one), is not known. \cite{ustimenko2023gradientboostingperformsgaussian} show that a randomized version of boosting converges to a Gaussian process. On the other hand, \cite{zhou2019boulevardregularizedstochasticgradient} show that taking an average instead of a sum of trees (in a process which they call Boulevard regularization) converges to a kernel ridge regression, yielding asymptotic normality. This was recently leveraged by \cite{fang2025gradient} to construct confidence intervals for the underlying nonparametric function $\f$ and prediction intervals for the labels, with extensions to random dropout and parallel boosting.
+	Explainable Boosting Machines (EBM) \citep{yin2012intelligible, nori2019interpretmlunifiedframeworkmachine} have emerged as a popular ``glass-box'' model that learns a Generalized Additive Model (GAM) \citep{hastie1986gams}, $\f(\bx) = \sum_{k=1}^{p}\f^{(k)}(\bx^{(k)})$, by fitting univariate gradient boosted regression trees to each feature. While EBMs provide a clear graphical representation for the effects of each feature, these are still point estimates, and vanilla EBMs \citep{yin2012intelligible} compute variance estimates via bootstrapping, which is computationally intensive and only heuristically justified. Although GAMs fitted via classical spline backfitting enjoy asymptotic confidence intervals \citep{2f43af29-e27b-3b6f-9c3a-d7c3bd53adac} and conformal prediction yields marginal prediction intervals, neither directly supplies frequentist feature-wise confidence intervals for tree-based EBM components. \aigen{Extended motivation comparing black-box post-hoc explanations and glass-box additive models, together with 1D and UCI Obesity feature-effect visualizations, is provided in \citet{fang2026statistical}.\label{fig:ebm-effects-wide}\label{fig:coverage-1d}}
 
     \paragraph{Our contributions.}
-     Unfortunately, the underlying nonparametric function itself can be highly complicated and uninterpretable in general. Restricting this to the class of GAMs, as with EBMs, yields interpretability. However, the existing Boulevard theory \cite{zhou2019boulevardregularizedstochasticgradient} does not directly apply to the class of algorithms we consider here. These results need to be extended to allow different structure matrices (resulting in different kernels) for each feature, along with enforcing the GAM identifiability conditions. While we sketch an algorithm that can be analyzed largely within the framework of \cite{fang2025gradient}, further algorithmic variants that either employ backfitting directly or employ parallelization methods result in different algorithmic limits requiring separate analysis. Unlike prior Boulevard analyses, EBMs induce \emph{feature-specific} kernels. This makes the theory substantially more delicate: one must control their interaction under centering and GAM identifiability, and establish asymptotic normality for each additive component, not just the overall predictor. To handle these additional challenges, we make the following contributions:
+     Restricting the regression function to the class of GAMs yields interpretability, but the existing Boulevard theory \citep{zhou2022boulevard, fang2025statistical} does not directly apply: EBMs induce \emph{feature-specific} structure matrices and kernels whose interaction must be controlled under centering and GAM identifiability to establish asymptotic normality for each additive component. To handle these challenges, we make the following contributions:
      
 	\vspace{-2ex}
 	\begin{itemize}
-		\item \textbf{Asymptotic Theory.} We establish central limit theorems for three variations of EBMs (parallelized, backfitting-like parallelized, and sequential), showing that the Boulevard-regularized ensemble converges to a feature-wise kernel ridge regression. The resulting predictions are asymptotically normal and achieve the minimax-optimal MSE of $O(pn^{-2/3})$ for fitting Lipschitz $p$-dimensional GAMs \cite{yuan2015minimaxoptimalratesestimation}. This avoids the curse of dimensionality, significantly improving upon the rates of \cite{zhou2019boulevardregularizedstochasticgradient, fang2025gradient}.
+		\item \textbf{Asymptotic Theory.} We establish central limit theorems for three variations of EBMs (parallelized, backfitting-like parallelized, and sequential), showing that the Boulevard-regularized ensemble converges to a feature-wise kernel ridge regression. The resulting predictions are asymptotically normal and achieve the minimax-optimal MSE of $O(pn^{-2/3})$ for fitting Lipschitz $p$-dimensional GAMs \citep{yuan2015minimaxoptimalratesestimation}. This avoids the curse of dimensionality, significantly improving upon the rates of \cite{zhou2022boulevard, fang2025statistical}.
 		
-		\item \textbf{Frequentist Inference.} By leveraging our proposed CLT for baseline vector $\bbeta$ and feature-wise predictions $\widehat \f^{(k)}$, we extend the heuristic bootstrap to a set of inference toolkits. We provide confidence intervals for each underlying function $\f^{(k)}$ (see Figure \ref{fig:ebm-effects-wide} for an example), and prediction intervals for the response. This also allows a direct test of variable importance following the methods of \cite{mentch2015quantifyinguncertaintyrandomforests}. We round out those propositions by numerical experiments to back up the validity of our algorithms.
+		\item \textbf{Frequentist Inference.} By leveraging our proposed CLT for baseline vector $\bbeta$ and feature-wise predictions $\widehat \f^{(k)}$, we extend the heuristic bootstrap to a set of inference toolkits. We provide confidence intervals for each underlying function $\f^{(k)}$ and prediction intervals for the response. This also allows a direct test of variable importance following the methods of \cite{mentch2016randomforestci}. We round out those propositions by numerical experiments to back up the validity of our algorithms.
 		
-		\item \textbf{Computational Efficiency.} The derived procedures above rely on a kernel ridge regression, with a prohibitively expensive $O(n^3)$ runtime. \cite{fang2025gradient} employ the Nyström approximation to produce intervals in $O(np^2)$ kernel precomputation and $O(p^2)$ query time, but the recursive implementation of \cite{musco2017recursivesamplingnystrommethod} can be slow in practice. Given that EBMs utilize histogram trees, we instead work out the computations in histogram bin-space.
+		\item \textbf{Computational Efficiency.} The derived procedures above rely on a kernel ridge regression, with a prohibitively expensive $O(n^3)$ runtime. \cite{fang2025statistical} employ the Nyström approximation to produce intervals in $O(np^2)$ kernel precomputation and $O(p^2)$ query time, but the recursive implementation of \cite{musco2017recursivenystrom} can be slow in practice. Given that EBMs utilize histogram trees, we instead work out the computations in histogram bin-space.
         This bin-based implementation runs in an additional lower-order $O(pm^2)$ time per training round, $O(pm^3)$ kernel precomputation time, and $O(pm^2)$ interval query time, where $p$ is the number of features and $m$ the maximum number of bins per-feature. As the number of bins is usually capped at $255$ or $511$, this is independent of the number of samples $n$!
 	\end{itemize}
-	\begin{figure*}[ht!]
-    \vspace{-3ex}
-    \centering
-     \includegraphics[width=0.8\linewidth]{figures/ch06/plots_ebm/coverage_1d_plot.png}
-        \vspace{-2ex}
-	    \caption{Example of confidence and prediction intervals on a simple 1D function $y=2\sin(2\pi x) + x^2$.}
-	    \label{fig:coverage-1d} \vspace{-2ex}
-	\end{figure*}
-	
-	% {\bf exploitation of basis representation?}
-	
-	% {\bf need to sketch out results and simulations}
+
 	\subsection{Setup and Notation}
 	\label{ch06b:sec:setup}
 	
-	%    \kevin{Introduce plot on overfitting, and refer the reader to Fig 2 of our last paper for evidence that Boulevard avoids overfitting and allows the user to ignore the need for early stopping. The figure we will provide (overfit\_mse.png) shows that the EBM and InferableEBM frameworks are robust to this. EBM does so through a really small learning rate and random split sampling, we do so via Boulevard regularization. }
-	
-	Let $(\bX_n, \by_n) = (\bx_i,y_i)_{i=1}^n$ are i.i.d.\ samples with $\bx_i=(\bx_i^{(1)},\ldots,\bx_i^{(p)})^\top$. Let $\jmat=\bI_n-\frac{1}{n}\bone\bone^\top$ denote the centering projector. We adopt the standard GAM identifiability convention that each component is centered on the training set: $\sum_{i=1}^n \f^{(k)}(\bx_i^{(k)})=0$ for all $k$, so the intercept equals the sample mean. Then:
+	Let $(\bX_n, \by_n) = (\bx_i,y_i)_{i=1}^n$ be i.i.d.\ samples with $\bx_i=(\bx_i^{(1)},\ldots,\bx_i^{(p)})^\top$. Let $\jmat=\bI_n-\frac{1}{n}\bone\bone^\top$ denote the centering projector. We adopt the standard GAM identifiability convention that each component is centered on the training set: $\sum_{i=1}^n \f^{(k)}(\bx_i^{(k)})=0$ for all $k$, so the intercept equals the sample mean. Then:
 	\begin{assumption}[Additive Lipschitz Nonparametric Regression]
 		\label{aspt:truth}
 		Assume that the response satisfies
@@ -622,11 +437,7 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 		Assume the covariates have a bounded density on their support: $0<c_1\leq \mu(\mathbf{x}) \leq c_2<\infty$.  Each component function $\f^{(k)}:\mathbb{R}\to\mathbb{R}$ is mean--zero with respect to the marginal of $\bx^{(k)}$, and is $L$-Lipschitz. The intercept $\bbeta$ is defined as the unconditional mean of the response: $\bbeta := \E_{\bx, \epsilon}[y] = \int y \, d\mu_{\bx}(x)\, d\mu_\epsilon(\epsilon).$
 	\end{assumption}
 	
-	\paragraph{Boulevard Regularization.}\cite{zhou2019boulevardregularizedstochasticgradient} replace the usual additive update with a moving average. Instead of adding the next tree: $\widehat{\f}_b \leftarrow \f_{b-1}+\lambda\bt_b$, they average over all previous trees: $\widehat{\f}_b \leftarrow \frac{b-1}{b}\f_{b-1}+\frac{\lambda}{b}\bt_b$. This idea of shrinking the previous ensemble as also been adopted by \cite{ustimenko2022sglbstochasticgradientlangevin, ustimenko2023gradientboostingperformsgaussian}. This ensures convergence to a kernel ridge regression in the limit of infinite boosting rounds, and that the resulting predictions are asymptotically normal.\footnote{A particular advantage of Boulevard regularization is that it is robust to overfitting \cite{fang2025gradient}. Figure \ref{fig:overfit_mse} shows this behavior for Algorithm \ref{alg:brebm_ident}. EBM achieves this here via tiny learning rates when cycling through features in sequence. We do this while fitting to features in parallel.}
-    
-	
-	
-
+	\paragraph{Boulevard Regularization.} \aigen{As introduced in Section~\ref{sec:setup}, Boulevard regularization \citep{zhou2022boulevard} replaces the standard additive boosting update with the moving average $\widehat{\f}_b \leftarrow \frac{b-1}{b}\f_{b-1}+\frac{\lambda}{b}\bt_b$; we extend this moving-average stabilization below to centered univariate trees across $p$ additive components.}
 
 	\subsection{Algorithms} \label{ch06b:sec:algorithms}
     
@@ -635,7 +446,7 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 		\label{alg:brebm_ident}
 		\begin{algorithmic}[1]
 			\State \textbf{Input:} $\mathbf{X}\in\mathbb{R}^{n\times p}$, $\mathbf{y}\in\mathbb{R}^n$, subsample rate $\xi$, learning rate $\lambda$, rounds $B$, truncation level $M>0$.
-			\State \textbf{Init:} $\widehat{\bbeta}_0 \gets \frac{1}{n}\sum_{i=1}^n \by_i$;\quad $\f_k^{(0)} \gets 0$ for all $k$.
+			\State \textbf{Init:} $\widehat{\bbeta}_0 \gets \frac{1}{n}\sum_{i=1}^n \by_i$,\quad $\f_k^{(0)} \gets 0$ for all $k$.
 			\For{$b=1$ \textbf{ to } $B$}
 			\For{$k=1$ \textbf{ to } $p$ \textbf{ in parallel}}
 			\State Sample $G_{b,k}\subset\{1,\dots,n\}$ i.i.d. w.p. $\xi$.
@@ -651,63 +462,48 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 			\State \textbf{Output:} $\widehat \f(x) \gets \widehat{\bbeta}_B + \frac{1+\lambda}{\lambda}\sum_{k=1}^p \f_k^{(B)}(\bx^{(k)})$.
 		\end{algorithmic}
 	\end{algorithm}
-	
-	
-    We adapt the above regularized boosting procedure to fitting EBMs below in Algorithm \ref{alg:brebm_ident}, in the hope that doing so allows us to show similar theoretical guarantees for the resulting procedure. 
-    
-    \paragraph{Parallelization and  inference.} Algorithm \ref{alg:brebm_ident} is a minimal parallelized variation on EBMs. At each round $b$, the new set of $p$ univariate trees $(\bt_b^{(k)})_{k=1}^p$ are fitted in parallel by regressing the current residual $r_{i,k}$ on each of the $p$ features $\bx_i^{(k)}$. The trees are then centered and clipped, before being introduced into the ensemble as part of the average: $\mathbf{f}_b^{(k)} \gets \frac{b-1}{b} \mathbf{f}_{b-1}^{(k)}+\frac{1}{b} \widetilde{\mathbf{t}}_b^{(k)}$.
-    
-    Averaging yields a kernel ridge regression limit and a CLT, but (as in Boulevard) the fitted signal is asymptotically shrunk, requiring rescaling by $\frac{1+\lambda}{\lambda}$. In Section \ref{sec:finite-sample-convergence}, we show that the prediction made by Algorithm \ref{alg:brebm_ident} converge to a kernel-ridge-regression. Informally:
-	$$
-	\widehat{\f}_b(\bx) \underset{b\to\infty}{\overset{a.s.}{\longrightarrow}} \bar{\by}+ \sum_{k=1}^{p}\E[\sveck(\bx)]^\top \jmat[\bI + \jmat\bK]^{-1}\by.
-	$$
-	The down-scaling stems from the matrix $[\bI + \jmat\bK]^{-1}$: When the aggregated kernel $\bK = \sum_{k=1}^{p} \Kmatk$ becomes nearly the identity (i.e. the aggregated decision boundaries are fine enough), we see a $\frac{\lambda}{1+\lambda}$ shrinkage.
 
-    \paragraph{Difficulty in parallelization.} 
-    The parallelization in Algorithm \ref{alg:brebm_ident} does not come for free. One has to either use a small learning rate of $1/p$, or make a rather strong assumption on the feature kernels (see Assumption \ref{aspt:proj-orth}) for Algorithm \ref{alg:brebm_ident} to provably converge.
-    
-    Though in practice this is not an issue, we explore alternatives below for the sake of completeness. One is to abandon parallelism, and randomly choose a single feature to fit a tree to during each boosting round. This is presented in Algorithm \ref{alg:brebm_random_cyclic} (see Appendix \ref{ch06b:app:algorithms}), which converges to the same fixed point as Algorithm \ref{alg:brebm_ident}, but without the computational gains. 
+	\begin{algorithm}[ht!]
+		\caption{\aigen{Leave-One-Out Parallel Moving-Average Boosting for Generalized Additive Models}}
+		\label{alg:ebm_bratp}
+		\begin{algorithmic}[1]
+			\State \textbf{Input:} $\mathbf{X}\in\mathbb{R}^{n\times p}$, $\mathbf{y}\in\mathbb{R}^n$, subsample rate $\xi$, rounds $B$, truncation level $M>0$.
+			\State \textbf{Init:} $\widehat{\bbeta}_0 \gets \frac{1}{n}\sum_{i=1}^n \by_i$,\quad $\f_k^{(0)} \gets 0$ for all $k$.
+			\For{$b=1$ \textbf{ to } $B$}
+			\For{$k=1$ \textbf{ to } $p$ \textbf{ in parallel}}
+			\State Sample $G_{b,k}\subset\{1,\dots,n\}$ i.i.d. w.p. $\xi$.
+			\State $r_{i,k} \gets \by_i - (\widehat{\bbeta}_{b-1} + \sum_{\ell \neq k} \f_{b-1}^{(\ell)}(\bx_i^{(\ell)}))$.
+			\State Fit tree $\bt^{(b,k)}$ to $\{(\bx_i^{(k)}, r_{i,k})\}_{i\in G_{b,k}}$.
+			\State $\mu_{b,k} \gets \frac{1}{n}\sum_{i=1}^n \bt^{(b,k)}(\bx_i^{(k)})$.
+			\State $\widetilde \bt_b^{(k)}(\bx) \gets t_b^{(k)}(\bx) - \mu_{b,k}$.
+			\State $\widetilde \bt_b^{(k)}(x) \gets \max\{-M,\;\min\{\widetilde \bt_b^{(k)}(\bx),M\}\}$.
+			\State $\widehat{\bbeta}_b \gets \widehat{\bbeta}_{b-1} + \mu_{b,k}$.
+			\State $\f_b^{(k)} \gets \frac{b-1}{b} \f_{b-1}^{(k)} + \frac{1}{b}\,\widetilde \bt_b^{(k)}$.
+			\EndFor
+			\EndFor
+			\State \textbf{Output:} $\widehat \f(x) \gets \widehat{\bbeta}_B + 2\sum_{k=1}^p \f_k^{(B)}(\bx^{(k)})$.
+		\end{algorithmic}
+	\end{algorithm}
 	
-	\paragraph{Leave-one-out procedure.} One problem remains. Algorithms \ref{alg:brebm_ident} and \ref{alg:brebm_random_cyclic} converges to $\frac{\lambda}{1+\lambda} \f \leq \f/2$, and so require rescaling by $\frac{1+\lambda}{\lambda}$. 
-    We provide an alternative inspired by the backfitting-like procedure of \cite{fang2025gradient} in Algorithm \ref{alg:ebm_bratp} that does not require rescaling. 
+    We adapt the regularized boosting procedure to fitting EBMs in Algorithms~\ref{alg:brebm_ident} and \ref{alg:ebm_bratp}. 
     
-    This hybrid backfitting-boosting procedure amounts to not using predictions from trees trained on feature $\bx^{(k)}$ when fitting a new tree $\bt_{b}^{(k)}$ for it\footnote{This can be interpreted as treating other functions $\f^{(\ell)} \neq \f^{(k)}$ as nuisances and learning them via boosting, while learning $\f^{(k)}$ as a random forest.} -- instead using  residuals $\by_i - (\widehat{\bbeta}_b+\sum_{\ell\neq k}\f_{b-1}^{(\ell)}(\bx_i^{(\ell)}))$.
-    Although this does not require rescaling, it produces complicated confidence intervals that are harder to compute efficiently. Informally, Algorithm \ref{alg:ebm_bratp} converges to:
+    \paragraph{Parallelization and inference.} Algorithm \ref{alg:brebm_ident} is a minimal parallelized variation on EBMs. At each round $b$, the new set of $p$ univariate trees $(\bt_b^{(k)})_{k=1}^p$ are fitted in parallel by regressing the current residual $r_{i,k}$ on each of the $p$ features $\bx_i^{(k)}$. The trees are then centered and clipped, before being introduced into the ensemble as part of the average: $\mathbf{f}_b^{(k)} \gets \frac{b-1}{b} \mathbf{f}_{b-1}^{(k)}+\frac{\lambda}{b} \widetilde{\mathbf{t}}_b^{(k)}$.
+    Averaging yields a kernel ridge regression limit and a CLT, but (as in Boulevard) the fitted signal is asymptotically shrunk, requiring rescaling by $\frac{1+\lambda}{\lambda}$. Specifically, the predictions made by Algorithm \ref{alg:brebm_ident} converge almost surely as $b\to\infty$ to
+	$$
+	\widehat{\f}_b(\bx) \underset{b\to\infty}{\overset{a.s.}{\longrightarrow}} \bar{\by}+ \sum_{k=1}^{p}\E[\sveck(\bx)]^\top \jmat[\bI + \jmat\bK]^{-1}\by,
+	$$
+	where $\bK = \sum_{k=1}^{p} \Kmatk$. \aigen{A sequential random-cyclic warmup variant that samples a single feature $k \sim \mathrm{Unif}(\{1,\dots,p\})$ per boosting round and converges to the same fixed point without feature-level parallelism is analyzed in \citet{fang2026statistical} (Appendix~\ref{ch06b:app:algorithms}).\label{alg:brebm_random_cyclic}}
+	
+	\paragraph{Leave-one-out procedure.} Because Algorithm~\ref{alg:brebm_ident} converges to $\frac{\lambda}{1+\lambda} \f \leq \f/2$ and requires rescaling by $\frac{1+\lambda}{\lambda}$, we provide an alternative inspired by the backfitting-like procedure of \cite{fang2025statistical} in Algorithm \ref{alg:ebm_bratp} that does not require rescaling. This hybrid backfitting-boosting procedure amounts to omitting predictions from trees trained on feature $\bx^{(k)}$ when fitting a new tree $\bt_{b}^{(k)}$ for it -- instead using leave-one-feature-out residuals $\by_i - (\widehat{\bbeta}_{b-1}+\sum_{\ell\neq k}\f_{b-1}^{(\ell)}(\bx_i^{(\ell)}))$. Informally, Algorithm \ref{alg:ebm_bratp} converges to:
 	$$
 	\bar{\by}+ \sum_{k=1}^{p}\E[\sveck(\bx)]^\top (\bI - \E\Smatk)^{-1} \jmat\Big[\bI-(\bI+\mathcal{K})^{-1}\mathcal{K}\Big]\by,
 	$$
-    where $\mathcal{K}:=\sum_{k=1}^p(\mathbf{I}-\mathbb{E} \mathbf{S}^{(k)})^{-1} \mathbf{J}_n \mathbb{E} \mathbf{S}^{(k)}$ is a somewhat more complicated combined kernel that unlike Algorithms \ref{alg:brebm_ident} and \ref{alg:brebm_random_cyclic}, does not decompose into the sum of the individual feature kernels. 
-	\paragraph{Comparison to vanilla EBMs.} Our algorithms possess advantages over vanilla EBMs. The convergence to a kernel ridge regression allows us to show a central limit theorem for each function $\f^{(k)}$:
-    $$\lVert\rveck(\bx)\rVert_2^{-1}\left(c_E\cdot\widehat{\f}^{(k)}(\bx) - \f^{(k)}(\bx)\right)\stackrel{d}{\longrightarrow}\mathcal{N}(0, \sigma^2),$$
-    where $c_E$ is a scaling factor that is $\frac{\lambda}{1+\lambda}$ for Algorithms \ref{alg:brebm_ident} and \ref{alg:brebm_random_cyclic}, and $1$ for Algorithm \ref{alg:ebm_bratp}. $\rveck$ are the kernel weights for the kernel ridge regression predictions ${\rveck}^\top\by$. For instance, Algorithms \ref{alg:brebm_ident} and \ref{alg:brebm_random_cyclic} converge to ${\rveck}^\top\by := \mathbb{E}\left[\mathbf{s}^{(k)}(\mathbf{x})\right]^{\top} \mathbf{J}_n\left[\mathbf{I}+\mathbf{J}_n \mathbf{K}\right]^{-1} \by.$
-    
-    This asymptotic normality yields confidence intervals for each $\f^{(k)}$ and prediction intervals for the response $\by$ -- as long as we can compute $\lVert\rveck(\bx)\rVert_2$ efficiently. It also allows us to prove guarantees on the generalization error of each algorithm. We later show that $\lVert\rveck(\bx)\rVert_2 = \Theta(n^{-1/3})$, allowing us to show that our algorithms achieve the minimax-optimal MSE of $O(p\,n^{-2/3})$ for fitting Lipschitz GAMs. In comparison, vanilla EBMs hold \emph{no such guarantees}.
-    
-    % By incorporating Boulevard regularization, one replace the heuristic error band with asymptotic variance $\sigma_{\widehat{\f}}^2 = \norm{\rveck}\sigma^2$, where $\rveck$ is the kernel-ridge-regression style operator we introduce later in section \ref{ch06b:sec:theory}. Following the same intuition in \cite{zhou2019boulevardregularizedstochasticgradient}, the ultimate prediction is down-scaled by $\frac{\lambda}{1+\lambda}$. As a complement, Algorithm \ref{alg:ebm_bratp} is proposed to avoid such scaling.
-
-    \paragraph{Comparison to Boulevard.} The original gradient boosting algorithm with Boulevard regularization of \cite{zhou2019boulevardregularizedstochasticgradient} converges to a kernel ridge regression of the form $\E[\bs(\bx)]^\top(\lambda^{-1}\bI + \E[\bS])^{-1}\E[\bS]\by$. This is similar to our result for Algorithms \ref{alg:brebm_ident} and \ref{alg:brebm_random_cyclic}, but we achieve convergence for each centered univariate function while they achieve convergence only for the overall function $\f$. As a consequence, their method has an MSE of $O(n^{-\frac{1}{d+1}})$ that grows exponentially in dimension. This is not even minimax-optimal for the nonparametric Lipschitz regression setting they are in.
-    
-    The variants of \cite{fang2025gradient} incorporating dropout and parallel training converge to slightly different fixed points, but ultimately achieve the same asymptotic MSE rates exponential in dimension.
-    
-    % By way of comparison, in standard Boulevard trees have access to all features at once. \cite{fang2025gradient} added a dropout mechanism to the method first described in \cite{zhou2019boulevardregularizedstochasticgradient} in which trees are fit to residuals obtained after randomly dropping $(1-q)\%$ of the current ensemble resulting in a limit given by 
-    % $\E \mathbf{s}(\bx) ^T (\lambda^{-1}\bI + q \E \Smat)^{-1} \E \Smat \by$
-    % for a single expected tree structure matrix $\E \Smat$ which is approximately downscaled by $\lambda/(1+\lambda q)$.  A structured dropout algorithm that effectively divided the ensemble into $K$ groups, but with the same distribution over structure matrices, obtained a limit of $\E \mathbf{s}(\bx)^T(I + (K-1)\E \Smat)^{-1} K \E \Smat \by$, obviating the need to rescale. The analysis of this limit is simpler in comparison to those given above in having a common structure matrix and removing the identifiability concerns that motivate recentering. 
-    
-%    \kevin{Compare fixed points with Boulevard fixed points.}
+    where $\mathcal{K}:=\sum_{k=1}^p(\mathbf{I}-\mathbb{E} \mathbf{S}^{(k)})^{-1} \mathbf{J}_n \mathbb{E} \mathbf{S}^{(k)}$. \aigen{Detailed comparisons between Algorithms~\ref{alg:brebm_ident}--\ref{alg:ebm_bratp}, vanilla EBMs, and multidimensional Boulevard are given in \citet{fang2026statistical}.}
 	
     \subsection{Theory}
     \label{ch06b:sec:theory}
-    We now work towards proving the central limit theorem outlined above. To begin, we introduce a few definitions. First, we use regression trees as base learners. These can be understood as a linear transformation from the observed signal to the predictions via a smoothing tree kernel, formally defined below:
-	\begin{definition}[Regression trees]
-		\label{def:regression-trees}
-		A regression tree $\bt_n$ trained on $n$ datapoints segments the covariate space $[0,1]^d$ into a partition of hyper-rectangles $\{A_i\}_{i=1}^m$. When $A(\bx)$ is the rectangle containing $\bx$, and $s_{n,j}(\bx)$ is the frequency at which training point $\bx_j$ and test point $\bx$ share a leaf, ${s}_{n,j}(\bx) = \frac{\mathbbm{1}(\bx_j \in A(\bx))}{\sum_{k=1}^n \mathbbm{1}(\bx_k \in A(\bx))},$ the regression tree $\bt_n$ predicts $\bt_n(\bx) = \sum_{j=1}^n s_{n,j}(\bx)\cdot y_j$.
-	\end{definition}
-	This suggests that ${s}_{n,j}(\bx)$, the frequency at which training point $\bx_j$ and test point $\bx$ share a leaf, defines a similarity measure. This observation is insightful. In fact, the frequency at which training points $\bx_i, \bx_j$ share a leaf, $s_{n,j}(\bx_i)$, yields a kernel!\footnote{Theorem 3 of \cite{zhou2019boulevardregularizedstochasticgradient} shows that $\E\bS_n$ is p.s.d. with spectral norm no more than 1.}
-	\begin{definition}[Structure vectors and matrices]
-		\label{def:structure-vec-mat}
-		Let $\bt_n$ be a tree. $\bs_n(\bx) = (s_{n,1}(\bx),...,s_{n,n}(\bx))^\top$ be the structure vector of $\bx$. The matrix $\bS_n = \left(s_{n,j}(\bx_i)\right)_{i,j=1}^n$ with rows $\bs_n(\bx_i)^\top$ is the structure matrix of $\bt_n$.
-	\end{definition}
-	Following \cite{zhou2019boulevardregularizedstochasticgradient, fang2025gradient}, we require that the tree \emph{structures} be separated from the leaf  \emph{values}, and stabilize after a burn-in period:
+    \aigen{We adopt the regression tree and structure matrix definitions from Definitions~\ref{defn:regression-trees} and \ref{defn:structure-matrix} in Section~\ref{sec:setup}, applied to univariate partitions along each coordinate $k \in \{1,\dots,p\}$.\label{def:regression-trees}\label{def:structure-vec-mat}}
+	Following \cite{zhou2022boulevard, fang2025statistical}, we require that the tree \emph{structures} be separated from the leaf  \emph{values}, and stabilize after a burn-in period:
 	\begin{assumption}[Integrity]
 		\label{aspt:integrity}
 		Assume
@@ -718,55 +514,28 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 		\end{enumerate}
 	\end{assumption}
 	
-	The former can be satisfied by refitting leaf values on a hold-out dataset \cite{wager2017estimationinferenceheterogeneoustreatment}. Non-adaptivity may occur naturally, but can also be enforced by sampling from previous tree structures after a burn-in period. In practice, our algorithms tend to perform well even in the absence of these assumptions.
-	
-	\paragraph{Tree Geometry}
-	We control the geometry and size of leaves to ensure locality and stable averages. These assumptions control the MSE of the final estimate -- \cite{zhou2019boulevardregularizedstochasticgradient} and \cite{fang2025gradient} make spiritually similar assumptions, but with  different scalings in dimension that do not avoid the curse of dimensionality. Again, we avoid this problem due to the GAM structure of our problem setup:
+	\paragraph{Tree Geometry.}
+	We control the geometry and size of leaves to ensure locality and stable averages, obtaining dimension-free univariate rates due to the GAM structure:
 	\begin{assumption}[Bounded Leaf Diameter]
 		\label{ch06b:aspt:leaf-diameter}
 		Write $\mathsf{diam}(A)=\sup_{\bx_1,\bx_2\in A}\norm{\bx_1-\bx_2}$. For any leaf $A$ in a tree with structure $\Pi\in Q_n^{(k)}, \forall k = 1, \cdots, p$, we need $\sup_{A \in \Pi} \mathsf{diam}(A) =  O(d_n) = O(n^{-{1}/{3}})=o(\frac{1}{\log n})$.
 	\end{assumption}
-    Assumption \ref{ch06b:aspt:ub-minimal-leaf-size} forces trees to perform only \emph{local} averaging by keeping leaves well-balanced. Assumption \ref{aspt:truth} allows depths as large as $\Omega(\log n)$, which is natural for balanced binary trees.
-	
 	\vspace{-1ex}
 	\begin{assumption}[Increased Minimal Leaf Size]
 		\label{ch06b:aspt:ub-minimal-leaf-size}
 		For any $\nu >0$, the leaf geometric volume $v_n$ is bounded such that \(v_n =n^{-\frac{2}{3}+\nu}<n^{-\frac{1}{3}}=O(d_n)\).
 	\end{assumption}
-
-    This is natural: the leaf count cannot exceed the effective histogram resolution. Enforcing at least $n^{2/3-\nu}$ points per leaf rules out overly fine, high-variance partitions.
-
-    
 	\begin{assumption}[Restricted Tree Support]
 		\label{ch06b:aspt:restricted-tree-space}
 		For a tree constructed using feature $k$, the cardinality of the tree space $Q_n^{(k)}$ is bounded by $O\Big(n^{-1/3}\exp(n^{2/3-\epsilon_n})\Big)$, for some small $\epsilon_n \to 0$.
 	\end{assumption}
 
-    This is a technically convenient assumption for us to generalize it in random design case. It bounds the effective complexity of the tree class so we can use uniform LLNs and contraction arguments. The assumption still permits an super-polynomial large class in $n$, which is far looser than practice: vanilla EBMs use very shallow trees (typically depth 1--2) on a fixed histogram grid with at most a few hundred bins per feature, so the effective class is much smaller (roughly polynomial in $n$).
-    
-	Unlike \cite{zhou2019boulevardregularizedstochasticgradient} and \cite{fang2025gradient}, the assumptions above are dimension-free. They enforce asymptotic locality of the partition, allowing for control over bias and variance. Assumption \ref{ch06b:aspt:ub-minimal-leaf-size} ensures stability of the structure matrix spectrum, allowing us to recover the minimax-optimal rate later.
-
-    \paragraph{Warmup: Theory for Algorithm 
-    \ref{alg:brebm_random_cyclic}.}
-
-    
-    As mentioned earlier, the theory for Algorithm \ref{alg:brebm_random_cyclic} is  the easiest to prove. With the following observation, this amounts to a straightforward extension of \cite{zhou2019boulevardregularizedstochasticgradient}. The learner updates a feature's kernel at random each round, so the tree kernel chosen by Algorithm \ref{alg:brebm_random_cyclic} amounts to $\E\bS = \frac{1}{p}\sum_{k=1}^p\E[\Smatk]$. 
-    
-    This observation allows us to apply the theory of \cite{zhou2019boulevardregularizedstochasticgradient} almost verbatim. As such, Algorithm \ref{alg:brebm_random_cyclic} gives a spiritually similar fixed point iteration $\tilde{\by}^*:=\sum_{k}\hat{\by}_k^*=\lambda\jmat\E\bS(\by - \tilde{\by}^*)$\footnote{We drop intercepts as they are orthogonal to centering.}, modulo centering. This leads to a ensemble-wise fixed point of $\tilde{\by}^* = (\bI + \jmat\E\bS)^{-1}\jmat\E\bS\by$ and the subsequent feature-wise fixed points $\hat{\by}_k^* = \lambda\jmat\E\bS(\bI - (\bI + \jmat\E\bS)^{-1}\jmat\E\bS)\by=\lambda\jmat\E\Smatk(\bI + \jmat\E\bS)^{-1}\by$. Finite sample convergence and asymptotic normality holds following the same recipe discussed in \cite{zhou2019boulevardregularizedstochasticgradient}.
-
-    However, this sequential random update does not parallelize over features. 
-    To address these concerns we return to  Algorithm \ref{alg:brebm_ident} and analyze its convergence, which we will discuss in Section \ref{subsec:alg.1}.
-
     \paragraph{Feature-specific (specialized) kernels.}
-	Still, the above intuition is instructive. Unlike \citet{zhou2019boulevardregularizedstochasticgradient} and \citet{fang2025gradient}, which consider a single expected kernel $\E\bS$, EBMs induce \emph{feature-specific} kernels $\Kmatk:=\E[\Smatk]$.  This is a double-edged sword. On one hand, one has to control the way these kernels interact in our algorithms. On the other, it enables a clearer characterization of partial dependence, while allowing us to demonstrate feature-wise convergence, which in turn yields feature-wise confidence intervals. 
+	Unlike \citet{zhou2022boulevard} and \citet{fang2025statistical}, which consider a single expected kernel $\E\bS$, EBMs induce \emph{feature-specific} kernels $\Kmatk:=\E[\Smatk]$, enabling a characterization of partial dependence and feature-wise convergence and confidence intervals. \aigen{The warmup fixed-point analysis for sequential random feature updates is deferred to \citet{fang2026statistical}.}
 
     \paragraph{Theory for Algorithm \ref{alg:brebm_ident}.}
     \label{subsec:alg.1}
-    
-    As mentioned earlier in Section \ref{ch06b:sec:algorithms}, introducing parallelization introduces theoretical challenges. One way to prove that Algorithm \ref{alg:brebm_ident} converges is to use a learning rate of $\lambda =\frac{1}{p}$. However, this yields no speedup from Algorithm \ref{alg:brebm_random_cyclic} on average, as sampling with probability $1/p$ and averaging across $p$ updates are the same in expectation. 
-
-    Another way, that allows us to use a learning rate of $\lambda \approx 1$, is to make the following assumption:
-    
+    To prove that Algorithm \ref{alg:brebm_ident} converges with learning rate $\lambda \approx 1$ (rather than $\lambda = 1/p$), we make the following assumption:
 	\begin{assumption}[Projector-like feature kernels and conditional orthogonality]
 		\label{aspt:proj-orth}
 		Let $\Kmatk=\E[\Smatk]$ and $\jmat:=\bI_n-\frac{1}{n}\bone\bone^\top$. 
@@ -785,11 +554,7 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 			$
 		\end{itemize}
 	\end{assumption}
-	Assumption~\ref{aspt:proj-orth} is technically convenient but admittedly strong, especially the conditional orthogonality requirement. We therefore emphasize that it is used only to analyze Algorithm~\ref{alg:brebm_ident}. As a fallback, Algorithm~\ref{alg:ebm_bratp} removes this requirement and needs only Assumption~\ref{aspt:kernel-spec}. Intuitively, the projector-like condition says the centered expected tree kernel for feature $k$ behaves like the orthogonal projector onto mean-zero functions of $\bx^{(k)}$, while conditional orthogonality asserts these per-feature subspaces have negligible overlap across $k$ (similar in spirit to “no concurvity” conditions for uniqueness in additive models, e.g., \citealp{hastie1986gams}); this can hold exactly under feature independence and can be a reasonable approximation under weak dependence when partitions are shallow and not aligned across features.
-    
-
-    
-    Now we discuss the finite-sample convergence for Algorithm \ref{alg:brebm_ident} as promised. A way forward is to first establish almost surely convergence as we keep boosting with $b\to \infty$, then seek asymptotic normality when sample size grows. The first part is usually handled by showing that the difference to a set of postulated fixed points is a stochastic contraction mapping, decaying to 0. However, by the design of Algorithm \ref{alg:brebm_ident}, stepwise mean convergence can be fragile when $\lambda \approx 1$, hence we enforce Assumption \ref{aspt:proj-orth} to ensure stability. Formally, the convergence behavior can be characterized in Theorem \ref{thm:finite-sample-convergence-1}, stated below.
+	Assumption~\ref{aspt:proj-orth} is used only to analyze Algorithm~\ref{alg:brebm_ident}; Algorithm~\ref{alg:ebm_bratp} removes this requirement and needs only Assumption~\ref{aspt:kernel-spec}. Formally, the finite-sample convergence of Algorithm~\ref{alg:brebm_ident} is characterized in Theorem~\ref{thm:finite-sample-convergence-1}.
     
     \begin{theorem}
 		\label{thm:finite-sample-convergence-1}
@@ -811,10 +576,8 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 		and hence $\widehat{\mathbf{y}}_{b}\stackrel{a.s.}{\to} \widehat{\mathbf{y}}^*$ almost surely.
 	\end{theorem}
 
-    This fixed point carries two different relevant and practical perspectives. When setting $\lambda = \frac{1}{p}$, one essentially implements a coordinate descent. It also recovers the vanilla boulevard randomized tree kernel by assigning uniform mass on featurewise kernels. Thus convergence can be shown without additional assumptions. Taking $\lambda=1$, however, requires a more delicate characterization of tree behavior specified in Assumption \ref{aspt:proj-orth}. This condition implies that featurewise signals do not overlap with each other asymptotically, removing the need for averaging the final feature functions.\footnote{This can be thought of as parallel coordinate descent. Averaging is conservative, so when can we not do so?}
-
     \paragraph{Theory for Algorithm \ref{alg:ebm_bratp}.}
-    As discussed before, one may argue that Assumption \ref{aspt:proj-orth} is unrealistic. If one is not willing to use $\lambda=1/p$ then, Algorithm \ref{alg:ebm_bratp} poses a remedy. This does not rely on Assumption \ref{aspt:proj-orth}, and only depends on a weaker assumption below.
+    Algorithm \ref{alg:ebm_bratp} does not rely on Assumption \ref{aspt:proj-orth}, and only depends on a weaker assumption below (verified empirically in Table~\ref{tab:kernel_distinctness}).
     \begin{assumption}[Feature-kernel distinctness]
 		\label{aspt:kernel-spec}
 		Let $\Kmatk=\E[\Smatk]$. There exists $c_3<1$ such that, for all $a\ne k$,
@@ -824,9 +587,6 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 			(p-1)\,c_3 \;<\; 1.
 			$
 	\end{assumption}
-	
-    Assumption~\ref{aspt:kernel-spec} is a weaker version of Assumption~\ref{aspt:proj-orth}: instead of requiring (approximate) orthogonality of feature-wise subspaces, it only rules out the degenerate case where different features induce nearly identical smoothing operators in expectation. We verified this assumption empirically with plausible results. See Table \ref{tab:kernel_distinctness}. This milder assumption is sufficient for establishing a similar finite-sample convergence result below.
-
 
     \begin{theorem}
 		\label{thm:finite-sample-convergence-2}
@@ -836,12 +596,9 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 		\widetilde{\mathbf{y}}_k^* = (\bI-\E\Smatk)^{-1} \jmat\E\Smatk\left[\bI - \left(I+\mathcal{K}\right)^{-1}\mathcal{K}\right]\mathbf{y}.
 		\]
 		Then, $\widehat{\mathbf{y}}^{(k)}_b \overset{a.s.}{\to}\widetilde{\mathbf{y}}_k^*$, $\widehat{\mathbf{y}}_b\overset{a.s.}{\to}\widehat{\mathbf{y}}^*$, and $\widehat{\bbeta}^* \overset{a.s.}{\to}\bar{\mathbf{y}}:=\frac{1}{n}\mathbf{1}^\top\mathbf{y}.$
-		
 	\end{theorem}
 
-    The operator $(\bI-\Smatk)^{-1} (\bI-\frac{1}{n}\mathbf{1}\mathbf{1}^\top)\Smatk$, which we can interpret as a feature-wise KRR, is stacked with the fixed point of the residual created on the whole ensemble. In this product, $(\bI-\Smatk)^{-1} (\bI-\frac{1}{n}\mathbf{1}\mathbf{1}^\top)\Smatk$ measures the marginal contribution of a particular feature $k$ contribute to the ensemble prediction. 
-
-    \paragraph{A Central Limit Theorem.} We are now in a position to provide central limit theorems for all three algorithms. Unlike \cite{zhou2019boulevardregularizedstochasticgradient} and \cite{fang2025gradient}, the GAM structure of our problem allows us to relax the rates within the assumptions on tree geometries. While the following lemma allows us to check the Lindeberg-Feller conditions, it also allows us to recover the optimal minimax rate $n^{-2/3}$ for univariate non-parametric Lipschitz regression \cite{yuan2015minimaxoptimalratesestimation}. Below, we use the subscript $E=\{A,B\}$ to label relevant variables in Algorithm \ref{alg:brebm_ident} and \ref{alg:ebm_bratp}. 
+    \paragraph{A Central Limit Theorem.} Unlike \cite{zhou2022boulevard} and \cite{fang2025statistical}, the GAM structure of our problem allows us to recover the optimal univariate minimax rate $n^{-2/3}$ \citep{yuan2015minimaxoptimalratesestimation}. Below, we use the subscript $E=\{A,B\}$ to label relevant variables in Algorithm \ref{alg:brebm_ident} and \ref{alg:ebm_bratp}. 
 
     \begin{lemma}[Rate of Convergence]
 		\label{ch06b:lem:rateofr}
@@ -852,8 +609,6 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 		$ almost surely.
 	\end{lemma}
 
-	The rate of the boulevard vector enables a conditional CLT, informally $\frac{\rveck_E(\bx)^\top\f(\bX)-\f^{(k)}(\bx)}{\norm{\rveck_E(\bx)}}\overset{d}{\to}\mathcal{N}(0, \sigma^2)$. Working with either Assumption \ref{aspt:proj-orth} or Assumption \ref{aspt:kernel-spec}, we analyze the form of the combined kernel, and conclude with the following central limit theorem.
-
     \begin{theorem}[Asymptotic Normality]
 		\label{thm:unconditional-clt}
 		Define $c_A = \frac{\lambda}{1+\lambda}, c_B=1 $. For all $k = 1, \cdots, p$, we have that:
@@ -861,111 +616,45 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
 		$$
 	\end{theorem}
 
-    Normality of the intercept term $\hat{\bbeta}$ is also established and discussed in Lemma \ref{thm:baseline-clt}. Similar to \cite{fang2025gradient}, our CLTs yields a subsequent risk bound:
+    Normality of the intercept term $\hat{\bbeta}$ is also established in Lemma~\ref{thm:baseline-clt}, and our CLTs yield the minimax-optimal risk bound for Lipschitz $p$-dimensional GAMs \citep{yuan2015minimaxoptimalratesestimation}:
     \begin{corollary}
     \label{cor:risk-bound}
         $\E[(\frac{1}{c_E}\hat{\f}_E^{(k)}(\bx)-\f^{(k)}(\bx))^2] \lesssim \frac{\sigma^2}{c_E^2}p\,n^{-\frac{2}{3}}$.
     \end{corollary}
-    This result shows that our algorithms achieve the minimax-optimal MSE of $O(pn^{-2/3})$ for fitting Lipschitz $p$-dimensional GAMs \cite{yuan2015minimaxoptimalratesestimation}. This avoids the curse of dimensionality, significantly improving upon the rates of \cite{zhou2019boulevardregularizedstochasticgradient, fang2025gradient}.
 
     \begin{figure*}[ht!]
      \vspace{-2ex}\centering\includegraphics[width=0.7\linewidth]{figures/ch06/plots_ebm/feature_interval_plots.png}\vspace{-2ex}
-        \caption{Per-feature CIs and coverages for $f(x)=-5+10\sin(\pi x^{(1)}) + 5\cos(\pi x^{(2)}) + 20(x^{(2)}-0.5)^2  +10x^{(3)} - 5x^{(4)}$.}
+        \caption[Per-feature confidence intervals and empirical coverage on a synthetic GAM]{Per-feature CIs and coverages for $f(x)=-5+10\sin(\pi x^{(1)}) + 5\cos(\pi x^{(2)}) + 20(x^{(2)}-0.5)^2  +10x^{(3)} - 5x^{(4)}$.}
         \label{fig:feature-coverage}
         \vspace{-2ex}
     \end{figure*}
-
-    % \begin{corollary}[PAC Guarantee]
-    % \label{cor:pac-updated}
-    % If $n \;\ge\; C_1\!\left\{\Big(\tfrac{L}{\varepsilon}\Big)^{\!3}\;\vee\;\Big(\tfrac{\sigma^2\log(2/\delta)}{\varepsilon^2}\Big)^{\!\!3/2}\right\}$ and $b \;\ge\; C_2\;\frac{\lambda^2 M^2\, n^{1/3}}{\varepsilon^2\,\delta},$ then with probability at least $1-\delta$,
-    % \(
-    % \big|\hat f^{(b)}_n(x)-f(x)\big|\le \varepsilon.
-    % \)
-    % \end{corollary}
     
 	\subsection{Inference and Computation}
-    We can now derive confidence and prediction intervals from the result on asymptotic normality above. Here, we construct practical intervals and tests, and shows how to compute the required standard errors in \emph{bin space} so that inference time is independent of $n$. Throughout the section, we estimate the noise variance with a consistent variance estimates $\hat{\sigma}^2$ via in-sample or out-of-bag estimation.
-
+    We now construct practical intervals from Theorem~\ref{thm:unconditional-clt} and show how to compute the required standard errors in \emph{bin space} so that inference time is independent of $n$, using a consistent variance estimate $\hat{\sigma}^2$.
     
-    \paragraph{Confidence Intervals.}
-    We construct $(1-\alpha)$ confidence intervals for each of \{individual feature effects, the intercept, the values of a prediction at a new $\bx$\}.
+    \paragraph{Confidence, Reproduction, and Prediction Intervals.}
+    We construct $(1-\alpha)$ intervals as follows:
     \vspace{-2ex}
     \begin{itemize}
-        \item $c_E^{-1}\widehat{\f}^{(k)}_E(\bx)\ \pm\ z_{1-\alpha/2}\,c_E^{-1}\hat{\sigma}\,\lVert\rveck_E(\bx)\rVert$ yields a $(1-\alpha)$-confidence interval for the feature effect. By similar arguments in \cite{fang2025gradient}, the coverage rate will converge to $(1-\alpha)$ almost surely. This is validated by an example in Figure  \ref{fig:feature-coverage}.
-        \item For the intercept term, by Lemma~\ref{thm:baseline-clt}, $\widehat{\bbeta}$ is asymptotically normal with variance $\sigma^2/n$, yielding the usual interval $\widehat{\bbeta}\pm z_{1-\alpha/2}\,\hat{\sigma}/\sqrt{n}$
-        \item For the overall response, write $\widehat{f}_E(\bx)=\widehat{\bbeta}+c_E^{-1}\sum_{k=1}^p \widehat{\f}^{(k)}_E(\bx)$. A $(1-\alpha)$ confidence interval is
-    $\widehat{f}_E(\bx)\ \pm\ z_{1-\alpha/2}c_E^{-1}\hat{\sigma}\sqrt{\frac{1}{n}+\|\sum_{k=1}^p \rveck_E(\bx)\|_2^2\ }.
-    $
+        \item \textbf{Feature effect CIs:} $c_E^{-1}\widehat{\f}^{(k)}_E(\bx)\ \pm\ z_{1-\alpha/2}\,c_E^{-1}\hat{\sigma}\,\lVert\rveck_E(\bx)\rVert$ yields a $(1-\alpha)$-confidence interval for $\f^{(k)}(\bx^{(k)})$ (validated in Figure~\ref{fig:feature-coverage}).
+        \item \textbf{Intercept CI:} By Lemma~\ref{thm:baseline-clt}, $\widehat{\bbeta}\pm z_{1-\alpha/2}\,\hat{\sigma}/\sqrt{n}$.
+        \item \textbf{Overall response CI and PI:} For $\widehat{f}_E(\bx)=\widehat{\bbeta}+c_E^{-1}\sum_{k=1}^p \widehat{\f}^{(k)}_E(\bx)$, a $(1-\alpha)$ confidence interval is $\widehat{f}_E(\bx)\ \pm\ z_{1-\alpha/2}c_E^{-1}\hat{\sigma}\sqrt{\frac{1}{n}+\|\sum_{k=1}^p \rveck_E(\bx)\|_2^2}$, where $\|\sum_{k=1}^p \rveck_E(\bx)\|_2^2 = \sum_{k=1}^p \|\rveck_E(\bx)\|_2^2$ under Assumption~\ref{aspt:proj-orth}; scaling the CI width by $\sqrt{2}$ yields reproduction intervals, and replacing $\|\rveck_E(\bx)\|_2$ by $\sqrt{1+\|\rveck_E(\bx)\|_2^2}$ yields prediction intervals.
     \end{itemize}
-    \vspace{-2ex}
-    Recall that $\rveck_E(\bx)$ denotes the per-feature influence vector. Under Assumption~\ref{aspt:proj-orth}, $\lVert\sum_{k=1}^p \rveck_E(\bx)\rVert_2^2
-    =\sum_{k=1}^p \lVert{\rveck_E(\bx)}\rVert_2^2,$ so the variance contribution is the sum of feature-wise terms. Without Assumption~\ref{aspt:proj-orth}, this replacement is conservative by Cauchy--Schwarz.
-
-    \cite{fang2025gradient} examines two further variants that are immediately implementable:
     \vspace{-1ex}
-    \begin{itemize}
-    \item {\bf Reproduction Intervals.} All intervals above can be modified to be {\em reproduction} intervals for the predictions of a new model trained on an independent dataset by scaling their widths by $\sqrt{2}$. %\cite[see][]{zhou2019boulevardregularizedstochasticgradient}. This has the interpretation that 
-    %they cover a replication of the estimate on new data with probability $(1-\alpha)$. 
 
-%    To get reproduction intervals, scale the bandwidth of CIs by $\sqrt{2}$. The subsequent intercept intervals and response intervals can be constructed as shown in the previous paragraph.
-
-
- %   \paragraph{Prediction and Reproduction Intervals} 
- %   As discussed by \cite{fang2025gradient}, we can construct the prediction intervals and reproduction intervals for featurewise predictions and intercepts, with almost sure convergence of coverage rates. 
-    
-    \item {\bf Prediction Intervals.} We can construct  a prediction interval for a new $y$ given $\bx$ by computing ${c_E}^{-1}{\widehat{\f}^{(k)}_E(\bx)}\ \pm\ z_{1-\alpha/2}\,{c_E}^{-1}{\hat{\sigma}\sqrt{1+\lVert{\rveck_E(\bx)}\rVert_2^2}}$. 
-\end{itemize}
-
-    \paragraph{Binning. } The current implementation of EBMs \cite{nori2019interpretmlunifiedframeworkmachine} utilizes histogram trees. As we worked off this implementation, it was natural to construct intervals with the binned data, instead of working with the original data. A more detailed discussion of the discretization error induced by binning is deferred to Appendix~\ref{append:what_we_lose_by_binning}.
-    
-    As such, we compress all $n$ samples along feature $k$ into $m_k\!\ll\!n$ histogram bins and work entirely in \emph{bin space}. In Appendix~\ref{app:binning}, we construct a decomposition of the structure matrix that allows us to show that computing the norm of $\rveck(\bx)$ reduces to solving a $m_k\times m_k$ system of linear equations, and computing two $m_k$-length dot products. 
-    
-    After this compression, the dependence on $n$ disappears. Denote $m$ as the maximum number of bins among all $k$ binnings. Caching $\bM$ takes $O(pm^3)$, while each per-point inference query takes only $O(m^2)$ time. As bin numbers are often capped to 255 or 511 (independent of $n$), we can compute our intervals in time independent of the number of samples. This outperforms \cite{fang2025gradient}'s runtime of $O(nd_{\text{eff}}^2)$.
-
-    \paragraph{Practical Guidance.} In practice, Algorithm \ref{alg:brebm_ident} relies on conditional orthogonality; we recommend monitoring simple convergence diagnostics, and if convergence appears unstable, falling back to Algorithm \ref{alg:ebm_bratp}. In our experiments, the number of boosting rounds $B$ in the range 100--300 worked well. A smaller learning rate $\lambda$ typically improves finite-sample stability but can yield slightly wider intervals. Subsample rates in $[0.5,0.8]$ were robust. For binning, we found that using either the usual EBM defaults (e.g., 64 or 255 bins) or scaling the bin count as $m\asymp n^{1/3}$ works well; the latter matches our assumptions.
-
-    \begin{figure*}[ht!]
-        \centering\includegraphics[width=0.85\linewidth]{figures/ch06/plots_ebm/optuna_mse.png}\vspace{-2ex}
-        \caption{MSE horse races on UCI machine learning repository datasets. All hyperparameters tuned by Optuna.}
-        \label{fig:mse-horse-races}
-    \end{figure*}
+    \paragraph{Binning.} Because EBMs \citep{nori2019interpretmlunifiedframeworkmachine} utilize histogram trees, we compress all $n$ samples along feature $k$ into $m_k\!\ll\!n$ histogram bins and work entirely in \emph{bin space} (see Appendices~\ref{app:binning} and \ref{append:what_we_lose_by_binning}). Decomposing the structure matrix in bin space reduces computing $\|\rveck(\bx)\|_2$ to solving an $m_k\times m_k$ linear system and computing two $m_k$-length dot products. Denoting $m = \max_k m_k$, caching $\bM$ takes $O(pm^3)$ time and each per-point inference query takes $O(m^2)$ time -- independent of $n$ when $m$ is capped (e.g., at 255 or 511), outperforming the $O(nd_{\text{eff}}^2)$ Nystr\"om runtime of Part~I.
     
 	\subsection{Numerical Experiments}
     \label{ch06b:sec:experiments}
-    \paragraph{Predictive Accuracy} We compare Algorithm \ref{alg:brebm_ident} to other benchmark models on real world data from the UCI Machine Learning Repository in Figure \ref{fig:mse-horse-races}. Algorithm \ref{alg:brebm_ident} is competitive with EBMs across the Wine Quality, Obesity and Air Quality datasets, while converging much faster with parallelization. However, these datasets exhibit higher order interactions. Algorithm \ref{alg:brebm_ident} and EBMs ultimately underperform random forests and gradient boosting, though their added flexibility allows them to outperform a linear model. 
+    \paragraph{Predictive Accuracy and Overfitting Resistance.} \aigen{Comparisons of test MSE across Optuna-tuned UCI benchmarks and overfitting trajectories on $f(x)=\sin(4\pi x)$ and the Diabetes dataset \citep{Efron_2004} demonstrating that Algorithm~\ref{alg:brebm_ident} and EBM resist overfitting without early stopping are reported in \citet{fang2026statistical}.\label{fig:mse-horse-races}\label{fig:overfit_mse}}
     
-    However, the above setup had hyperparameters extensively tuned by Optuna over 100 trials. When this is not feasible, gradient boosting can be susceptible to overfitting. Figure \ref{fig:overfit_mse} depicts two examples where this is the case, on $f(x) = \sin(4\pi x)$ and the diabetes dataset from \cite{Efron_2004}. Here, the performances are flipped. Algorithm \ref{alg:brebm_ident} and EBMs perform the best with no need for early stopping, while the gradient boosting methods quickly overfit. EBMs achieve this via a tiny learning rate during cyclic boosting, while our implementation parallelizes over features for faster runtime.
-    
-    \paragraph{Interval Coverage Rates} To validate the proposed central limit theorems, we first construct feature-wise confidence intervals via binning and compute their coverage rates. Figure \ref{fig:feature-coverage} shows good coverage and width. In combination with Figure \ref{fig:coverage-1d}, we can qualitatively argue that their performance appears desirable.
-
-    Figure \ref{fig:ebm-effects-wide} and Figure \ref{fig:obesity-feature-effects} yield an example on real-world data from the obesity dataset of \cite{estimation_of_obesity_levels_based_on_eating_habits_and_physical_condition__544}, regressing weight on other covariates. Our intervals offer much-needed uncertainty estimates for each effect.
-    
-    Figure \ref{fig:coverage-rates} compares the coverage and width of the CIs and PIs for the overall response, and RIs for another realization. We use the same conformal correction that \cite{fang2025gradient} use for the PIs only. Coverage is close to nominal for the CIs and PIs, while the RIs exhibit some overcoverage. 
-
-    We further evaluate scalability in higher-dimensional, correlated synthetic additive models for Algorithm~\ref{alg:ebm_bratp} under the realistic Assumption~\ref{aspt:kernel-spec}. In Figure~\ref{tab:vanilla_vs_inferable_gam}, bootstrap EBMs achieve low RMSE but severely under-cover and are slow due to repeated refits, while Algorithm~\ref{alg:ebm_bratp} (and BRATD) attain near-nominal coverage; moreover, Algorithm~\ref{alg:ebm_bratp} yields better RMSE and tighter intervals than BRATD at comparable or lower runtime. Compared with \cite{fang2025gradient}, our intervals are also faster and better-behaved, since we avoid the curse of dimensionality and our runtime is independent of $n$.
-
-    
-    
-    Figure \ref{fig:highdim-real-table} shows that on real datasets with $p\approx 110$--$130$, Algorithm~\ref{alg:ebm_bratp} maintains near-nominal $95\%$ coverage ($0.948$--$0.956$), achieves RMSE comparable to the baselines, and is substantially faster than vanilla EBM. Relative to BRATD, it attains similar RMSE with lower training time on three of the four datasets, especially on the largest example.
-
-	\begin{figure}[ht!]
-		\centering\includegraphics[width=\linewidth]{figures/ch06/plots_ebm/overfit_combined.png}
-		\caption{RMSE for Algorithm \ref{alg:brebm_ident} and benchmarks with 2 s.e. bands over 50 trials, on $f(x) = \sin(4\pi x)$ and the diabetes dataset from \cite{Efron_2004}. Both EBM and Algorithm \ref{alg:brebm_ident} are highly resistant to overfitting.}
-		\label{fig:overfit_mse}
-	\end{figure}
-
-    \subsection{Conclusion}
-	Explainable boosting machines have been an important tool for producing glass-box models, used both to establish insight into the underlying patterns that generate data, and to diagnose potential non-causal behavior prior to deployment. The understanding presented by such methods must be qualified by appropriate uncertainty quantification. Current UQ for EBMs relies on bootstrapping which is both computationally intensive and lacks theoretical backing.
+    \paragraph{Interval Coverage and Scalability.} Figures~\ref{fig:feature-coverage} and \ref{fig:coverage-rates} validate the empirical coverage and width of our feature-wise and overall confidence, prediction, and reproduction intervals. We further evaluate scalability in higher-dimensional correlated synthetic additive models for Algorithm~\ref{alg:ebm_bratp} under Assumption~\ref{aspt:kernel-spec} in Table~\ref{tab:vanilla_vs_inferable_gam}, and on high-dimensional real datasets ($p\approx 95$--$127$) in Table~\ref{fig:highdim-real-table}. Bootstrap EBMs severely under-cover and are slow due to repeated refits, whereas Algorithm~\ref{alg:ebm_bratp} attains near-nominal $95\%$ coverage ($0.943$--$0.956$) with lower RMSE, tighter intervals, and substantially faster runtime.
     
     \begin{figure}[ht!]
         \centering\includegraphics[width=\linewidth]{figures/ch06/plots_ebm/coverage_rates.png}
-        \caption{Coverage and width of our intervals over $50$ trials, $n=2000$, on the same function as Figure \ref{fig:feature-coverage}.}
+        \caption[Empirical coverage and interval width across 50 trials on a synthetic GAM]{Coverage and width of our intervals over $50$ trials, $n=2000$, on the same function as Figure \ref{fig:feature-coverage}.}
         \label{fig:coverage-rates}
     \end{figure}
-
-    The Boulevard regularization method that we adopt to EBM here both removes the need to choose stopping times (see Figure \ref{fig:overfit_mse}), and generates a limit that can be characterized as a kernel ridge regression. This enables us to directly derive a central limit theorem for predictions of the resulting model and their additive components, and to thereby both derive consistent estimates of their asymptotic variance and provide confidence intervals and tests. 
-
-    This work opens several extensions.  We can readily extend the function class to more complex additive structure; including isolated interaction terms is straightforward, although additive components with shared features require new identifiability conditions \cite[e.g.][]{lengerich2020purifying}. More generally, these methods are extensible to mixtures of learners, such as the class of varying coefficient models discussed in \citet{zhou2022decision}. We can an also broaden the class of models to discrete outcomes and models with non-constant variance. Finally, the kernel form of the limit also admits combinations and comparisons across models as described in \cite{ghosal2022infinitesimal}.
     
     \begin{table}[H]
     \centering
@@ -1004,7 +693,7 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
     \end{tabular}
     
     \vspace{0.25em}
-    \caption{Synthetic Lipschitz GAMs (bootstrap EBM vs.\ Algorithm~\ref{alg:ebm_bratp} vs.\ BRATD).
+    \caption[RMSE, coverage, width, and runtime on synthetic Lipschitz GAMs]{Synthetic Lipschitz GAMs (bootstrap EBM vs.\ Algorithm~\ref{alg:ebm_bratp} vs.\ BRATD).
     Synthetic additive model with $n=1000$ and $p\in\{5,10,15,20\}$ (all $p$ features are structural; five base univariate functions are cycled across coordinates):
     $f_1(x)=2\sin(\pi x)$, $f_2(x)=(x-0.5)^2$, $f_3(x)=0.5\times\mathbf{1}\{x>0.3\}$, $f_4(x)=\sqrt{x}$, $f_5(x)=-1.5x$.
     We report mean RMSE, model-level empirical coverage at nominal $95\%$, average interval width, and runtime (seconds) over 10 repetitions ($\alpha=0.05$; 250 bootstrap resamples for EBM).}
@@ -1050,9 +739,12 @@ While Part~I established pointwise asymptotic normality and sketched uncertainty
         \bottomrule
     \end{tabular}
 
-    \caption{We report RMSE, $95\%$ empirical coverage, and training time for Algorithm~\ref{alg:ebm_bratp} (top), and baseline RMSE and training time for vanilla EBM and BRATD (bottom). Baseline coverage is omitted because large-scale uncertainty estimation is not computationally scalable.}
+    \caption[RMSE, coverage, and training time on high-dimensional real datasets]{We report RMSE, $95\%$ empirical coverage, and training time for Algorithm~\ref{alg:ebm_bratp} (top), and baseline RMSE and training time for vanilla EBM and BRATD (bottom). Baseline coverage is omitted because large-scale uncertainty estimation is not computationally scalable.}
     \label{fig:highdim-real-table}
     \end{table}
+
+    \subsection{Conclusion}
+	Adopting Boulevard regularization within EBMs removes the need for early stopping and yields a feature-wise kernel ridge regression limit with componentwise central limit theorems, enabling asymptotically valid confidence intervals, prediction intervals, and variable-importance tests computable in histogram bin space in time independent of $n$. Extensions to pairwise interactions \citep{lengerich2020purifying}, varying-coefficient models \citep{zhou2022decision}, and non-Gaussian outcomes are promising directions for future work.
 	
 	
 	

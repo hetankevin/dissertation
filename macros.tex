@@ -21,11 +21,11 @@
 
 \allowdisplaybreaks
 
-% Per-chapter algorithm numbering: Algorithm 1, Algorithm 2, Algorithm 3 within each chapter
+% Per-chapter algorithm numbering: Algorithm 2.1, Algorithm 2.2, ... within each chapter
 \makeatletter
 \@addtoreset{algorithm}{chapter}
 \makeatother
-\renewcommand{\thealgorithm}{\arabic{algorithm}}
+\renewcommand{\thealgorithm}{\thechapter.\arabic{algorithm}}
 \renewcommand{\theHalgorithm}{\thechapter.\arabic{algorithm}}
 
 % Compatibility between algorithmic (\STATE, \FOR, ...) and algpseudocode (\State, \For, ...)
@@ -837,14 +837,14 @@ boxsep=0.1pt,left=0pt,right=0pt,top=0pt,bottom=0pt}}
 \newcommand\editPlugAndPlay{Plug-and-play methods are necessary when transition densities are not available, but can have advantages even when they are. The plug-and-play property avoids difficulties arising when the full latent transition densities at different parameter values are mutually singular \citep{roberts01,karppinen24}. The plug-and-play property also facilitates the development of statistical software applicable to a broad class of POMP models.}
 
 % Draft markup macros:
-% - \aigen{...} and \begin{aigenblock}...\end{aigenblock} render AI-generated prose in green
+% - \aigen{...} and \begin{aigenblock}...\end{aigenblock} render newly drafted prose in green
 % - \todoresolve{...} renders caveats and items to resolve in BOLD RED ALL CAPS
 \newif\ifdraftmarkup
 \draftmarkuptrue
-\definecolor{aigreen}{RGB}{0,135,50}
+\definecolor{draftgreen}{RGB}{0,135,50}
 \definecolor{caveatred}{RGB}{204,0,0}
-\newcommand{\aigen}[1]{\ifdraftmarkup{\color{aigreen}#1}\else#1\fi}
-\newenvironment{aigenblock}{\ifdraftmarkup\color{aigreen}\fi}{}
+\newcommand{\aigen}[1]{\ifdraftmarkup{\color{draftgreen}#1}\else#1\fi}
+\newenvironment{aigenblock}{\ifdraftmarkup\color{draftgreen}\fi}{}
 \newcommand{\todoresolve}[1]{\ifdraftmarkup{\color{caveatred}\textbf{[RESOLVE: #1]}}\else\fi}
 
 
@@ -904,8 +904,8 @@ boxsep=0.1pt,left=0pt,right=0pt,top=0pt,bottom=0pt}}
 \providecommand{\g}{\bm{g}}
 \renewcommand{\d}{\mathrm{d}}
 \providecommand{\newEdit}[1]{#1}
-\providecommand{\editClaim}{Empirically, the benchmark tests suggest that \aigen{Algorithm~\ref{alg:ifad}} is a significant methodological advance over the IF2 algorithm of \cite{ionides15} for plug-and-play statistical inference on POMP models.}
-\providecommand{\editPoyiadjisCorrespondence}{Theorem~\ref{thm:mop-functional-forms} shows that \aigen{Algorithm~\ref{alg:dmop} ($\alpha=1$)} has a similar form to the consistent but high-variance score estimate in the first algorithm of \cite{poyiadjis11}. Unlike \cite{poyiadjis11}, our algorithm has the plug-and-play property; in the case $\alpha=1$, our algorithm replaces differentiation of the latent transition density in \cite{poyiadjis11} by pathwise differentiation of the simulator.}
+\providecommand{\editClaim}{Empirically, the benchmark tests suggest that \aigen{warm-starting discounted automatic-differentiation optimization with iterated filtering (Algorithm~\ref{alg:ifad})} is a significant methodological advance over iterated filtering (IF2) alone \citep{ionides15} for plug-and-play statistical inference on POMP models.}
+\providecommand{\editPoyiadjisCorrespondence}{Theorem~\ref{thm:mop-functional-forms} shows that \aigen{the undiscounted score estimator (Algorithm~\ref{alg:dmop} with $\alpha=1$)} has a similar form to the consistent but high-variance score estimate in the first algorithm of \citet{poyiadjis11}. Unlike \citet{poyiadjis11}, our algorithm is plug-and-play, replacing differentiation of the latent transition density in \citet{poyiadjis11} at $\alpha=1$ with pathwise differentiation of the simulator.}
 
 \let\oldtexttt\texttt
 \renewcommand{\texttt}[1]{\textnormal{\oldtexttt{#1}}}

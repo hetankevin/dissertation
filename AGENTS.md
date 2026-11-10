@@ -5,8 +5,8 @@ Read [HANDOFF.md](./HANDOFF.md) first before making changes. Keep `HANDOFF.md` c
 ## Ground Rules
 
 - Default Git identity for this repository: `hetankevin <kevtan@umich.edu>`.
-- Commit and push frequently with terse, lowercase, human-like commit messages. Never add AI coauthor attributions (`Co-Authored-By: Claude`, Codex, Gemini, Antigravity, etc.).
-- Follow Kevin's scholarly writing preferences and the `declaude` skill (`/Users/kevin/.gemini/config/skills/declaude/SKILL.md`):
+- Commit and push frequently with terse, lowercase, human-like commit messages.
+- Follow scholarly writing preferences:
   - State the problem and unresolved obstacle in the closest prior work before introducing our construction.
   - Write connected, conversational technical prose without semicolons in prose.
   - Display identities, bounds, and derivation steps in `\displaystyle` (`equation`, `align`, `aligned`) with explanatory prose between steps.

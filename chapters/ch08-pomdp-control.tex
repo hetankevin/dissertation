@@ -3,22 +3,22 @@
 
 \aigen{\emph{This chapter is based on joint work with Ziping Xu \citep{tan2026pomdp}: Kevin Tan and Ziping Xu, ``From POMDP Theory to Deep RL with Particle Filters,'' in Advances in Neural Information Processing Systems 39 (NeurIPS), 2026.}}
 
-\todoresolve{CHAPTER 8 COMPLETES THE PARTIAL-OBSERVABILITY PROGRESSION WITH CONTROL AND PLANNING (TAN AND XU, NEURIPS 2026). AI-GENERATED CHAPTER HEADER, ALGORITHM-NAME REPLACEMENTS (ALGORITHM 1 INSTEAD OF PF-MCTQ / MCTQ), AND NEW CAMERA-READY VALIDATION / FULL-HORIZON ANT / RUNTIME ADDITIONS ARE IN GREEN; OPEN CAMERA-READY ITEMS ARE FLAGGED IN RED ALL CAPS.}
+\todoresolve{CHAPTER 8 COMPLETES THE PARTIAL-OBSERVABILITY PROGRESSION WITH CONTROL AND PLANNING (TAN AND XU, NEURIPS 2026).}
 
 
 \section{Introduction}
 
 
 Partially observable Markov decision processes (POMDPs) provide a standard framework for sequential decision making under latent state uncertainty \citep{kaelbling1998planning}. They are a natural model for problems in robotics, healthcare, recommendation, and other settings \citep{hauskrecht2000planning,pineau2003point} where the learner must act using only indirect and noisy observations of the underlying system. 
-In principle, optimal control in a POMDP can be reduced to planning in the belief-state MDP, where the belief is the posterior distribution over latent states given the observation history \cite{cassandra1994acting,kaelbling1998planning}. This makes model-based RL especially natural in POMDPs: to act under a belief, the learner must already learn a model rich enough to perform filtering, and this same model can be used for planning. 
+In principle, optimal control in a POMDP can be reduced to planning in the belief-state MDP, where the belief is the posterior distribution over latent states given the observation history \citep{cassandra1994acting,kaelbling1998planning}. This makes model-based RL especially natural in POMDPs: to act under a belief, the learner must already learn a model rich enough to perform filtering, and this same model can be used for planning. 
 
-However, the belief state reduction does not remove the main computational and learning difficulties. An online model-based decision maker must simultaneously (i) learn the unknown model, (ii) maintain a posterior over latent states online, and (iii) plan over this continuous belief space. These three tasks--\textit{learning, inference, and planning}--interact in a way that makes exact online control in POMDPs intractable in both computation and sample complexity in general \cite{papadimitriou1987complexity} without special structure, motivating a large literature on \textit{approximate} methods for each component individually. 
+However, the belief state reduction does not remove the main computational and learning difficulties. An online model-based decision maker must simultaneously (i) learn the unknown model, (ii) maintain a posterior over latent states online, and (iii) plan over this continuous belief space. These three tasks---\textit{learning, inference, and planning}---interact in a way that makes exact online control in POMDPs intractable in both computation and sample complexity in general \citep{papadimitriou1987complexity} without special structure, motivating a large literature on \textit{approximate} methods for each component individually. 
 
-Existing methods typically make one component of the above POMDP pipeline tractable while leaving the others either computationally expensive or theoretically uncontrolled. For instance, on the planning side, Monte Carlo tree search has led to scalable online POMDP solvers such as Partially Observable Monte Carlo Planning (POMCP), sparse tree search, and progressive widening methods \cite{silver2010monte,lim2021sparse,sunberg2018online}. However, these are primarily planning algorithms under a known generative model, and do not natively provide end-to-end learning guarantees for unknown latent dynamics.
-A more aggressive approximation is QMDP, which replaces the belief-MDP continuation value by the fully observed MDP value averaged under the current belief \cite{littman1995learning}. QMDP is computationally efficient but can introduce substantial bias. Existing theory gives limited guidance on when this bias is small or how it can be mitigated. 
-Regarding inference, particle filters, a.k.a. sequential Monte Carlo (SMC), provide a flexible approximation to Bayesian filtering in nonlinear non-Gaussian systems \cite{crisan2002survey,whiteley2013stability}, but SMC theory for POMDPs \cite{lim2021sparse,lim2023optimalityparticlepomdp} has not been fully integrated with approximate online planning and model learning. On learning, recent theoretical work has made significant progress on sample-efficient model estimation for POMDPs. \cite{liu2022partially,liu2023optimistic} develop Optimistic MLE as a generic model-based algorithm with polynomial sample complexity for a broad class of POMDPs. These results establish statistical feasibility under exact or abstract planning oracles. They do not specify how to perform approximate filtering or planning with the learned model in a computationally practical way.
+Existing methods typically make one component of the above POMDP pipeline tractable while leaving the others either computationally expensive or theoretically uncontrolled. For instance, on the planning side, Monte Carlo tree search has led to scalable online POMDP solvers such as Partially Observable Monte Carlo Planning (POMCP), sparse tree search, and progressive widening methods \citep{silver2010monte,lim2021sparse,sunberg2018online}. However, these are primarily planning algorithms under a known generative model, and do not natively provide end-to-end learning guarantees for unknown latent dynamics.
+A more aggressive approximation is QMDP, which replaces the belief-MDP continuation value by the fully observed MDP value averaged under the current belief \citep{littman1995learning}. QMDP is computationally efficient but can introduce substantial bias. Existing theory gives limited guidance on when this bias is small or how it can be mitigated. 
+Regarding inference, particle filters, a.k.a. sequential Monte Carlo (SMC), provide a flexible approximation to Bayesian filtering in nonlinear non-Gaussian systems \citep{crisan2002survey,whiteley2013stability}, but SMC theory for POMDPs \citep{lim2021sparse,lim2023optimalityparticlepomdp} has not been fully integrated with approximate online planning and model learning. On learning, recent theoretical work has made significant progress on sample-efficient model estimation for POMDPs. \cite{liu2022partially,liu2023optimistic} develop Optimistic MLE as a generic model-based algorithm with polynomial sample complexity for a broad class of POMDPs. These results establish statistical feasibility under exact or abstract planning oracles. They do not specify how to perform approximate filtering or planning with the learned model in a computationally practical way.
 
-A separate practical line of work uses recurrent policies or differentiable planning modules. Recurrent model-free deep RL methods, such as GRU or LSTM-based PPO and Q-learning variants, can perform well empirically under partial observability, but their hidden states are difficult to interpret as beliefs and are hard to analyze theoretically. QMDP-net takes a more structured approach by embedding approximate Bayesian filtering and QMDP planning into a differentiable architecture \cite{karkus2017qmdpnet}. This is closer in spirit to our goal: combine model learning, belief state inference, and planning in a way that resembles modern deep learning practice, while maintaining provable guarantees. However, the approximation error of learned variational or differentiable filtering is difficult to control. Our view is that using SMC as the filtering primitive yields a more principled bridge: it is compatible with learned latent dynamics and has well-developed stability and approximation theory \cite{crisan2002survey,whiteley2013stability}. 
+A separate practical line of work uses recurrent policies or differentiable planning modules. Recurrent model-free deep RL methods, such as GRU or LSTM-based PPO and Q-learning variants, can perform well empirically under partial observability, but their hidden states are difficult to interpret as beliefs and are hard to analyze theoretically. QMDP-net takes a more structured approach by embedding approximate Bayesian filtering and QMDP planning into a differentiable architecture \citep{karkus2017qmdpnet}. This is closer in spirit to our goal: combine model learning, belief state inference, and planning in a way that resembles modern deep learning practice, while maintaining provable guarantees. However, the approximation error of learned variational or differentiable filtering is difficult to control. Our view is that using SMC as the filtering primitive yields a more principled bridge: it is compatible with learned latent dynamics and has well-developed stability and approximation theory \citep{crisan2002survey,whiteley2013stability}. 
 
 In summary, existing work advances individual components---planning, inference, or learning---but no current method provides a unified pipeline that combines all three with both computational practicality and end-to-end theoretical guarantees. This leaves open the central question
 \begin{center}
@@ -29,7 +29,7 @@ that still admits end-to-end theoretical guarantees?}
 
 \subsection{Our Contributions}
 
-This paper develops a practical and analyzable route from POMDP theory to model-based deep RL. We answer the central question by developing a model-based learning-inference-planning pipeline for POMDPs called \textbf{\aigen{Algorithm~\ref{alg:pf_mcts}}} that is compatible with deep RL practice. Our contributions are:
+This chapter develops a practical and analyzable route from POMDP theory to model-based deep RL. We answer the central question by developing a model-based learning-inference-planning pipeline for POMDPs (\aigen{Algorithm~\ref{alg:pf_mcts}}) that is compatible with deep RL practice. Our contributions are:
 \begin{enumerate}
     \item \textbf{A practical inference-learning-planning pipeline.} We propose an online algorithm that learns a latent dynamics model, tracks the current belief with particles, and plans under this belief. Each is modular and can be instantiated with standard deep RL primitives.
 
@@ -45,10 +45,10 @@ This paper develops a practical and analyzable route from POMDP theory to model-
 
 
 
-Overall, the paper argues that particle filtering can serve as a practical bridge between POMDP theory and deep RL. It gives a belief representation that is explicit enough to analyze, flexible enough for nonlinear latent dynamics, and compatible with MPC-style planning and learned critics. This yields a route to online POMDP learning that is closer to modern model-based RL than exact belief-space planning, while providing a transparent theoretical account that lets users trace each source of approximation error and make informed design choices.
+Overall, this chapter argues that particle filtering can serve as a practical bridge between POMDP theory and deep RL. It gives a belief representation that is explicit enough to analyze, flexible enough for nonlinear latent dynamics, and compatible with MPC-style planning and learned critics. This yields a route to online POMDP learning that is closer to modern model-based RL than exact belief-space planning, while providing a transparent theoretical account that lets users trace each source of approximation error and make informed design choices.
 
 
-The rest of the paper is organized as follows. Section~\ref{sec:problem} introduces the online learning problem and the regret criterion in the belief-state MDP. Section~\ref{sec:algorithm} presents \aigen{Algorithm~\ref{alg:pf_mcts}}, describing the \aigen{Algorithm~\ref{alg:mctq}} planning subroutine and the full online pipeline. Section~\ref{sec:analysis} develops the error analysis: we decompose the regret into four traceable terms, analyze the structural QMDP bias and its variance interpretation, bound each error source, and combine them into the end-to-end regret guarantee. We conclude with case studies on LQG, contextual MDPs, and smooth-value POMDPs that illustrate when the QMDP approximation is benign.
+The rest of this chapter is organized as follows. Section~\ref{sec:problem} introduces the online learning problem and the regret criterion in the belief-state MDP. Section~\ref{sec:algorithm} presents \aigen{Algorithm~\ref{alg:pf_mcts}}, describing the finite-depth belief-tree planning subroutine (\aigen{Algorithm~\ref{alg:mctq}}) and the full online pipeline. Section~\ref{sec:analysis} develops the error analysis: we decompose the regret into four traceable terms, analyze the structural QMDP bias and its variance interpretation, bound each error source, and combine them into the end-to-end regret guarantee. We conclude with case studies on LQG, contextual MDPs, and smooth-value POMDPs that illustrate when the QMDP approximation is benign.
 
 
 \section{Problem Formulation}
@@ -59,7 +59,7 @@ The rest of the paper is organized as follows. Section~\ref{sec:problem} introdu
     \centering
     \includegraphics[width=\linewidth]{figures/ch08/Figures/lqr_posterior_small.png}
     \vspace{-4ex}
-    \caption{Particle beliefs for the unobserved velocity of a double integrator LQR over the last 1000 steps. Mean, 10th and 90th quantiles visualized. Beliefs track the state when the system is stable.}
+    \caption[Particle beliefs for the unobserved velocity of a double-integrator LQR]{Particle beliefs for the unobserved velocity of a double integrator LQR over the last 1000 steps. Mean, 10th and 90th quantiles visualized. Beliefs track the state when the system is stable.}
     \label{fig:lqr-posterior-small}
 \end{figure}
 
@@ -70,7 +70,7 @@ Figure~\ref{fig:lqr-posterior-small} shows a particle approximation of such a be
 % \textbf{Notation.} For a measurable space $\mathcal X$, let $\Delta(\mathcal X)$ denote the set of probability distributions over $\mathcal{X}$.
 
 \paragraph{Parameterized POMDP model.}
-For each parameter $\theta \in \Theta$, let $\mathcal M_{\theta} = (\gS,\gA,\gO, P_{\theta}, Z_{\theta}, r,\gamma,b_0)$ be an infinite-horizon discounted POMDP, where $\gS$ is the latent state space, $\gA$ is the action space, and $\gO$ is the observation space. The controlled state transition kernel is $P_{\theta}(\cdot \mid s,a) \in \Delta(\gS)$, the observation kernel is $Z_{\theta}(\cdot \mid s') \in \Delta(\gO)$, the reward function is $r:\gS\times\gA\to\mathbb [0, R_{\max}]$, the discount factor is $\gamma\in(0,1)$, and $b_0\in\Delta(\gS)$ is the initial belief. The true environment is specified by an unknown true parameter $\theta^\star$, and we write $\gM^{\star} := \gM_{\theta^\star}$. Here, for a measurable space $\mathcal X$, $\Delta(\mathcal X)$ denotes the set of probability measures on $\mathcal{X}$, and beliefs $b\in\Delta(\gS)$ are written as measures $b(\mathrm ds)$ throughout.
+For each parameter $\theta \in \Theta$, let $\mathcal M_{\theta} = (\gS,\gA,\gO, P_{\theta}, Z_{\theta}, r,\gamma,b_0)$ be an infinite-horizon discounted POMDP, where $\gS$ is the latent state space, $\gA$ is the action space, and $\gO$ is the observation space. The controlled state transition kernel is $P_{\theta}(\cdot \mid s,a) \in \Delta(\gS)$, the observation kernel is $Z_{\theta}(\cdot \mid s') \in \Delta(\gO)$, the reward function is $r:\gS\times\gA\to [0, R_{\max}]$, the discount factor is $\gamma\in(0,1)$, and $b_0\in\Delta(\gS)$ is the initial belief. The true environment is specified by an unknown true parameter $\theta^\star$, and we write $\gM^{\star} := \gM_{\theta^\star}$. Here, for a measurable space $\mathcal X$, $\Delta(\mathcal X)$ denotes the set of probability measures on $\mathcal{X}$, and beliefs $b\in\Delta(\gS)$ are written as measures $b(\mathrm ds)$ throughout.
 
 \paragraph{Generative process and belief states.}
 At each time $t=0,1,2,\ldots$, the latent state, observation, and reward evolve according to
@@ -149,7 +149,7 @@ More generally, for a policy $\pi$ acting on histories, let $V_{\theta}^{\pi,B}(
 % \end{equation}
 % where the expectation is taken over both the trajectory generated by the learner and the randomness of the environment.
 
-\section{\aigen{Online Particle Filtering and Belief-Tree Planning}}
+\section[Online Particle Filtering and Belief-Tree Planning]{\aigen{Online Particle Filtering and Belief-Tree Planning}}
 \label{sec:algorithm}
 
 We present \aigen{Algorithm~\ref{alg:pf_mcts}}, a model-based online learning algorithm that integrates model learning, belief inference, and planning into a modular pipeline. We first divide time into doubling epochs $E_k=[2^{k-1},2^k)$, $k=1,\ldots,\lceil\log_2 T\rceil$, using the standard doubling trick~\citep{besson2018doubling}. At the start of each epoch, the algorithm (i) updates the MLE estimator $\bar\theta_k$ using all past data and freezes it for the epoch, (ii) maintains a particle approximation $b_t^J$ of the current belief via sequential predict-reweight-resample, and (iii) plans under $\bar{\theta}_k$ and $b_t^J$ using finite-depth Monte-Carlo belief-tree search with QMDP leaf evaluation. The doubling-epoch structure prevents the model from updating too frequently.  We discuss each component respectively.
@@ -158,7 +158,7 @@ We present \aigen{Algorithm~\ref{alg:pf_mcts}}, a model-based online learning al
 \begin{equation}\label{eq:beta_mle}
 \bar\theta_k\in\bigl\{\theta\in\Theta:\gL_{T_k}(\theta)\ge \max_{\theta'\in\Theta}\gL_{T_k}(\theta')-\beta\bigr\},
 \end{equation}
-for a tolerance $\beta\ge 0$. The model $\bar\theta_k$ is frozen throughout epoch $E_k$. When $\beta=0$ this is exact MLE, but we accommodate a $\beta$-suboptimal solver. In practice, recent work has produced a wide variety of methods for estimating the MLE in partially observed Markov process (POMP) models via gradient ascent, applicable here \citep{naesseth2018variationalsequentialmontecarlo, tan2024acceleratedinferencepartiallyobserved, chen2025self, ionides15, corenflos21}.
+for a tolerance $\beta\ge 0$. The model $\bar\theta_k$ is frozen throughout epoch $E_k$. When $\beta=0$ this is exact MLE, but we accommodate a $\beta$-suboptimal solver. In practice, recent work has produced a wide variety of methods for estimating the MLE in partially observed Markov process (POMP) models via gradient ascent, applicable here \citep{naesseth18, tan2024accelerated, chen2025self, ionides15, corenflos21}.
 
 \paragraph{Filtering update.} After playing $a_t$ and observing $o_{t+1}$, particles are propagated and reweighted under the current epoch's model $\bar\theta_{k(t)}$:
 \begin{equation}\label{eq:pf_predict_weight}
@@ -168,7 +168,7 @@ w^{(t+1)}_j \propto Z_{\bar\theta_{k(t)}}(o_{t+1}\mid \hat s^{(t+1)}_j),
 \end{equation}
 followed by multinomial resampling
 $s^{(t+1)}_j \sim \mathrm{Categorical}(w^{(t+1)}_1,\ldots,w^{(t+1)}_J)$ for $j=1,\ldots,J$.
-This is the bootstrap sampling-importance-resampling (SIR) filter; any SMC scheme satisfying the $L^p$ error bound of Appendix~\ref{app:pf_proof} can be substituted.
+This is the bootstrap sampling-importance-resampling (SIR) filter, and any SMC scheme satisfying the $L^p$ error bound of Appendix~\ref{app:pf_proof} can be substituted.
 
 % The full procedure is summarized in Algorithm~\ref{alg:pf_mcts}.
 
@@ -181,7 +181,7 @@ This is the bootstrap sampling-importance-resampling (SIR) filter; any SMC schem
 % \end{figure}
 
 \begin{algorithm}[t]
-\caption{\aigen{Online Particle Filtering with Finite-Depth Monte Carlo Belief-Tree Planning.} \aigen{The belief-tree planner} (Algorithm~\ref{alg:mctq}) takes the particle belief $b_t^J$ and returns an estimate $\widehat Q_t(b_t^J,a)$ of $Q_{\bar\theta_k,d}(b_t^J,a)$ for every root action $a\in\gA$.}
+\caption[Online particle filtering with finite-depth Monte Carlo belief-tree planning]{\aigen{Online Particle Filtering with Finite-Depth Monte Carlo Belief-Tree Planning.} \aigen{The belief-tree planner} (Algorithm~\ref{alg:mctq}) takes the particle belief $b_t^J$ and returns an estimate $\widehat Q_t(b_t^J,a)$ of $Q_{\bar\theta_k,d}(b_t^J,a)$ for every root action $a\in\gA$.}
 \label{alg:pf_mcts}
 \begin{algorithmic}[1]
 \Require particles $J$; depth $d$; rollouts $N$; horizon $T$; tolerance $\beta$; model class $\Theta$; exploration parameter $\eta>0$.
@@ -224,7 +224,7 @@ When $d=0$, $\bar V_{\theta,0}^{\star,S}(b)=\max_a\int Q_\theta^{\star,S}(s,a)\,
 
 \paragraph{Particle belief and MCTS approximation.}
 In practice, the current belief is represented by a particle approximation $b_t^J=\frac{1}{J}\sum_{j=1}^J \delta_{s_t^{(j)}}$.
-Starting from $b^J_t$, \aigen{Algorithm~\ref{alg:mctq}} builds a search tree of depth $d$ with $N$ Monte Carlo simulations per root action, inspired by the POMCP framework~\cite{silver2010monte}.
+Starting from $b^J_t$, \aigen{Algorithm~\ref{alg:mctq}} builds a search tree of depth $d$ with $N$ Monte Carlo simulations per root action, inspired by the POMCP framework~\citep{silver2010monte}.
 Each simulation samples a particle from $b_t^J$, descends to depth $d$ using uniform random action selection at internal nodes, expands nodes as it passes through them, and records its state in the particle set $B(v)$ of every node $v$ it visits.
 Each depth-$d$ leaf is evaluated by the QMDP value of its pooled particles, $\max_{a'}|B(v)|^{-1}\sum_{s\in B(v)}Q_\theta^{\star,S}(s,a')$, and a bottom-up dynamic program then computes $\widehat Q_t(b_t^J,a)$ for each root action.
 Uniform selection is a proof device rather than a performance claim: the analysis only needs the internal rule to read no statistic of the current tree and to give every action probability at least $\pi_{\min}>0$, so a frozen learned proposal also qualifies, whereas UCB1 does not (Appendix~\ref{app:mctq}).
@@ -268,7 +268,7 @@ Terms (B1) and (B1$'$) measure the cost of evaluating value functions at the par
 The planning gap (B2) further splits into Monte Carlo error from finite MCTS rollouts ($O(1/\sqrt{N})$) and structural error from QMDP bootstrapping at depth $d$.
 
 \textbf{Three objects.} The analysis separates the belief-MDP optimum $V_\theta^{\star,B}$, the deterministic \emph{planning target} $\bar V_{\theta,d}^{\star,S}=\gT_\theta^d\bar V_\theta^{\star,S}$ of~\eqref{eq:U0_def}, and the randomized estimate $\widehat Q_t(b_t^J,a)$ that \aigen{Algorithm~\ref{alg:mctq}} computes from pooled particle sets.
-The target differs from the optimum by the structural error, which decays geometrically in $d$ and involves no particles; the estimate differs from the target by the Monte Carlo error, which grows with $d$, so for a fixed $N$ the bound is U-shaped in the depth.
+The target differs from the optimum by the structural error, which decays geometrically in $d$ and involves no particles, whereas the estimate differs from the target by the Monte Carlo error, which grows with $d$, so for a fixed $N$ the bound is U-shaped in the depth.
 Each component enters only through an interface (a $\beta$-approximate MLE oracle, an SMC filter with an $L^p$ bound, a planner with a Monte Carlo error bound), so the decomposition survives substituting, e.g., POMCP-style planners or variational filters.
 
 
@@ -280,11 +280,11 @@ Each component enters only through an interface (a $\beta$-approximate MLE oracl
 \subsection{Assumptions and main result}
 \label{sec:final_regret}
 
-Modern SMC analyses \cite{delmoral2004feynmankac, chopin20, karjalainen2026forgettingparticlefilters} impose rather unavoidable but stringent conditions on the transition kernel and observation density. We inherit these in the form of the following Doeblin and bounded observation density assumption (Assumption \ref{aspt:particle_error}) on the latent dynamics. This choice aligns well with our aim to provide an end-to-end regret bound that decomposes error across the learning--inference--planning pipeline, interpolating between theory and practice, rather than to develop optimal exploration methods for POMDP model estimation, as Assumption \ref{aspt:particle_error} ensures that simple exploration strategies like $\varepsilon$-greedy have sufficient coverage. At the same time, the Doeblin condition resembles commonplace strong mixing assumptions within the RL literature \citep{gaur2024closinggapachievingglobal, wu2022finitetimeanalysistimescale, xu2021improvingsamplecomplexitybounds, kausik2023mixtures} and the $\alpha$-revealing condition commonplace in the POMDP literature plays a similar role to the bounded observation density condition \citep{liu2022partially,liu2023optimistic}.
+Modern SMC analyses \citep{delMoral04, chopin20, karjalainen23} impose rather unavoidable but stringent conditions on the transition kernel and observation density. We inherit these in the form of the following Doeblin and bounded observation density assumption (Assumption \ref{aspt:particle_error}) on the latent dynamics. This choice aligns well with our aim to provide an end-to-end regret bound that decomposes error across the learning--inference--planning pipeline, interpolating between theory and practice, rather than to develop optimal exploration methods for POMDP model estimation, as Assumption \ref{aspt:particle_error} ensures that simple exploration strategies like $\varepsilon$-greedy have sufficient coverage. At the same time, the Doeblin condition resembles commonplace strong mixing assumptions within the RL literature \citep{gaur2024closing, wu2022finitetimeanalysistimescale, xu2020improving, kausik2023learning} and the $\alpha$-revealing condition commonplace in the POMDP literature plays a similar role to the bounded observation density condition \citep{liu2022partially,liu2023optimistic}.
 
-% This assumption is standard in the sequential Monte Carlo literature: the Doeblin condition and bounded weights are the canonical conditions for time-uniform stability of particle filters and Feynman-Kac particle systems~\cite{delmoral2004feynmankac,crisan2002survey,whiteley2013stability,doucmoulinesolsson2014,chopin2004central}. 
+% This assumption is standard in the sequential Monte Carlo literature: the Doeblin condition and bounded weights are the canonical conditions for time-uniform stability of particle filters and Feynman-Kac particle systems~\cite{delMoral04, crisan2002survey, whiteley2013stability, doucmoulinesolsson2014, chopin2004central}. 
 % While strong from an RL perspective---it ensures passive state coverage and precludes the need for strategic state-space exploration---the Doeblin condition does \emph{not} provide coverage over the action space. 
-% To be clear, this assumption is commonplace in the SMC literature, to the point where it is rather unavoidable within modern analyses \cite{delmoral2004feynmankac, chopin20}. At the same time, the Doeblin condition resembles commonplace strong mixing assumptions within the RL literature \citep{gaur2024closinggapachievingglobal, wu2022finitetimeanalysistimescale, xu2021improvingsamplecomplexitybounds, kausik2023mixtures} and the $\alpha$-revealing condition commonplace in the POMDP literature is spiritually similar to the bounded observation density condition \citep{liu2022partially,liu2023optimistic}.
+% To be clear, this assumption is commonplace in the SMC literature, to the point where it is rather unavoidable within modern analyses \cite{delMoral04, chopin20}. At the same time, the Doeblin condition resembles commonplace strong mixing assumptions within the RL literature \citep{gaur2024closing, wu2022finitetimeanalysistimescale, xu2020improving, kausik2023learning} and the $\alpha$-revealing condition commonplace in the POMDP literature is spiritually similar to the bounded observation density condition \citep{liu2022partially,liu2023optimistic}.
 
 \begin{aspt}[Uniform mixing and bounded weights]\label{aspt:particle_error} \text{ }
 \begin{enumerate}
@@ -335,12 +335,12 @@ The coefficients are
 The particle error decays as $J^{-1/(2\kappa_{\mathrm{pf}})}$ at cost $O(J)$, the Monte Carlo error as $N^{-1/2}$ at cost $O(N)$, and the structural error as $\gamma^{d}$ at a tree size of up to $(|\gA|M)^{d}$ nodes.
 The bound therefore exposes a \textbf{sample-vs.-computational efficiency trade-off} through the marginal return of each budget, but a concrete allocation requires knowledge of $\kappa_{\mathrm{pf}}$ and $\Xi_\theta$ and is not an optimality statement.
 \aigen{Section~\ref{sec:validation} empirically validates each of these four scaling laws on a Doeblin-mixing POMDP satisfying Assumption~\ref{aspt:particle_error} and demonstrates how the decomposition guides the choice of $(J, N, d)$ under a target per-term error tolerance.}
-With continuous observations, the binning keeps the discretization bias at the Monte Carlo order $O(V_{\max}/\sqrt N)$, and the price is paid in the constant: $M$ grows as $N^{d_o/2}$ for $\gO\subseteq\R^{d_o}$, so $C_{\mathrm{mc}}$ grows exponentially in $d\cdot d_o$; balancing bin width against $N$ instead gives the rate $\widetilde O(N^{-1/(d\,d_o+2)})$ (Remark~\ref{rmk:disc_resolution}).
+With continuous observations, the binning keeps the discretization bias at the Monte Carlo order $O(V_{\max}/\sqrt N)$, and the price is paid in the constant: $M$ grows as $N^{d_o/2}$ for $\gO\subseteq\R^{d_o}$, so $C_{\mathrm{mc}}$ grows exponentially in $d\cdot d_o$, whereas balancing bin width against $N$ instead gives the rate $\widetilde O(N^{-1/(d\,d_o+2)})$ (Remark~\ref{rmk:disc_resolution}).
 This cost is absent only at $d=0$, the regime used in our deep RL experiments.
 
 \textbf{Technical challenges.} Bounding each source in~\eqref{eq:B_decomp} under online learning raises three difficulties. First, controlling (B1) requires working with a test-function class defined directly over $\gS$, rather than only the parametric family $\{Q^{\star,B}_\theta\}_\theta$. This is because the belief-space value functions may lack the regularity needed for uniform particle-filter error control. In fact, the planning-induced class over multiple steps is effectively uncountable over the possible model parameters, so we control it through truncation. The required truncation level depends on the desired particle approximation accuracy: as the particle error target decreases, the tail must be made smaller, which enlarges the truncated function class. This creates a tradeoff between the complexity of the truncated class and the particle ensemble size, leading to a slower ($1/J^{1/2\kappa_{\mathrm{pf}}}$), essentially nonparametric, rate that emphasizes the technical challenge of the problem.
 
-Second, the filtering analysis must account for the fact that the data are generated online by a changing policy. Classical particle-filter stability assumes a fixed generative model, whereas here the filter receives actions from a non-stationary, improving policy. We extend time-uniform $L^p$ bounds~\citep{delmoral2004feynmankac} to this setting by exploiting the Doeblin condition uniformly over actions. Third, since Doeblin coverage applies only to states and not actions, we further ensure action coverage via $\varepsilon$-greedy exploration. This enables us to transfer the MLE concentration result across policies, controlling both terms (A) and (C), and to control the Monte Carlo error in (B2).
+Second, the filtering analysis must account for the fact that the data are generated online by a changing policy. Classical particle-filter stability assumes a fixed generative model, whereas here the filter receives actions from a non-stationary, improving policy. We extend time-uniform $L^p$ bounds~\citep{delMoral04} to this setting by exploiting the Doeblin condition uniformly over actions. Third, since Doeblin coverage applies only to states and not actions, we further ensure action coverage via $\varepsilon$-greedy exploration. This enables us to transfer the MLE concentration result across policies, controlling both terms (A) and (C), and to control the Monte Carlo error in (B2).
 
 \begin{rmk}[Where the hardness of POMDPs goes]
 POMDP sample complexity may in the worst case scale exponentially in the effective horizon $1/(1-\gamma)$.
@@ -391,7 +391,7 @@ It remains to discuss the QMDP approximation error, which is governed by the \em
 \right),
 \label{eq:Xi_def}
 \end{equation}
-which measures the value lost by choosing a single action for all states (QMDP planning) rather than the state-dependent optimal action. We show (Proposition~\ref{prop:structural_error} in Appendix~\ref{app:structural_proofs}) that the depth-$d$ \aigen{Algorithm~\ref{alg:mctq}} structural error satisfies $\|\bar V_{\theta,d}^{\star,S}-V_{\theta}^{\star,B}\|_\infty\le\frac{\gamma^{d+1}}{1-\gamma}\Xi_\theta$, decaying geometrically with depth $d$.
+which measures the value lost by choosing a single action for all states (QMDP planning) rather than the state-dependent optimal action. We show (Proposition~\ref{prop:structural_error} in Appendix~\ref{app:structural_proofs}) that the depth-$d$ belief-tree structural error of \aigen{Algorithm~\ref{alg:mctq}} satisfies $\|\bar V_{\theta,d}^{\star,S}-V_{\theta}^{\star,B}\|_\infty\le\frac{\gamma^{d+1}}{1-\gamma}\Xi_\theta$, decaying geometrically with depth $d$.
 
 The structural quantity $\Xi_\theta$ admits a natural interpretation in terms of posterior \emph{variance} of value-relevant features. Let $g:\gS\to\R^k$ be a measurable embedding, and write
 $m_g(b):=\E_{S\sim b}[g(S)]$ and $\Sigma_g(b):=\Cov_{S\sim b}(g(S))$.
@@ -465,7 +465,7 @@ Appendix~\ref{app:case_study_proofs} instantiates the structural analysis on lin
     \centering
     \includegraphics[width=\linewidth]{figures/ch08/Figures/heartsteps.png}
     \vspace{-4ex}
-    \caption{Cumulative reward above the baseline rollout across four HeartSteps scenarios, where the positive intervention effect and the delayed negative measurement effect or proxy $O_t$ informativeness are varied. Mean and 2.5\% and 97.5\% quantiles displayed on five seeds.}
+    \caption[Cumulative reward above baseline across four HeartSteps scenarios]{Cumulative reward above the baseline rollout across four HeartSteps scenarios, where the positive intervention effect and the delayed negative measurement effect or proxy $O_t$ informativeness are varied. Mean and 2.5\% and 97.5\% quantiles displayed on five seeds.}
     \label{fig:heartsteps}
 \end{figure}
 
@@ -496,13 +496,13 @@ To verify the individual scaling rates predicted by Theorem~\ref{thm:final_regre
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/ch08/Figures/theory_bound_audit.pdf}
-    \caption{\aigen{Empirical audit of the isolated filtering ($J$), Monte Carlo rollout ($N$), and structural planning-depth ($d$) error terms of Theorem~\ref{thm:final_regret_bound} on the Doeblin-mixing Tiger POMDP.}}
+    \caption[Empirical audit of regret decomposition error terms on Mixing Tiger]{\aigen{Empirical audit of the isolated filtering ($J$), Monte Carlo rollout ($N$), and structural planning-depth ($d$) error terms of Theorem~\ref{thm:final_regret_bound} on the Doeblin-mixing Tiger POMDP.}}
     \label{fig:theory_bound_audit}
 \end{figure}
 
 \begin{table}[t]
 \centering
-\caption{\aigen{Empirical versus theoretical scaling rates for the four terms of Theorem~\ref{thm:final_regret_bound} on the Doeblin-mixing Tiger POMDP.}}
+\caption[Empirical versus theoretical scaling rates on Mixing Tiger]{\aigen{Empirical versus theoretical scaling rates for the four terms of Theorem~\ref{thm:final_regret_bound} on the Doeblin-mixing Tiger POMDP.}}
 \label{tab:fitted_rates}
 \small
 \begin{tabular}{lll}
@@ -521,7 +521,7 @@ Online MLE estimation ($\sum_{t=1}^T \varepsilon_{\mathrm{opt},t}$) & $T^{0.57}$
 
 \begin{table}[t]
 \centering
-\caption{Which experiments satisfy the assumptions of Theorem~\ref{thm:final_regret_bound}. \checkmark: holds; $\times$: fails; $\sim$: approximately.}
+\caption[Summary of Theorem~\ref{thm:final_regret_bound} assumptions across Chapter~\ref{ch:pomdp-control} environments]{Which experiments satisfy the assumptions of Theorem~\ref{thm:final_regret_bound}. \checkmark: holds; $\times$: fails; $\sim$: approximately.}
 \label{tab:theory_coverage}
 \small
 \begin{tabular}{lccccl}
@@ -536,20 +536,20 @@ MuJoCo & $\times$ & $\times$ & $\times$ & \checkmark & heuristic demonstration \
 \end{tabular}
 \end{table}
 
-We instantiate \aigen{Algorithm~\ref{alg:pf_mcts}} using the \texttt{pypomp} \cite{pypomp2024github} package for particle-filtering primitives
-with MOP \cite{tan2024acceleratedinferencepartiallyobserved} or VSMC \cite{naesseth2018variationalsequentialmontecarlo} gradient estimators. This allows us to employ highly optimized JAX implementations of the particle filter on GPU. We learn a neural dynamics
+We instantiate \aigen{Algorithm~\ref{alg:pf_mcts}} using the \texttt{pypomp} \citep{pypomp2024github} package for particle-filtering primitives
+with \aigen{weight-discounted particle filter (Algorithm~\ref{alg:dmop} in Chapter~\ref{ch:pomp-estimation}; \citealp{tan2024accelerated})} or VSMC \citep{naesseth18} gradient estimators. This allows us to employ highly optimized JAX implementations of the particle filter on GPU. We learn a neural dynamics
 model online, maintain a particle approximation to the latent state posterior,
 and use an actor and a critic trained with recurrent SAC-style updates \citep{ni2021recurrentbaseline} in the same vein as \cite{han2026neuralodesdemodels}.  In the experiments we use belief-tree depth $d=0$: each particle is rolled out at the state level under a learned actor and bootstrapped with a learned critic, rather than planning over a tree of particle beliefs.
 With continuous actions and observations a depth-$d$ tree requires binning at a cost of up to $(|\gA|M)^d$ nodes, so this is the main practical gap from the theory.
 Rollout planning corresponds to the QMDP end of the depth axis, whereas deeper belief planning reduces the structural bias.
 \aigen{Appendix~\ref{sec:app08-planner-comparison} evaluates the analyzed belief-tree planner at depths $d > 0$ on finite active-sensing POMDPs against POMCP and Sparse-PFT. The practical deep RL instantiation is presented in Algorithm~\ref{alg:pf_mcts_practical}. All deep RL experiments were run on two RTX 3090 GPUs.}
 
-\todoresolve{CAMERA-READY ITEM E3/E4: CONFIRM THAT ALGORITHM 4 (PRACTICAL DEEP RL INSTANTIATION) AND THE HYPERPARAMETER TABLES DISTINGUISH STATE-LEVEL ROLLOUT HORIZON L FROM BELIEF-TREE DEPTH d=0, AND VERIFY PLANNER COMPARISON CODE AGAINST REVISED DP-BACKUP PSEUDOCODE.}
+\todoresolve{CAMERA-READY ITEM E3/E4: CONFIRM THAT THE PRACTICAL DEEP RL INSTANTIATION AND THE HYPERPARAMETER TABLES DISTINGUISH STATE-LEVEL ROLLOUT HORIZON L FROM BELIEF-TREE DEPTH d=0, AND VERIFY PLANNER COMPARISON CODE AGAINST REVISED DP-BACKUP PSEUDOCODE.}
 
 
 
 \textbf{Double-integrator LQR.} We first study a partially observed double-integrator LQR.  The state contains
-position and velocity, but the observation reveals only position. Thus the
+position and velocity, but the observation reveals only position. The
 latent velocity is therefore not identifiable from the current observation alone. Different
 velocities induce the same observation and can only be distinguished using
 history.  This environment isolates the filtering problem.  The posterior
@@ -573,7 +573,7 @@ measurement has delayed negative effects on future engagement. More details and 
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/ch08/Figures/mujoco_camera_ready.pdf}
-    \caption{\aigen{Partial-observation MuJoCo learning curves in the low-sample regime across Ant, HalfCheetah, Hopper, and Walker2d with either position or velocity hidden. Non-Ant panels and baselines show smoothed per-episode returns across $5$ seeds ($\text{mean} \pm 1.96\,\mathrm{SD}/\sqrt{n}$). The Ant panels plot the $10$-episode rolling training return over the full $49.2\text{k}$-step horizon for the stabilized update-to-data configuration (solid, $3$ seeds) alongside the initial high-UTD configuration (dashed, $2$ complete seeds, which peaks near $3\text{k}$ steps indicated by the vertical dotted line before collapsing).}}
+    \caption[Partial-observation MuJoCo learning curves in the low-sample regime]{\aigen{Partial-observation MuJoCo learning curves in the low-sample regime across Ant, HalfCheetah, Hopper, and Walker2d with either position or velocity hidden. Non-Ant panels and baselines show smoothed per-episode returns across $5$ seeds ($\text{mean} \pm 1.96\,\mathrm{SD}/\sqrt{n}$). The Ant panels plot the $10$-episode rolling training return over the full $49.2\text{k}$-step horizon for the stabilized update-to-data configuration (solid, $3$ seeds) alongside the initial high-UTD configuration (dashed, $2$ complete seeds, which peaks near $3\text{k}$ steps indicated by the vertical dotted line before collapsing).}}
     \label{fig:mujoco}
 \end{figure}
 
@@ -599,7 +599,7 @@ Table~\ref{tab:ch08_runtime} reports the measured wall-clock training cost on a 
 
 \begin{table}[t]
 \centering
-\caption{\aigen{Measured wall-clock runtime on a single RTX 3090 GPU (MuJoCo Ant, position hidden, matched end-to-end collection and gradient updates).}}
+\caption[Wall-clock training runtime on partial-observation MuJoCo Ant]{\aigen{Measured wall-clock runtime on a single RTX 3090 GPU (MuJoCo Ant, position hidden, matched end-to-end collection and gradient updates).}}
 \label{tab:ch08_runtime}
 \small
 \begin{tabular}{lrrr}
@@ -629,8 +629,7 @@ We presented an online model-based POMDP pipeline that combines particle filteri
 
 \textbf{Limitations.} Our analysis relies on the Doeblin mixing condition and bounded observation densities, which ensure passive state coverage and obviate the need for strategic exploration.
 These assumptions fail in many POMDPs.
-In item search with exact observations the observation density is not bounded below, and a particle set of size $J$ misses the true location among $K$ with probability $(1-1/K)^J$; in Light--Dark-type problems, where information must be actively gathered, $\Xi_\theta$ is large and shallow planning never gathers it.
-\aigen{(see the controlled stress tests in Appendix~\ref{sec:app08-stress-tests})}
+In item search with exact observations the observation density is not bounded below, and a particle set of size $J$ misses the true location among $K$ with probability $(1-1/K)^J$, while in Light--Dark-type problems, where information must be actively gathered, $\Xi_\theta$ is large and shallow planning never gathers it \aigen{(see the controlled stress tests in Appendix~\ref{sec:app08-stress-tests})}.
 Second, the bounded reward assumption excludes settings such as LQG.
 Third, the deep RL experiments run at depth $d=0$ with a learned critic and actor, so they sit at the QMDP end of the analyzed algorithm, and our guarantees cover non-adaptive (e.g., uniform) rather than UCT-style action selection inside the tree.
 \aigen{In Appendix~\ref{sec:app08-planner-comparison}, we confirm empirically on multi-step active-sensing POMDPs that UCB1 action selection within the belief tree outperforms uniform exploration at a matched simulation budget, demonstrating that uniform exploration is purely a theoretical proof device.}

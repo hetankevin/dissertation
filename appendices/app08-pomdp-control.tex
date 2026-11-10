@@ -4,30 +4,12 @@
 \aigen{This appendix contains the complete belief-tree planner pseudocode (Algorithms~\ref{alg:mctq} and \ref{alg:simulate}), the practical state-rollout deep RL instantiation (Algorithm~\ref{alg:pf_mcts_practical}), the proofs of the four-way regret decomposition and special-case QMDP structural bias bounds, environment specifications and posterior diagnostics for Double-Integrator LQR and HeartSteps, hyperparameter tables, and the camera-ready validation and ablation studies for Chapter~\ref{ch:pomdp-control}.}
 
 
-\section{Further Related Work}
-
-Our work is related to research on approximate planning in POMDPs, particle-based belief representations, and inference in latent-state models.
-
-\paragraph{Planning in POMDPs.}
-POMDP planning can be formulated as dynamic programming over the belief state \cite{kaelbling1998planning}, but exact planning is difficult because the belief space is continuous and must be updated online. Practical methods therefore rely on approximations. Sampling-based planners such as POMCP combine Monte-Carlo tree search with particle-based belief updates and scale to large problems without explicit belief-stateenumeration \cite{silver2010monte,lim2021sparse}, while progressive-widening methods extend this approach to continuous spaces \cite{sunberg2018online}. Another common approximation is QMDP, which replaces belief-space continuation values with fully observed MDP values averaged under the current belief \cite{cassandra1994acting,littman1995learning}. Our method is connected to this line of work through combining finite-depth MCTS with a QMDP-style bootstrap, but differs in that we study this approximation in an online learning setting and explicitly quantify the resulting structural error.
-POMCP, POWSS, and sparse PFT are online planners: they replan from the current belief at every step, but they are analyzed with the model given to the planner, so none of them is an online learning result, and the same holds for our planner analyzed at a frozen $\theta$.
-Their guarantees concern a single planning call at an exactly known $\theta$, with no estimation error and no horizon $T$, so they do not directly yield a regret bound when the planner is called with a re-estimated $\bar\theta_k$.
-Because our decomposition enters the planner only through $\epsilon_{\mathrm{mc}}(t,d)$, one could substitute such a planner by re-deriving that term (and term (B1), which a particle-belief MDP absorbs) under $\bar\theta_k$.
-Planning on the particle-belief MDP also costs $O(J)$ generative calls per node, against $O(1)$ for a state-level simulation.
-
-\paragraph{Particle-based inference under partial observability.}
-A related line of work uses particle filtering to approximate the belief state. Classical particle filtering theory provides convergence and stability guarantees for approximate Bayes filtering \cite{crisan2002survey,whiteley2013stability}. \cite{lim2023optimalityparticlepomdp} studied the particle-belief MDP directly and established optimality guarantees relative to the true belief-state MDP. More recent work has studied planning with particle methods in structured partially observed systems \cite{du2021particle} as well as joint state and parameter inference in state-space models \cite{chen2025self}. Our paper connects these directions in a different way: rather than planning over propagated particle beliefs, we use particles to represent the current belief, perform state-level lookahead from those particles, and combine this with online model learning. This leads to an end-to-end regret analysis that separates estimation error, particle approximation error, Monte-Carlo planning error, and QMDP-style approximation bias.
-
-\paragraph{Model-free approaches.}
-Model-free alternatives instead avoid explicit filtering by giving the learner a short horizon lookback or memory \citep{ni2021recurrentbaseline, kara2022convergencefinitememoryqlearning}. The latter are often effective in practice, especially with deep recurrent policies, but their hidden states are difficult to interpret as beliefs, and remain challenging to analyze. Existing sample complexity guarantees for the former often contain caveats, such as only quasipolynomial rather than polynomial sample complexity \citep{golowich2023planning, golowich2022planningobservablepomdpsquasipolynomial}, or non-standard assumptions \citep{anjarlekar2026scalable}. We will focus on the model-based approach.
-
-
-\section{\aigen{Algorithm~\ref{alg:mctq}} Planning Subroutine}
+\section[Finite-Depth Belief-Tree Planning Subroutine]{\aigen{Finite-Depth Belief-Tree Planning Subroutine (Algorithm~\ref{alg:mctq})}}
 \label{app:mctq}
 
-We describe the full \aigen{Algorithm~\ref{alg:mctq}} (Monte Carlo Tree search with QMDP leaves) planning subroutine referenced in Algorithm~\ref{alg:pf_mcts}.
+We describe the full finite-depth Monte Carlo belief-tree planning subroutine with QMDP leaves (\aigen{Algorithm~\ref{alg:mctq}}) referenced in Algorithm~\ref{alg:pf_mcts}.
 \aigen{Algorithm~\ref{alg:mctq}} estimates the depth-$d$ belief-tree action-value $Q_{\theta,d}(b^J,a)$ defined in~\eqref{eq:Qd_def} by Monte Carlo tree search on the particle belief.
-It is inspired by the POMCP framework~\cite{silver2010monte}, with three departures: internal actions are drawn uniformly at random rather than by UCB1, every simulation descends to the full depth $d$, and values are computed by a bottom-up dynamic programming (DP) backup after all simulations complete.
+It is inspired by the POMCP framework~\citep{silver2010monte}, with three departures: internal actions are drawn uniformly at random rather than by UCB1, every simulation descends to the full depth $d$, and values are computed by a bottom-up dynamic programming (DP) backup after all simulations complete.
 
 \paragraph{Overview.}
 Given the current particle belief $b^J=\frac{1}{J}\sum_{j=1}^J\delta_{s_j}$, model $\theta$, search depth $d$, simulation budget $N$ per root action, and a precomputed fully observable Q-function $Q_\theta^{\star,S}$ (e.g., from value iteration), \aigen{Algorithm~\ref{alg:mctq}} estimates $Q_{\theta,d}(b^J,a)$ for each root action $a\in\gA$ separately (round-robin), so that every root action receives exactly $N$ simulations.
@@ -36,7 +18,7 @@ Nodes are created the first time a simulation passes through them, and every nod
 After all $N$ simulations complete, a bottom-up DP backup computes value estimates: at each depth-$d$ leaf, the QMDP value of its accumulated particles; at each internal node, $\hat V(v)=\max_{a'}\hat Q(v,a')$, where $\hat Q(v,a')$ is the empirical mean of $r+\gamma\hat V(\text{child})$ over the simulations that selected $a'$ at $v$.
 The root estimate $\widehat Q(b^J,a)$ is the same empirical mean at the root.
 
-Like POMCP~\cite{silver2010monte}, \aigen{Algorithm~\ref{alg:mctq}} indexes its search trees by action-observation histories $h=(a_1,o_1,\ldots,a_k,o_k)$ rather than by explicit beliefs, and represents the belief at each node implicitly by the collection of states simulated through that node.
+Like POMCP~\citep{silver2010monte}, \aigen{Algorithm~\ref{alg:mctq}} indexes its search trees by action-observation histories $h=(a_1,o_1,\ldots,a_k,o_k)$ rather than by explicit beliefs, and represents the belief at each node implicitly by the collection of states simulated through that node.
 The round-robin over root actions is needed because the regret analysis (Lemma~\ref{lem:delta_bound_main}) requires uniformly good estimates $\widehat Q(b^J,a)$ for \emph{all} $a\in\gA$.
 The analysis (Proposition~\ref{prop:mc_concentration}) uses two properties of the internal action-selection rule $\pi$, i.e., the rule that picks actions at nodes below the root within one planning call:
 \begin{enumerate}
@@ -107,7 +89,7 @@ When $d=0$ no tree is built and $\widehat Q(b^J,a)=\frac1J\sum_{j=1}^J Q_\theta^
 The full procedure is given in Algorithms~\ref{alg:mctq} and~\ref{alg:simulate}.
 
 \begin{algorithm}[t]
-\caption{\aigen{Finite-Depth Monte Carlo Belief-Tree Planning with QMDP Leaf Bootstrapping}}
+\caption[Finite-depth Monte Carlo belief-tree planning with QMDP leaf bootstrapping]{\aigen{Finite-Depth Monte Carlo Belief-Tree Planning with QMDP Leaf Bootstrapping}}
 \label{alg:mctq}
 \begin{algorithmic}[1]
 \Require model $\theta$; particle belief $b^J=\frac{1}{J}\sum_{j=1}^J\delta_{s_j}$; depth $d$; simulations per action $N$; MDP Q-function $Q_\theta^{\star,S}$
@@ -135,7 +117,7 @@ The full procedure is given in Algorithms~\ref{alg:mctq} and~\ref{alg:simulate}.
 \end{algorithm}
 
 \begin{algorithm}[t]
-\caption{\textsc{Simulate}: Recursive uniform-exploration descent to full depth}
+\caption[\textsc{Simulate}: recursive uniform-exploration descent to full depth]{\textsc{Simulate}: Recursive uniform-exploration descent to full depth}
 \label{alg:simulate}
 \begin{algorithmic}[1]
 \Require state $s$; remaining depth $\ell$; model $\theta$; tree node $v$
@@ -178,643 +160,20 @@ The simulation returns themselves are not independent, and the argument does not
 The proof is written for uniform selection; for a rule satisfying (S1)--(S2), it goes through with $|\gA|$ replaced by $1/\pi_{\min}$ wherever it bounds the fraction of a node's visits that select a given action.
 
 
-\section{Figures and Additional Details for Experiments}
+
+\section{Practical Instantiation and Benchmark Specifications}
 \label{ch08:app:experiments}
-
-
-
-        
-\begin{algorithm}[H]
-    \caption{Practical particle filtering with state-level Monte-Carlo planning}\label{alg:pf_mcts_practical}
-    \begin{algorithmic}[1]
-    \Require number of state particles $J$; planning depth $d$; rollouts per action $N$; horizon $T$;
-    initial parameter $\bar\theta_1$; model update oracle $\textsc{ModelUpdate}(\cdot)$.
-    \State \textbf{Initialize:} model dataset $\gD_m$, policy dataset $\gD_p$. 
-    \State Sample $s^{(1)}_1,\ldots,s^{(1)}_J \sim b_0$ and set $b_1^J = \frac{1}{J}\sum_{j=1}^J \delta_{s^{(1)}_j}$.
-    \For{$t=1,2,\ldots,T$}
-        \If{model update}
-        \State $\gD_m = \gD_m \cup \gD_p$.
-      \State Update $\bar\theta_t$ via updating the model on $\gD_m$ with gradient descent.
-      \State $\gD_p = \emptyset$.
-      \Else 
-      \State $\bar\theta_t \gets \bar\theta_{t-1}$.
-      \EndIf
-      \For{each particle $j=1,\ldots,J$ and each action $a\in\gA$}
-        \State $\widehat Q_t(s^{(t)}_j,a) \gets \textsc{StateMCTS}\big(s^{(t)}_j,a,\bar\theta_t,d,N,\widehat Q^{\mathrm{MDP}}_{\bar\theta_t}, \widehat{\pi}_{\bar{\theta}_t}^{\mathrm{MDP}}\big)$, where actions are sampled by $\widehat{\pi}_{\bar{\theta}_t}^{\mathrm{MDP}}$ and not the greedy policy w.r.t. $\widehat Q_t$. Collect $\widehat{a}_j^{(t)}$, the best action sampled for particle $j$.
-      \EndFor
-      \State $\widehat Q_t(b_t^J,a) \gets \frac{1}{J}\sum_{j=1}^J \widehat Q_t(s^{(t)}_j,a)$ for all $a\in\gA$.
-    %   \State Define $\pi_t(\cdot \mid H_t) = \frac{1}{J}\sum_{j=1}^J \delta_{\widehat Q_t(s^{(t)}_j, \cdot)}$.
-      \State Play $a_t \in \argmax_{j\in [J]} \widehat Q_t(b_t^J, \widehat{a}_j^{(t)})$. Alternatively, sample $\tilde{s}^{(t)} \sim b_t^J$ and play $a_t \sim  \widehat{\pi}_{\bar{\theta}_t}^{\mathrm{MDP}}(\cdot | \tilde{s}^{(t)})$.
-      \State Observe $(o_{t+1}, r_t)$ and append to $\gD_p$.
-      \For{$j=1,\ldots,J$}
-        \State Sample prediction $\hat s^{(t+1)}_j \sim P_{\bar\theta_t}(\cdot\mid s^{(t)}_j,a_t)$.
-        \State Set weight $w^{(t+1)}_j \propto Z_{\bar\theta_t}(o_{t+1}\mid \hat s^{(t+1)}_j)$.
-      \EndFor
-      \State Resample $s^{(t+1)}_1,\ldots,s^{(t+1)}_J \sim \mathrm{Categorical}(w^{(t+1)}_1,\ldots,w^{(t+1)}_J)$.
-      \State Set $b_{t+1}^J = \frac{1}{J}\sum_{j=1}^J \delta_{s^{(t+1)}_j}$.
-      \State Update MDP value estimate $\widehat Q^{\mathrm{MDP}}_{\bar\theta_t}(s,a)$ and policy $\widehat{\pi}_{\bar{\theta}_t}^{\mathrm{MDP}}$ for $(\gS,\gA,P_{\bar\theta_t},r,\gamma)$ on $\gD_p$.
-    \EndFor
-    \end{algorithmic}
-    \end{algorithm}
-    
-\subsection{Double Integrator LQR}
+\label{alg:pf_mcts_practical}
 \label{app:lqr}
-
-
-We use a partially observed double-integrator LQR system. The latent state is
-\[
-x_t =
-\begin{bmatrix}
-p_t \\
-v_t
-\end{bmatrix},
-\]
-where $p_t$ is position and $v_t$ is velocity. The scalar control
-$u_t \in [-3,3]$ is acceleration. With time step $\Delta t = 0.05$, the
-dynamics are
-\[
-x_{t+1}
-=
-A x_t + B u_t + w_t,
-\qquad
-A =
-\begin{bmatrix}
-1 & \Delta t \\
-0 & 1
-\end{bmatrix},
-\qquad
-B =
-\begin{bmatrix}
-\frac{1}{2}\Delta t^2 \\
-\Delta t
-\end{bmatrix},
-\]
-with process noise
-\[
-w_t \sim \mathcal{N}(0, \sigma_w^2 I_2),
-\qquad
-\sigma_w = 0.01.
-\]
-
-The agent observes only the position coordinate:
-\[
-o_t = C x_t + \epsilon_t,
-\qquad
-C =
-\begin{bmatrix}
-1 & 0
-\end{bmatrix},
-\qquad
-\epsilon_t \sim \mathcal{N}(0,\sigma_o^2),
-\qquad
-\sigma_o = 0.05.
-\]
-Thus the velocity $v_t$ is latent. It is not recoverable from the current
-observation alone because the observation map is not injective:
-\[
-\operatorname{rank}(C)=1 < 2.
-\]
-Equivalently, for any fixed position $p$ and any two distinct velocities
-$v \neq v'$,
-\[
-C
-\begin{bmatrix}
-p \\
-v
-\end{bmatrix}
-=
-p
-=
-C
-\begin{bmatrix}
-p \\
-v'
-\end{bmatrix}.
-\]
-Therefore, even in the noiseless observation case, a single current
-observation cannot distinguish states that differ only in velocity. With
-observation noise, the ambiguity is strictly larger. Recovering information
-about $v_t$ requires temporal history, e.g. past observations and actions,
-rather than $o_t$ alone.
-
-The reward is the negative quadratic LQR cost,
-\[
-r_t
-=
--
-\left(
-x_t^\top Q x_t
-+
-u_t^\top R u_t
-\right),
-\qquad
-Q = I_2,
-\qquad
-R = 0.1 I_1.
-\]
-The discounted objective is
-\[
-J(\pi)
-=
-\mathbb{E}_{\pi}
-\left[
-\sum_{t=0}^{T-1}
-\gamma^t r_t
-\right],
-\qquad
-\gamma = 0.9,
-\qquad
-T = 200.
-\]
-
-In our experiments, the initial state is sampled as
-\[
-x_0 \sim \mathcal{N}(0, I_2),
-\]
-episodes terminate after $T=200$ steps or when
-\[
-\|x_t\|_2 > 20.
-\]
-We use $32$ particles for belief tracking, planner depth $1$, planner
-discount $0.9$, and a maximum of $16$ candidate actions.
-
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{figures/ch08/Figures/lqr_snapshot.png}
-    \caption{Snapshot of belief state at select training checkpoints. State recovery improves over time.}
-    \label{fig:lqr-snapshot}
-\end{figure}
-
-\newpage
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{figures/ch08/Figures/lqr_posterior.png}
-    \caption{Posterior panel over five seeds for the double integrator LQR, over the last 1000 steps. The 10th quantile and 90th quantile are visualized. In this setting, only the magnitude, but not the direction, latent state is identifiable from the current observations alone. With no access to memory, the particle belief state still exhibits the ability to tracking the belief state, as seen in seeds 2 and 4, but fails when the state rapidly diverges. This suggests that the particle belief can be used in tandem with memory for latent state recovery.. }
-    \label{fig:lqr-posterior}
-\end{figure}
-
-\newpage 
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{figures/ch08/Figures/lqr_belief_mean.png}
-    \caption{Belief mean panel over five seeds for LQR. The MLP backbone diverges, while the GRU backbone converges.}
-    \label{fig:lqr-belief-mean}
-\end{figure}
-
-
-
-\newpage
-
-\subsection{Heartsteps}
+\label{fig:lqr-snapshot}
+\label{fig:lqr-posterior}
+\label{fig:lqr-belief-mean}
 \label{app:heartsteps}
+\label{fig:heartsteps-all}
+\label{fig:heartsteps-snapshot}
+\label{fig:heartsteps-posterior}
 
-\paragraph{HeartSteps as an AOMDP.}
-We follow the formulation of \cite{gao2025activemeasuringreinforcementlearning} in formulating HeartSteps as an actively observable Markov decision process
-(AOMDP). At each day $t$, the agent first chooses a measurement action
-$I_{t,1} \in \{0,1\}$, where $I_{t,1}=1$ corresponds to sending a survey
-that reveals the latent reward/commitment state. The agent then chooses a
-control action $A_{t,2} \in \{0,1\}$, where $A_{t,2}=1$ corresponds to
-sending a walking-suggestion intervention.
-
-Let $R_t$ denote the user's latent commitment to being active on day $t$,
-$E_t$ denote engagement or burden, $C_{t,2}$ denote context before the
-intervention decision, $M_{t,2}$ denote the proximal physical activity
-outcome, and $O_t$ denote a passive proxy emission of the latent reward.
-Following the AOMDP indexing, the latent state is
-\[
-U_{t+1} := R_t,
-\]
-and the observed state after the control action is
-\[
-Z_{t+1} := (M_{t,2}, E_t).
-\]
-The reward is the latent reward itself,
-\[
-r(Z_{t+1}, U_{t+1}) = R_t.
-\]
-
-The measurement-stage and control-stage states are
-\[
-S^I_{t,1} = (E_{t-1}, R_{t-1}),
-\qquad
-S^A_{t,2} = (E_{t-1}, R_{t-1}, C_{t,2}, I_{t,1}).
-\]
-Before choosing $I_{t,1}$, the agent observes $E_{t-1}$ and the passive
-emission $O_{t-1}$, but not $R_{t-1}$. If $I_{t,1}=1$, the agent observes
-$R_{t-1}$ before choosing $A_{t,2}$; if $I_{t,1}=0$, $R_{t-1}$ remains
-latent.
-
-The HeartSteps transition model is
-\[
-C_{t,2}
-=
-\theta^C_0 + \varepsilon^C_{t,2},
-\]
-\[
-M_{t,2}
-=
-\theta^M_0
-+
-\theta^M_1 E_{t-1}
-+
-\theta^M_2 R_{t-1}
-+
-\theta^M_3 C_{t,2}
-+
-A_{t,2}
-\left(
-\theta^M_4
-+
-\theta^M_5 E_{t-1}
-+
-\theta^M_6 R_{t-1}
-+
-\theta^M_7 C_{t,2}
-\right)
-+
-\varepsilon^M_{t,2},
-\]
-\[
-E_t
-=
-\theta^E_0
-+
-\theta^E_1 E_{t-1}
-+
-\theta^E_A A_{t,2}
-+
-\theta^E_{AE} A_{t,2} E_{t-1}
-+
-\theta^E_I I_{t,1}
-+
-\theta^E_{IE} I_{t,1} E_{t-1}
-+
-\varepsilon^E_t,
-\]
-\[
-R_t
-=
-\theta^R_0
-+
-\theta^R_1 M_{t,2}
-+
-\theta^R_2 E_t
-+
-\theta^R_3 R_{t-1}
-+
-\varepsilon^R_t,
-\]
-and the passive emission model is
-\[
-O_t
-=
-\theta^O_0
-+
-\theta^O_1 R_t
-+
-\varepsilon^O_t.
-\]
-The noise terms are mean-zero, with variances
-$\sigma_C^2,\sigma_M^2,\sigma_E^2,\sigma_R^2,\sigma_O^2$.
-
-The latent reward is not recoverable from the current passive observation
-alone. Indeed, when $I_{t,1}=0$, the posterior over $R_{t-1}$ satisfies
-\[
-p(R_{t-1}=r \mid E_{t-1}, O_{t-1}, H_{t,1})
-\propto
-p(O_{t-1} \mid R_{t-1}=r)
-p(R_{t-1}=r \mid E_{t-1}, H_{t,1}),
-\]
-where
-\[
-O_{t-1}
-=
-\theta^O_0
-+
-\theta^O_1 R_{t-1}
-+
-\varepsilon^O_{t-1}.
-\]
-Thus, unless the emission noise is degenerate and the prior is already a
-point mass, the posterior is not a Dirac measure. In particular, for
-$\sigma_O^2>0$, multiple values of $R_{t-1}$ have positive likelihood for
-the same observed $O_{t-1}$. Therefore the latent reward cannot be
-identified from the current passive observation alone. By contrast, when
-$I_{t,1}=1$, the survey reveals $R_{t-1}$ and collapses the posterior:
-\[
-p(R_{t-1} \mid H_{t,2})
-=
-\delta_{R_{t-1}}.
-\]
-
-The AOMDP objective is
-\[
-\pi^\star
-\in
-\arg\max_\pi
-\mathbb{E}_\pi
-\left[
-\sum_{t=1}^{H}
-\gamma^{t-1} R_t
-\right].
-\]
-
-\paragraph{Implementation settings.}
-In our HeartSteps experiments, the encoded simulator state is
-\[
-x_t =
-(R_t, E_t, t/H, C_t, M_t, O_t) \in \mathbb{R}^6.
-\]
-The observed coordinates are
-\[
-(E_t, t/H, C_t, M_t, O_t),
-\]
-and the only latent coordinate is $R_t$. We use horizon
-\[
-H = 270,
-\qquad
-\gamma = 0.9,
-\]
-binary control actions $A_{t,2}\in\{0,1\}$, and binary measurement actions
-$I_{t,1}\in\{0,1\}$ in the AOMDP formulation. The benchmark contains
-$42$ user-specific environments.
-
-For \aigen{Algorithm~\ref{alg:pf_mcts}}, our default settings use
-\[
-J = 16
-\]
-particles, planner depth $1$, planner discount $0.9$, and at most $16$
-candidate actions. The model and policy are trained online over
-$27$ epochs with $10$ environment steps per epoch, for a total of
-$270$ environment steps.
-
-\paragraph{Benchmarks.}
-RLSVI-SMC is the never-measure benchmark in our experiments.  It fixes the
-measurement action to zero,
-\[
-    I_{t,1} = 0 \qquad \text{for all } t,
-\]
-so the latent reward is not directly observed after initialization.  Instead,
-the algorithm maintains an SMC approximation to the posterior belief over the
-latent reward,
-\[
-    \widehat b_t^R = \sum_{j=1}^J w_t^{(j)} \delta_{\widehat R_t^{(j)}} ,
-\]
-and chooses the control action using randomized least-squares value iteration
-with a linear value-function approximation,
-\[
-    Q_A(b_{t,2}, a)
-    \approx \phi_A(b_{t,2}, a)^\top \beta_A .
-\]
-Thus RLSVI-SMC is a strong and intentionally tailored benchmark for this
-linear-function-approximation setting: the belief update uses the specified
-linear-Gaussian working model, and the control rule uses hand-specified linear
-features of the belief state, context, action, and action interactions.
-
-\aigen{Algorithm~\ref{alg:pf_mcts}} is also evaluated under the never-measure information pattern,
-\[
-    I_{t,1}=0,
-\]
-so it has the same lack of direct latent-reward measurements as RLSVI-SMC.
-However, \aigen{Algorithm~\ref{alg:pf_mcts}} is less specialized to the linear benchmark structure: it must
-learn a dynamics model, actor, and critic, parameterized by neural networks,
-from the observed data.  Consequently, \aigen{Algorithm~\ref{alg:pf_mcts}} pays an additional estimation
-cost relative to RLSVI-SMC, which is already matched to the linear basis and
-Bayesian regression structure of the benchmark.
-
-Dyna-ATMQ differs from both no-measure methods.  It is an active-measurement
-baseline that maintains a tabular belief over a discretized state space, learns
-a Dirichlet transition model and Q-table, and separately decides whether to
-measure by comparing the estimated value of measurement to a measurement cost.
-Its control action is selected from the belief-weighted Q-values,
-\[
-    A_{t,2}
-    \in \arg\max_{a}
-    \sum_s b_t(s) Q(s,a),
-\]
-while its measurement decision can reveal the latent reward and collapse the
-posterior uncertainty.  In our experiments Dyna-ATMQ measures the environment
-around half the time on average, giving it an informational advantage over both
-RLSVI-SMC/never-measure and \aigen{Algorithm~\ref{alg:pf_mcts}}, which do not measure the environment.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{figures/ch08/Figures/heartsteps_all.png}
-    \caption{Cumulative reward above the baseline rollout across the twelve HeartSteps scenarios.
-Panels vary the positive intervention effect (rows: minimal, small, medium) and the delayed negative measurement effect or proxy informativeness (columns: zero negative effect, minimal negative effect, small negative effect, and uninformative passive proxy $O_t$). Solid lines show the mean across runs and shaded bands show 2.5\% and 97.5\% quantiles.
-The never-measure RLSVI-SMC benchmark performs best in most scenarios because it is specifically matched to the linear-Gaussian HeartSteps structure and is given access to hand-specified linear features. \aigen{Algorithm~\ref{alg:pf_mcts}} also never measures, but must learn its model, actor, and critic from data using neural approximators, so it typically improves over baseline while trailing the tailored linear benchmark. Dyna-ATMQ often underperforms when measurement has delayed negative effects, especially when the positive intervention effect is weak, because it measures frequently and therefore gains latent-state information at the cost of worsening future engagement. Its relative performance improves when the positive effect is larger or when passive proxy information is unavailable and so direct measurements become more valuable.
-}
-    \label{fig:heartsteps-all}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{figures/ch08/Figures/heartsteps_snapshot.png}
-    \caption{Belief over the latent reward at three training checkpoints in HeartSteps. Rows show \aigen{Algorithm~\ref{alg:pf_mcts}}, the never-measure RLSVI-SMC benchmark, and Dyna-ATMQ; columns show days 27, 135, and 243. Each panel displays posterior particles, a kernel density estimate, the posterior interquartile range, and the posterior mean. The red vertical line marks the true latent reward. We see that Dyna-ATMQ having access to measurements of the environment gives it an informational advantage over the other two algorithms. On the other hand, the correct linear specification that RLSVI-SMC enjoys allows it to create a posterior that is close to Gaussian. \aigen{Algorithm~\ref{alg:pf_mcts}}, which has to estimate a dynamics model, actor, and critic, parameterized by neural networks,
-from the observed data, consequently has a much more expressive and multimodal posterior.
-}
-    \label{fig:heartsteps-snapshot}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{figures/ch08/Figures/heartsteps_posterior.png}
-    \caption{
-Latent-reward belief trajectories for HeartSteps scenario (a), shown separately by random seed.
-Columns compare \aigen{Algorithm~\ref{alg:pf_mcts}}, the never-measure RLSVI-SMC benchmark, and Dyna-ATMQ; rows show five independent seeds.
-Each panel plots the posterior median, interquartile range, and 10--90\% interval for the latent reward, with the dashed red curve showing the true latent reward.
-All three methods track the latent reward at the level needed for control, but they express uncertainty differently.
-Never-measure produces comparatively narrow posteriors because it is tailored to the linear-Gaussian HeartSteps model and uses a conjugate SMC/RLSVI update.
-\aigen{Algorithm~\ref{alg:pf_mcts}} has wider and more variable posteriors because it must learn the transition model and value functions from data while never directly measuring the latent reward.
-Dyna-ATMQ also shows broad posterior support, but its belief remains centered near the true trajectory because it actively measures the latent reward on many days, partially collapsing uncertainty despite the coarser tabular approximation.
-}
-    \label{fig:heartsteps-posterior}
-\end{figure}
-
-
-\subsection{Hyperparameters}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-\toprule
-Hyperparameter & Value \\
-\midrule
-Environment & LQR double integrator \\
-Observed indices & $[0]$ \\
-Warmup steps & $256$ \\
-Initial model / policy updates & $100$ / $100$ \\
-Epochs / steps per epoch & $40$ / $256$ \\
-Model updates per epoch & $10$ \\
-Particles & $32$ \\
-Model subsequence length & $64$ \\
-Network hidden dimensions & $[]$ \\
-Recurrent lookback & $5$ \\
-Planner depth / discount & $1$ / $0.9$ \\
-SAC actor / critic learning rate & $3\times10^{-4}$ / $3\times10^{-4}$ \\
-SAC batch size / entropy coefficient & $32$ / $0.01$ \\
-Model learning rate / batch size & $3\times10^{-5}$ / $64$ \\
-Particle filter mode / $\alpha$ & MOP / $0.8$ \\
-ESS threshold / rejuvenation std. & $0.5$ / $0.1$ \\
-Environment noise: transition / observation & $0.01$ / $0.05$ \\
-Action bound / horizon & $3.0$ / $200$ \\
-\bottomrule
-\end{tabular}
-\vspace{1ex}
-\caption{Key hyperparameters for LQR.}
-\end{table}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-\toprule
-Hyperparameter & Value \\
-\midrule
-Environment & HeartSteps \\
-User id / horizon & $0$ / $270$ \\
-Noise mode / observation noise & sequential / $0.0$ \\
-Warmup steps & $1024$ \\
-Initial model / policy updates & $10$ / $30$ \\
-Epochs / steps per epoch & $27$ / $10$ \\
-Model updates per epoch & $10$ \\
-Particles & $16$ \\
-GRU backbone / recurrent BPTT & false / false \\
-Hidden size / preprocessor / postprocessor & $32$ / $32$ / $32$ \\
-Planner depth / discount & $1$ / $0.9$ \\
-SAC actor / critic learning rate & $10^{-3}$ / $10^{-3}$ \\
-SAC batch size / entropy coefficient & $64$ / $0.003$ \\
-Automatic entropy tuning & false \\
-Model learning rate / batch size & $3\times10^{-4}$ / $256$ \\
-Particle filter mode / $\alpha$ & MOP / $0.8$ \\
-ESS threshold / rejuvenation std. & $0.5$ / $0.001$ \\
-\bottomrule
-\end{tabular}
-\vspace{1ex}
-\caption{Key hyperparameters for HeartSteps.}
-\end{table}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-\toprule
-Hyperparameter & Value \\
-\midrule
-Environment & Ant \\
-Observation variants & no position, no velocity \\
-Observation noise / discount & $0.1$ / $0.99$ \\
-Warmup steps & $1000$ \\
-Initial model / policy updates & $2000$ / $10$ \\
-Epochs / steps per epoch & $10$ / $300$ \\
-Model updates per epoch & $0$ \\
-Particles & $16$ \\
-Model subsequence length & $32$ \\
-GRU backbone / BPTT size & true / $32$ \\
-Hidden dimensions & $[256,256]$ \\
-Planner depth / discount & $10$ / $0.99$ \\
-SAC actor / critic learning rate & $3\times10^{-4}$ / $3\times10^{-4}$ \\
-SAC batch size / entropy coefficient & $256$ / $0.2$ \\
-Model learning rate / batch size & $3\times10^{-4}$ / $256$ \\
-Particle filter mode / $\alpha$ & MOP / $0.8$ \\
-ESS threshold / rejuvenation std. & $0.5$ / $0.1$ \\
-\bottomrule
-\end{tabular}
-\vspace{1ex}
-\caption{Key hyperparameters for MuJoCo Ant.}
-\end{table}
-
-\begin{table}[t]
-\centering
-\begin{tabular}{ll}
-\toprule
-Hyperparameter & Value \\
-\midrule
-Environment & HalfCheetah \\
-Observation variants & no position, no velocity \\
-Observation noise / discount & $0.1$ / $0.99$ \\
-Warmup steps & $1000$ \\
-Initial model / policy updates & $1000$ / $10$ \\
-Epochs / steps per epoch & $50$ / $1000$ \\
-Model updates per epoch & $100$ \\
-Early-stop patience / min updates & $20/20$ no-position; $5/5$ no-velocity \\
-Particles & $16$ \\
-Model subsequence length & $32$ \\
-GRU backbone / BPTT size & true / $32$ \\
-Hidden dimensions & $[256,256]$ \\
-Planner depth / discount & $10$ / $0.99$ \\
-SAC actor / critic learning rate & $3\times10^{-4}$ / $3\times10^{-4}$ \\
-SAC batch size / entropy coefficient & $256$ / $0.2$ \\
-Model learning rate / batch size & $3\times10^{-4}$ / $256$ \\
-Particle filter mode / $\alpha$ & MOP / $0.8$ \\
-\bottomrule
-\end{tabular}
-\vspace{1ex}
-\caption{Key hyperparameters for MuJoCo HalfCheetah.}
-\end{table}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-\toprule
-Hyperparameter & Value \\
-\midrule
-Environment & Hopper \\
-Observation variants & no position, no velocity \\
-Observation noise / discount & $0.1$ / $0.99$ \\
-Warmup steps & $1000$ \\
-Initial model / policy updates & $1000$ / $10$ \\
-Epochs / steps per epoch & $50$ / $1000$ \\
-Model updates per epoch & $100$ \\
-Particles & $16$ \\
-Model subsequence length & $32$ \\
-GRU backbone / BPTT size & true / $32$ \\
-Hidden dimensions & $[256,256]$ \\
-Planner depth / discount & $10$ / $0.99$ \\
-SAC actor / critic learning rate & $3\times10^{-4}$ / $3\times10^{-4}$ \\
-SAC batch size / entropy coefficient & $256$ / $0.2$ \\
-Model learning rate / batch size & $3\times10^{-4}$ / $256$ \\
-Particle filter mode / $\alpha$ & MOP / $0.8$ \\
-ESS threshold / rejuvenation std. & $0.5$ / $0.1$ \\
-\bottomrule
-\end{tabular}
-
-\caption{Key hyperparameters for MuJoCo Hopper.}
-\end{table}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{ll}
-\toprule
-Hyperparameter & Value \\
-\midrule
-Environment & Walker2d \\
-Observation variants & no position, no velocity \\
-Observation noise / discount & $0.1$ / $0.99$ \\
-Warmup steps & $1000$ \\
-Initial model / policy updates & $1000$ / $10$ \\
-Epochs / steps per epoch & $50$ / $1000$ \\
-Model updates per epoch & $100$ \\
-Early-stop patience / min updates & $20/20$ no-position; $5/5$ no-velocity \\
-Particles & $16$ \\
-Model subsequence length & $32$ \\
-GRU backbone / BPTT size & true / $32$ \\
-Hidden dimensions & $[256,256]$ \\
-Planner depth / discount & $10$ / $0.99$ \\
-SAC actor / critic learning rate & $3\times10^{-4}$ / $3\times10^{-4}$ \\
-SAC batch size / entropy coefficient & $256$ / $0.2$ \\
-Model learning rate / batch size & $3\times10^{-4}$ / $256$ \\
-Particle filter mode / $\alpha$ & MOP / $0.8$ \\
-\bottomrule
-\end{tabular}
-\vspace{1ex}
-\caption{Key hyperparameters for MuJoCo Walker2d.}
-\end{table}
-
-
-
+\aigen{Extended related work on belief-space planning and particle filtering, the practical deep reinforcement learning instantiation (Algorithm~\ref{alg:pf_mcts_practical}), and full environment specifications, posterior diagnostics, and hyperparameter tables for the Double-Integrator LQR, HeartSteps, and MuJoCo benchmarks appear in Appendices~A and~C of \citet{tan2026pomdp}.}
 
 \section{Detailed Error Analysis and Proofs}
 \label{app:proofs}
@@ -827,7 +186,7 @@ Throughout, $|r(s,a)|\le R_{\max}$ and $V_{\max}:=R_{\max}/(1-\gamma)$. We defin
 
 
 %% ===================================================================
-\subsection{Structural Error of QMDP Bootstrapping}
+\subsection{Structural Error of Leaf Value Bootstrapping}
 \label{app:structural_proofs}
 
 Define the \emph{linear QMDP surrogate}
@@ -837,7 +196,7 @@ Define the \emph{linear QMDP surrogate}
 \end{equation}
 By Jensen's inequality, $\widetilde V_\theta^{\star}(b)\ge \bar V_\theta^{\star,S}(b)$ and the gap $\Xi_\theta := \sup_b [\widetilde V_\theta^{\star}(b)-\bar V_\theta^{\star,S}(b)] \ge 0$.
 
-\begin{prop}[Structural error of \aigen{Algorithm~\ref{alg:mctq}}]
+\begin{prop}[Structural Error of the QMDP Leaf Value Approximation]
 \label{prop:structural_error}
 For every $\theta\in\Theta$ and $d\ge 0$,
 \begin{equation}
@@ -1341,7 +700,7 @@ Summing over depths, leaves included,
 \end{equation}
 
 \emph{Step 3: Discretization error.}
-For $o,o'$ in the same bin, the Bayes update sensitivity~\cite[Section~4.3]{doucmoulinesolsson2014} gives
+For $o,o'$ in the same bin, the Bayes update sensitivity~\citep[Section~4.3]{doucmoulinesolsson2014} gives
 \[
 \|\tau_\theta(b,a,o)-\tau_\theta(b,a,o')\|_{\mathrm{TV}}
 \;\le\;
@@ -1449,7 +808,7 @@ We work under Assumption~\ref{aspt:particle_error} throughout. Write $b_t:=b_t^{
     \paragraph{Term (II): test-function bound via Feynman-Kac.}
     Conditional on $(a_{1:T},o_{1:T})$, the particle filter is a Feynman-Kac system with kernels $M_s(\cdot\mid s'):=P_{\bar\theta_s}(\cdot\mid s',a_s)$ and potentials $G_s(s'):=Z_{\bar\theta_s}(o_s\mid s')$. Under Assumption~\ref{aspt:particle_error}, the kernels satisfy $M_s(s'\mid x)\ge\varepsilon_{\mathrm{mix}}\,\nu(s')$ and the potentials satisfy $g_{\min}\le G_s(x)\le g_{\max}$ uniformly. We invoke the following time-uniform particle-filter bound. 
     
-    \begin{lem}[{\cite[Lemma~2.3]{karjalainen2026forgettingparticlefilters}; see also \cite[Theorem~7.4.4]{delmoral2004feynmankac}}]\label{lem:karjalainen}
+    \begin{lem}[{\cite[Lemma~2.3]{karjalainen23}; see also \cite[Theorem~7.4.4]{delMoral04}}]\label{lem:karjalainen}
     Let $(\eta_n)_{n\ge 0}$ and $(\eta_n^N)_{n\ge 0}$ be the exact and $N$-particle Feynman-Kac measures on a measurable space $E$. Suppose the Markov kernels $(M_\ell)_{\ell\ge 1}$ admit densities w.r.t.\ a common measure $\lambda$ satisfying $\underline M\le M_\ell(x,y)\le\overline M$ for all $\ell,x,y$, and the potentials satisfy $\underline G\le G_\ell(x)\le\overline G$ for all $\ell,x$. Then for all $n\ge 0$, $N\ge 2$, $p\ge 1$, and $\varphi$ with $\mathrm{osc}(\varphi)\le 1$:
     \begin{equation}\label{eq:karjalainen_lp}
     \bigl(\E\bigl[|\eta_n^N(\varphi)-\eta_n(\varphi)|^p\bigr]\bigr)^{1/p} 
@@ -1610,7 +969,7 @@ Under Assumption~\ref{aspt:particle_error}, bounding the numerator below and den
 K_\theta^{a,o}(s,ds')\;\ge\;\frac{g_{\min}\varepsilon_{\mathrm{mix}}}{g_{\max}}\,\nu(s')\,ds'
 \qquad\forall\,s\in\gS,
 \end{equation}
-giving Dobrushin coefficient $\rho:=1-\varepsilon_{\mathrm{mix}}g_{\min}/g_{\max}$. Standard Dobrushin contraction~\cite[Theorem~4.3.1]{doucmoulinesolsson2014} under different models $\theta^\star,\bar\theta_s$ yields
+giving Dobrushin coefficient $\rho:=1-\varepsilon_{\mathrm{mix}}g_{\min}/g_{\max}$. Standard Dobrushin contraction~\citep[Theorem~4.3.1]{doucmoulinesolsson2014} under different models $\theta^\star,\bar\theta_s$ yields
 \begin{equation}\label{eq:filter_recursion}
 \|b_s^{\theta^\star}-b_s^{\bar\theta_{1:s}}\|_{\mathrm{TV}}
 \;\le\;
@@ -1657,7 +1016,7 @@ Let $\PP_{\theta,H}^\pi$ denote the length-$H$ trajectory distribution under $(\
 \begin{equation}\label{eq:conf_set}
 \gC_k:=\bigl\{\theta\in\Theta:\gL_{T_k}(\theta)\ge \gL_{T_k}(\bar\theta_k)-\beta\bigr\},
 \end{equation}
-where $\gL_{T_k}$ is the log-likelihood over epochs $1,\ldots,k-1$. By construction $\bar\theta_k\in\gC_k$, and $\theta^\star\in\gC_k$ for all $k$ w.h.p.\ when $\beta\ge c_0\log[\gN_\Theta(1/T)T/\delta_{\mathrm{opt}}]$~\cite[Prop.~B.1]{liu2023optimistic}.
+where $\gL_{T_k}$ is the log-likelihood over epochs $1,\ldots,k-1$. By construction $\bar\theta_k\in\gC_k$, and $\theta^\star\in\gC_k$ for all $k$ w.h.p.\ when $\beta\ge c_0\log[\gN_\Theta(1/T)T/\delta_{\mathrm{opt}}]$~\citep[Prop.~B.1]{liu2023optimistic}.
 
 \begin{prop}[Likelihood-to-$\ell_1$ concentration]\label{prop:lik_to_l1}
 There exists $c>0$ such that w.p.\ $\ge 1-\delta$, simultaneously for all $n\in[T]$ and all $\theta\in\Theta$ with $\gL_n(\theta)\ge\gL_n(\theta^\star)-\beta$:
@@ -1671,7 +1030,7 @@ c\,\beta_T,
 \end{prop}
 
 \begin{proof}
-The episodic version is~\cite[Prop.~B.2]{liu2023optimistic}. We transfer to the online setting via a blocking argument: partition the trajectory into $\lfloor T/(2H)\rfloor$ blocks of length $2H$, each split into a burn-in half and a data half. Choose $H$ so that
+The episodic version is given by~\citet[Prop.~B.2]{liu2023optimistic}. We transfer to the online setting via a blocking argument: partition the trajectory into $\lfloor T/(2H)\rfloor$ blocks of length $2H$, each split into a burn-in half and a data half. Choose $H$ so that
 \[
 \rho^H = (1-\varepsilon_{\mathrm{mix}}g_{\min}/g_{\max})^H \;\le\; 1/T^2,
 \qquad\text{i.e.,}\quad
@@ -1926,455 +1285,44 @@ The total regret is:
 \begin{equation}\label{eq:eps_schedule}
 \mathrm{Reg}_T = \widetilde O\!\left(\frac{K_{\mathrm{cov}}^{1/2}\,R_{\max}\,T^{3/4}}{(1-\gamma)^{3/2}}\right) + \frac{C_{\mathrm{pf}}\,R_{\max}\,T}{(1-\gamma)^2}\cdot J^{-\frac{1}{2\kappa_{\mathrm{pf}}}} + \frac{C_{\mathrm{mc}}\,R_{\max}\,T}{(1-\gamma)^2\sqrt{N}} + \frac{2\gamma^{d+1}}{(1-\gamma)^2}\sum_t\Xi_{\bar\theta_{k(t)}}.
 \end{equation}
-The $T^{3/4}$ rate is driven by the $1/\varepsilon$ coverage transfer for term~(A). Using optimistic model selection ($\tilde\theta_t:=\arg\max_{\theta\in\gC_t}V_\theta^{\star,B}$) eliminates term~(A) and recovers $\widetilde O(\sqrt{T})$ from term~(C) alone, at the cost of solving an optimistic planning problem~\cite{liu2023optimistic}.
+The $T^{3/4}$ rate is driven by the $1/\varepsilon$ coverage transfer for term~(A). Using optimistic model selection ($\tilde\theta_t:=\arg\max_{\theta\in\gC_t}V_\theta^{\star,B}$) eliminates term~(A) and recovers $\widetilde O(\sqrt{T})$ from term~(C) alone, at the cost of solving an optimistic planning problem~\citep{liu2023optimistic}.
 
 A constant $\varepsilon$ gives the same $\widetilde O(T^{3/4})$ rate after optimization and may be preferable when $T$ is unknown.
 
 
 
 %% ===================================================================
-\subsection{Greedy Exploitation with Offline Coverage}
+
+\section{Offline Coverage, Structural Bias Bounds, Case Studies, and Ablations}
 \label{app:offline_coverage}
-
-The $T^{3/4}$ rate in Theorem~\ref{thm:final_regret_bound} arises from the coverage transfer for term~(A), which requires $\varepsilon$-greedy exploration to ensure the MLE concentrates at all policies. An alternative is to replace online exploration with an offline dataset that already provides coverage of the optimal policy. This mirrors the hybrid RL framework~\cite{song2023hybrid}, where offline data with sufficient coverage enables greedy online exploitation.
-
-\paragraph{Setting.}
-Suppose the agent has access to an offline dataset $\gD_{\mathrm{off}}$ of $N$ i.i.d.\ length-$H$ trajectories collected by a behavior policy $\pi_b$ in the true POMDP (model $\theta^\star$). The agent then runs \aigen{Algorithm~\ref{alg:pf_mcts}} for $T$ online steps with \emph{greedy} exploitation ($\varepsilon_t=0$, no exploration). The MLE is computed from the union $\gD_{\mathrm{off}}\cup\gD_{\mathrm{on}}$.
-
-\begin{defn}[Single-policy concentrability]\label{def:spc}
-The single-policy concentrability coefficient of the behavior policy $\pi_b$ with respect to the optimal policy $\pi^\star:=\arg\max_\pi V_{\theta^\star}^{\pi,B}$ is
-\begin{equation}\label{eq:coff_def}
-c_{\mathrm{off}}^\star
-:=\sup_{\theta,\theta'\in\Theta}
-\frac{\|\PP_{\theta,H}^{\pi^\star}-\PP_{\theta',H}^{\pi^\star}\|_1}{\|\PP_{\theta,H}^{\pi_b}-\PP_{\theta',H}^{\pi_b}\|_1}.
-\end{equation}
-\end{defn}
-
-Under Assumption~\ref{aspt:particle_error}, if $\pi_b(a\mid h)\ge\alpha_b/|\gA|$ for all $a,h$, Lemma~\ref{lem:coverage} gives $c_{\mathrm{off}}^\star\le K_{\mathrm{cov}}/\alpha_b=\frac{H|\gA|}{\alpha_b}\cdot\frac{g_{\max}^2}{\varepsilon_{\mathrm{mix}}\,g_{\min}^2}$. Note that $c_{\mathrm{off}}^\star$ involves only the \emph{optimal} policy, not a supremum over all policies; this is the key difference from the all-policy concentrability that $\varepsilon$-greedy provides.
-
-\begin{prop}[Regret with offline coverage]\label{prop:offline_regret}
-Under Assumption~\ref{aspt:particle_error}, suppose the agent has $N$ offline trajectories from $\pi_b$ and runs the doubling-epoch \aigen{Algorithm~\ref{alg:pf_mcts}} with greedy exploitation ($\varepsilon_k=0$) for $T$ online steps. Let $\beta_{T,N}:=\beta+\log[\gN_\Theta(1/(T+N))(T+N)/\delta]$. Then w.p.\ $\ge 1-\delta$:
-\begin{equation}\label{eq:offline_regret}
-\mathrm{Reg}_T
-\;\le\;
-\underbrace{\widetilde O\!\left(\frac{R_{\max}\sqrt{T}}{1-\gamma}\right)}_{\text{term (C)}}
-+
-\underbrace{\frac{c_{\mathrm{off}}^\star R_{\max}\sqrt{c\beta_{T,N}}}{1-\gamma}\cdot\frac{T}{\sqrt{N}}}_{\text{term (A)}}
-+\;\text{computational terms},
-\end{equation}
-where the computational terms are the same as in Theorem~\ref{thm:final_regret_bound} (particle, MC, structural).
-
-In particular, when $N\ge (c_{\mathrm{off}}^\star)^2\,T$, the total regret is $\widetilde O\bigl(\sqrt{T}/(1-\gamma)\bigr)$ plus computational terms --- achieving $\sqrt{T}$ regret without any online exploration.
-\end{prop}
-
-\begin{proof}
-The regret decomposition~\eqref{eq:main_decomp_round_t} gives
-\[
-\mathrm{Reg}_T \;=\; \E\sum_{t=1}^T\bigl[\text{(A)}_t+\text{(B)}_t+\text{(C)}_t\bigr].
-\]
-There is no exploration cost since $\varepsilon_k=0$.
-
-\emph{MLE concentration with offline data.}
-The MLE is fit on $\gD_{\mathrm{off}}\cup\gD_{\mathrm{on}}$. The offline trajectories are i.i.d.\ under $(\theta^\star,\pi_b)$, so the episodic MLE concentration~\cite[Prop.~B.2]{liu2023optimistic} applies directly to the offline portion. Combined with the blocking argument for the online portion (Proposition~\ref{prop:lik_to_l1}):
-\begin{equation}\label{eq:hist_l1_hybrid}
-N\,\bigl\|\PP_{\bar\theta_k}^{\pi_b}\bigr\|_1^2
-+\sum_{t=1}^{T_{k+1}-1}\bigl\|\PP_{\bar\theta_k}^{\pi^t}\bigr\|_1^2
-\;\le\;c\,\beta_{T,N}
-\qquad\forall\,k\le K,
-\end{equation}
-using the shorthand $\|\PP_\theta^\pi\|_1:=\|\PP_{\theta,H}^\pi-\PP_{\theta^\star,H}^\pi\|_1$.
-
-\emph{Term (C).}
-Identical to the proof of Proposition~\ref{prop:model_error_combined}: since $\bar\theta_k$ is fixed within $E_k$, within-epoch Cauchy-Schwarz on the online terms in~\eqref{eq:hist_l1_hybrid} gives
-\[
-\sum_{t=1}^T\text{(C)}_t
-\;\le\;\frac{R_{\max}}{1-\gamma}\sqrt{c\beta_{T,N}}\sum_{k=1}^K\sqrt{|E_k|}+O(\gamma^H T)
-\;=\;\widetilde O\!\left(\frac{R_{\max}\sqrt{T}}{1-\gamma}\right).
-\]
-
-\emph{Term (A).}
-We use a tighter decomposition that avoids $\sup_\pi$:
-\begin{equation}\label{eq:A_single_policy}
-\text{(A)}_t
-= V_{\theta^\star}^{\star,B}(b_t)-V_{\bar\theta_{k(t)}}^{\star,B}(b_t)
-\;\le\;
-V_{\theta^\star}^{\pi^\star,B}(b_t)-V_{\bar\theta_{k(t)}}^{\pi^\star,B}(b_t)
-\;\le\;
-\frac{R_{\max}}{1-\gamma}\bigl\|\PP_{\bar\theta_{k(t)}}^{\pi^\star}\bigr\|_1,
-\end{equation}
-where the first inequality uses $V_{\bar\theta_{k(t)}}^{\star,B}\ge V_{\bar\theta_{k(t)}}^{\pi^\star,B}$ (optimality under $\bar\theta_{k(t)}$) and the second is the simulation lemma (Lemma~\ref{lem:simulation}).
-
-By Definition~\ref{def:spc}:
-\[
-\bigl\|\PP_{\bar\theta_k}^{\pi^\star}\bigr\|_1
-\;\le\;
-c_{\mathrm{off}}^\star\,\bigl\|\PP_{\bar\theta_k}^{\pi_b}\bigr\|_1.
-\]
-From the offline portion of~\eqref{eq:hist_l1_hybrid}:
-\[
-\bigl\|\PP_{\bar\theta_k}^{\pi_b}\bigr\|_1
-\;\le\;\sqrt{\frac{c\,\beta_{T,N}}{N}}.
-\]
-Since $\bar\theta_k$ is frozen within $E_k$, this bound is constant across the epoch:
-\[
-\sum_{t\in E_k}\text{(A)}_t
-\;\le\;
-\frac{R_{\max}}{1-\gamma}\cdot c_{\mathrm{off}}^\star\sqrt{\frac{c\,\beta_{T,N}}{N}}\cdot|E_k|.
-\]
-Summing across epochs:
-\[
-\sum_{t=1}^T\text{(A)}_t
-\;\le\;
-\frac{c_{\mathrm{off}}^\star R_{\max}}{1-\gamma}\sqrt{\frac{c\,\beta_{T,N}}{N}}\cdot T.
-\]
-
-\emph{Term (B) and filter mismatch.}
-Identical to the proof of Theorem~\ref{thm:final_regret_bound}. The filter mismatch $\sum_t d_{\mathrm{model}}^{a_t}$ is bounded by $C_{\mathrm{mix}}\sqrt{c\beta_{T,N}}\sum_k\sqrt{|E_k|}=\widetilde O(\sqrt{T})$ via~\eqref{eq:dmodel_bound} (the online diagonal bound, which does not require coverage).
-
-\emph{Combining.}
-\[
-\mathrm{Reg}_T
-\;\le\;
-\frac{R_{\max}}{1-\gamma}\widetilde O(\sqrt{T})
-+\frac{c_{\mathrm{off}}^\star R_{\max}\sqrt{c\beta_{T,N}}}{1-\gamma}\cdot\frac{T}{\sqrt{N}}
-+\frac{C_{\mathrm{pf}}'R_{\max}T}{(1-\gamma)^2\sqrt{J}}
-+\frac{C_{\mathrm{mc}}R_{\max}T}{(1-\gamma)^2\sqrt{N_{\mathrm{mc}}}}
-+\frac{2\gamma^{d+1}}{(1-\gamma)^2}\sum_t\Xi_{\bar\theta_{k(t)}}.
-\]
-When $N\ge (c_{\mathrm{off}}^\star)^2\,T$, the second term is $O(\sqrt{T\beta_{T,N}}/(1-\gamma))=\widetilde O(\sqrt{T}/(1-\gamma))$, and the leading rate is $\widetilde O(\sqrt{T})$.
-\end{proof}
-
-%% ===================================================================
-\subsection{Variance Perspective on the QMDP Bias}
+\label{def:spc}
+\label{eq:coff_def}
+\label{prop:offline_regret}
+\label{eq:offline_regret}
+\label{eq:hist_l1_hybrid}
+\label{eq:A_single_policy}
 \label{app:variance_proofs}
-
-We provide a variance-based interpretation of the Jensen gap $\Xi_\theta$ defined in~\eqref{eq:Xi_def}. The key idea is that $\Xi_\theta$ is controlled by the curvature of the value function along a sufficient embedding and the posterior variance of the embedded features.
-
-\paragraph{Value-relevant embedding.}
-Let $g:\gS\to\R^k$ be a measurable embedding, and write
-\[
-m_g(b):=\E_{S\sim b}[g(S)],
-\qquad
-\Sigma_g(b):=\Cov_{S\sim b}\bigl(g(S)\bigr).
-\]
-
-\begin{aspt}[Value-relevant embedding]\label{aspt:value_embedding}
-There exist twice continuously differentiable maps $F_\theta^a:\R^k\to\R$ for each $a\in\gA$ such that
-$Q_\theta^{\star,S}(s,a)=F_\theta^a(g(s))$ for all $(s,a)\in\gS\times\gA$, with curvature bounds
-\[
-\sup_{a\in\gA}\sup_{x\in\mathrm{conv}(g(\gS))}\bigl\|\nabla^2 F_\theta^a(x)\bigr\|_{\mathrm{op}}\le L_\theta
-\qquad\text{and}\qquad
-\sup_{x\in\mathrm{conv}(g(\gS))}\bigl\|\nabla^2 F_\theta(x)\bigr\|_{\mathrm{op}}\le L_\theta,
-\]
-where $F_\theta(x):=\max_a F_\theta^a(x)$ and $V_\theta^{\star,S}(s)=F_\theta(g(s))$.
-\end{aspt}
-The second curvature condition on $F_\theta=\max_a F_\theta^a$ is a genuine assumption: $F_\theta$ is not $C^2$ at switching boundaries where the maximizing action changes. The bound~\eqref{eq:variance_xi_bound} uses $\|\nabla^2 F_\theta\|_{\mathrm{op}}\le L_\theta$ only for the upper bound on $\widetilde V_\theta^\star(b)$; the lower bound on $\bar V_\theta^{\star,S}(b)$ uses only the per-action bounds $\|\nabla^2 F_\theta^a\|_{\mathrm{op}}\le L_\theta$.
-
-% \begin{rmk}[Necessity of the $F_\theta$ curvature condition]
-% If only the per-action curvature bounds $\|\nabla^2 F_\theta^a\|_{\mathrm{op}}\le L_\theta$ are assumed (without requiring $F_\theta=\max_a F_\theta^a$ to be $C^2$), the Jensen gap satisfies the weaker bound
-% \[
-% \Xi_\theta(b)
-% \;\le\;
-% 2L_\theta\,\tr(\Sigma_g(b)) + C_\nabla\sqrt{\tr(\Sigma_g(b))},
-% \]
-% where $C_\nabla:=\max_{a\neq a'}\|\nabla F_\theta^a(m_g(b))-\nabla F_\theta^{a'}(m_g(b))\|$ captures the gradient heterogeneity across actions. The $O(\sqrt{\mathrm{variance}})$ first-order term arises because the expectation of the maximum of zero-mean linear functions, $\E_b[\max_a \nabla F_\theta^a(m)^\top(g(S)-m)]$, scales with the standard deviation $\sqrt{\tr(\Sigma_g(b))}$ rather than the variance. Consequently, the $C^2$ assumption on $F_\theta$ is necessary for the stated $O(\tr(\Sigma_g(b)))$ bound. It holds whenever a single action is globally optimal (so $F_\theta=F_\theta^{a^\star}$ is $C^2$), or when $V_\theta^{\star,S}$ is a smooth function of $s$ (e.g., quadratic in LQG).
-% \end{rmk}
-
-We first state an auxiliary lemma used in the proof of Proposition~\ref{prop:variance_qmdp_bias}.
-
-\begin{lem}[Mean-belief value approximation]\label{lem:mean_belief_value}
-Under Assumption~\ref{aspt:value_embedding}, for every belief $b\in\Delta(\gS)$,
-\begin{equation}
-\bigl|\bar V_\theta^{\star,S}(b)-F_\theta(m_g(b))\bigr|
-\;\le\;
-\frac{L_\theta}{2}\,\tr\bigl(\Sigma_g(b)\bigr).
+\label{aspt:value_embedding}
+\label{lem:mean_belief_value}
 \label{eq:mean_belief_approx}
-\end{equation}
-\end{lem}
-
-\begin{proof}
-By Jensen's inequality applied to the pointwise maximum,
-\[
-\bar V_\theta^{\star,S}(b)
-=\max_{a\in\gA}\int_{\gS}Q_\theta^{\star,S}(s,a)\,b(\mathrm ds)
-\;\le\;
-\int_{\gS}V_\theta^{\star,S}(s)\,b(\mathrm ds).
-\]
-By Assumption~\ref{aspt:value_embedding}, $V_\theta^{\star,S}(s)=F_\theta(g(s))$, so
-\begin{equation}
-\bar V_\theta^{\star,S}(b)
-\;\le\;
-\int_{\gS}F_\theta(g(s))\,b(\mathrm ds).
 \label{eq:upper_step1}
-\end{equation}
-Expand $F_\theta$ in a second-order Taylor expansion around $m_g(b)$.
-For each $s$, there exists $\xi_s\in\mathrm{conv}(g(\gS))$ on the segment between $m_g(b)$ and $g(s)$ such that
-\[
-F_\theta(g(s))
-=F_\theta(m_g(b))
-+\nabla F_\theta(m_g(b))^\top\!\bigl(g(s)-m_g(b)\bigr)
-+\tfrac{1}{2}\bigl(g(s)-m_g(b)\bigr)^\top\!\nabla^2 F_\theta(\xi_s)\,\bigl(g(s)-m_g(b)\bigr).
-\]
-Integrating against $b$ and using $\int_{\gS}(g(s)-m_g(b))\,b(\mathrm ds)=0$,
-\begin{equation}
-\int_{\gS}F_\theta(g(s))\,b(\mathrm ds)-F_\theta(m_g(b))
-=\tfrac{1}{2}\int_{\gS}\bigl(g(s)-m_g(b)\bigr)^\top\!\nabla^2 F_\theta(\xi_s)\,\bigl(g(s)-m_g(b)\bigr)\,b(\mathrm ds).
 \label{eq:taylor_remainder}
-\end{equation}
-Since $\|\nabla^2 F_\theta(\xi_s)\|_{\mathrm{op}}\le L_\theta$, each integrand is bounded in absolute value by $L_\theta\,\|g(s)-m_g(b)\|^2$,
-so \eqref{eq:taylor_remainder} lies in $[-\frac{L_\theta}{2}\,\tr(\Sigma_g(b)),\;\frac{L_\theta}{2}\,\tr(\Sigma_g(b))]$.
-Combined with~\eqref{eq:upper_step1}, we obtain the upper bound
-\begin{equation}
-\bar V_\theta^{\star,S}(b)\;\le\;F_\theta(m_g(b))+\tfrac{L_\theta}{2}\,\tr\bigl(\Sigma_g(b)\bigr).
 \label{eq:lemma_upper}
-\end{equation}
-For the lower bound, fix any $a\in\gA$. By Assumption~\ref{aspt:value_embedding}, $Q_\theta^{\star,S}(s,a)=F_\theta^a(g(s))$ with $\|\nabla^2 F_\theta^a\|_{\mathrm{op}}\le L_\theta$. The same Taylor expansion gives
-\[
-\int F_\theta^a(g(s))\,b(\mathrm ds)\;\ge\; F_\theta^a(m_g(b))-\tfrac{L_\theta}{2}\,\tr(\Sigma_g(b)).
-\]
-Taking $\max_a$:
-\begin{equation}
-\bar V_\theta^{\star,S}(b)=\max_a\int F_\theta^a(g(s))\,b(\mathrm ds)\;\ge\;\max_a F_\theta^a(m_g(b))-\tfrac{L_\theta}{2}\,\tr(\Sigma_g(b))=F_\theta(m_g(b))-\tfrac{L_\theta}{2}\,\tr(\Sigma_g(b)).\qedhere
 \label{eq:lemma_lower}
-\end{equation}
-\end{proof}
-
-\begin{rmk}
-The upper half~\eqref{eq:lemma_upper} follows from Jensen's inequality alone and is used to verify the hypothesis of Proposition~\ref{prop:variance_qmdp_bias} in concrete settings.
-\end{rmk}
-
-\begin{prop}[Curvature bound on $\Xi_\theta$]\label{prop:variance_qmdp_bias}
-Under Assumption~\ref{aspt:value_embedding}, for every belief $b\in\Delta(\gS)$,
-\begin{equation}
-\Xi_\theta(b)
-:=\widetilde V_\theta^{\star}(b)-\bar V_\theta^{\star,S}(b)
-\;\le\;
-L_\theta\,\tr\bigl(\Sigma_g(b)\bigr).
+\label{prop:variance_qmdp_bias}
 \label{eq:variance_xi_bound}
-\end{equation}
-In particular, $\Xi_\theta=\sup_b\Xi_\theta(b)\le L_\theta\sup_b\tr(\Sigma_g(b))$.
-\end{prop}
-
-\begin{proof}
-We bound $\Xi_\theta(b)=\widetilde V_\theta^\star(b)-\bar V_\theta^{\star,S}(b)$ for each belief $b$.
-
-\emph{Upper bound on $\widetilde V_\theta^\star(b)$.}
-By Assumption~\ref{aspt:value_embedding}, $V_\theta^{\star,S}(s)=F_\theta(g(s))$ where $F_\theta=\max_a F_\theta^a$ has curvature $\le L_\theta$.
-Applying the standard Taylor upper bound (as in Lemma~\ref{lem:mean_belief_value}) to $F_\theta$:
-\begin{equation}\label{eq:tV_upper}
-\widetilde V_\theta^\star(b)=\int F_\theta(g(s))\,b(\mathrm ds)\le F_\theta(m_g(b))+\frac{L_\theta}{2}\,\tr(\Sigma_g(b)).
-\end{equation}
-Since $F_\theta(m_g(b))=\max_a F_\theta^a(m_g(b))$, this gives $\widetilde V_\theta^\star(b)\le\max_a F_\theta^a(m_g(b))+\frac{L_\theta}{2}\tr(\Sigma_g(b))$.
-
-\emph{Lower bound on $\bar V_\theta^{\star,S}(b)$.}
-By Assumption~\ref{aspt:value_embedding}, $Q_\theta^{\star,S}(s,a)=F_\theta^a(g(s))$ for each $a$. For any fixed $a$,
-$$\int Q_\theta^{\star,S}(s,a)\,b(\mathrm ds)=\int F_\theta^a(g(s))\,b(\mathrm ds)\ge F_\theta^a(m_g(b))-\frac{L_\theta}{2}\tr(\Sigma_g(b)),$$
-where the inequality is the Taylor lower bound (each $F_\theta^a$ has curvature $\le L_\theta$).
-Taking the maximum over $a$:
-\[
-\bar V_\theta^{\star,S}(b)=\max_a\int F_\theta^a(g(s))\,b(\mathrm ds)\ge\max_a\Bigl[F_\theta^a(m_g(b))-\frac{L_\theta}{2}\tr(\Sigma_g(b))\Bigr]=\max_a F_\theta^a(m_g(b))-\frac{L_\theta}{2}\tr(\Sigma_g(b)).
-\]
-
-\emph{Combining.}
-$$\Xi_\theta(b)=\widetilde V_\theta^\star(b)-\bar V_\theta^{\star,S}(b)\le\bigl[\max_a F_\theta^a(m_g(b))+\frac{L_\theta}{2}\tr(\Sigma_g(b))\bigr]-\bigl[\max_a F_\theta^a(m_g(b))-\frac{L_\theta}{2}\tr(\Sigma_g(b))\bigr]=L_\theta\,\tr(\Sigma_g(b)).$$
-\end{proof}
-
-
-%% ===================================================================
-\subsection{Case Studies}
+\label{eq:tV_upper}
 \label{app:case_study_proofs}
-
-\textbf{Case 1: Discounted partially observed LQG.}
-Consider linear-Gaussian dynamics
-$S_{t+1}=\Phi S_t+\Gamma A_t+W_t$, $O_t=H S_t+\eta_t$,
-with $W_t\sim\gN(0,\Sigma_W)$, $\eta_t\sim\gN(0,\Sigma_\eta)$ i.i.d., quadratic reward $r(s,a)=-(s^\top Q_{\mathrm{c}} s+a^\top Ra)$, $Q_{\mathrm{c}}\succeq 0$, $R\succ 0$. Assume $(\Phi,\Gamma)$ is stabilizable and $(\Phi,H)$ is detectable. For LQG, we obtain the closed-form expression $\Xi_\theta =\tr\bigl((M-P)\,\bar\Sigma\bigr)$, where $P$ solve the Riccati equation, $M = Q_c + \gamma \Phi^{\top} P \Phi$, and $\bar \Sigma$ is the steady-state Kalman predictive covariance. When $\Gamma = 0$, we have $M = P$ and $\Xi_{\theta} = 0$. Note that for LQG, the QMDP policy is always optimal.
-
-\begin{cor}[LQG]\label{cor:lqg}
-Let $M:=Q_{\mathrm{c}}+\gamma\Phi^\top P\Phi$ where $P\succeq 0$ solves the discounted algebraic Riccati equation, and let $\bar\Sigma_{\mathrm{post}}$ be the steady-state Kalman posterior (filtered) covariance satisfying $\bar\Sigma_{\mathrm{post}}=\bar\Sigma - \bar\Sigma H^\top(H\bar\Sigma H^\top+\Sigma_\eta)^{-1}H\bar\Sigma$ with $\bar\Sigma:=\Phi\bar\Sigma_{\mathrm{post}}\Phi^\top+\Sigma_W$ the steady-state predictive covariance. Then
-$\Xi_\theta =\tr\bigl((M-P)\,\bar\Sigma\bigr)$ and the QMDP policy is belief-MDP optimal: $\sup_b\bigl[V_\theta^{\star,B}(b)-V_\theta^{\pi_{\mathrm{Q}},B}(b)\bigr]=0$.
-\end{cor}
-
-The QMDP action equals the certainty-equivalent LQR control $a=Km$, which is belief-MDP optimal by the separation principle.
-When $\Gamma=0$, the gives $M=P$, so $\Xi_\theta=0$: the QMDP value and the belief-MDP value coincide exactly. When $\Gamma\neq 0$, $M-P\succeq 0$ is generically nonzero, so $\Xi_\theta>0$; the QMDP \emph{policy} remains optimal, but the QMDP \emph{value} underestimates the belief-MDP value by $\tr((M-P)\bar\Sigma)$.
-
-\emph{Remark.} LQG has unbounded reward and $V_{\max}=\infty$, so it lies outside the standing assumption $|r(s,a)|\le R_{\max}$ of Theorem~\ref{thm:final_regret_bound}. The corollary illustrates the structural analysis (Jensen gap and policy optimality) but does not directly instantiate the regret bound.
-
-\textbf{Case 2: Identifiable contextual MDP.}
-Consider an episodic contextual MDP \cite{kausik2023learning} with a fixed latent context $C\in\gC$ sampled once per episode and Markov dynamics $S_{t+1}\sim P_c(\cdot\mid S_t,A_t)$, $r_t=r_c(S_t,A_t)$ given $C=c$. Assume
-(i) there exists an estimator $\widehat C_t=\widehat C_t(H_t)$ with $\PP(\widehat C_t\neq C)\le \rho_t$, $\rho_t\downarrow 0$; and
-(ii) $\sup_{c\in\gC}\|V_c^{\star,S}\|_\infty\le V_{\max}$.
-Then $\Xi_{\theta,t}\;\le\; 2V_{\max}\,\rho_t$ and $\sup_b\bigl[V_\theta^{\star,B}(b)-V_\theta^{\pi_{\mathrm{Q}},B}(b)\bigr]\;\le\;{4\gamma\, V_{\max}}\,\rho_t/{(1-\gamma)^2}$. As the context becomes identifiable ($\rho_t\to 0$), both the structural residual and the QMDP policy suboptimality vanish. For the structural bias term $\sum_t\Xi_t\le 2V_{\max}\sum_t\rho_t$ to be $o(\sqrt{T})$, we need $\sum_{t=1}^T\rho_t=o(\sqrt{T})$. 
-This result also suggests a schedule for the planning depth d that decays with $t$, reflecting diminishing structural bias.
-
-\paragraph{Proofs.}
-
-The fully observed value function is $V_\theta^{\star,S}(s)=-s^\top Ps-c_0$, where $P\succeq 0$ solves the discounted algebraic Riccati equation (DARE). The constant $c_0$ is determined by substituting into the Bellman equation: $$-s^\top Ps-c_0=\max_a\{r(s,a)+\gamma\E[V^{\star,S}(s')]\},$$ which gives $c_0=\gamma[\tr(P\Sigma_W)+c_0]$ from the noise covariance term, yielding $c_0=\gamma\tr(P\Sigma_W)/(1-\gamma)$.
-Hence
-\[
-Q_\theta^{\star,S}(s,a)
-=-(s^\top Q_{\mathrm{c}} s+a^\top Ra)
--\gamma(\Phi s+\Gamma a)^\top P(\Phi s+\Gamma a)
--\gamma\tr(P\Sigma_W)-\gamma c_0.
-\]
-For belief $b=\gN(m,\Sigma)$,
-\[
-\int Q_\theta^{\star,S}(s,a)\,b(\mathrm ds)
-=-m^\top Q_{\mathrm{c}} m - a^\top R a
--\gamma(\Phi m+\Gamma a)^\top P(\Phi m+\Gamma a)
--\tr(M\Sigma)-\gamma\tr(P\Sigma_W)-\gamma c_0,
-\]
-where $M:=Q_{\mathrm{c}}+\gamma\Phi^\top P\Phi$.
-All $\Sigma$-dependent terms are independent of $a$, so the QMDP action is
-\[
-\arg\max_a \int Q_\theta^{\star,S}(s,a)\,b(\mathrm ds)
-=\arg\max_a\bigl\{-a^\top Ra-\gamma(\Phi m+\Gamma a)^\top P(\Phi m+\Gamma a)\bigr\}
-=Km,
-\]
-with $$K=-\gamma(R+\gamma\Gamma^\top P\Gamma)^{-1}\Gamma^\top P\Phi.$$
-By the separation principle for discounted LQG (stabilizable/detectable), the belief-MDP optimal action is also $Km$, so QMDP and belief-optimal policies coincide. This gives part~2.
-
-\emph{Structural residual.}
-We compute $\Xi_\theta(b)=\widetilde V_\theta^\star(b)-\bar V_\theta^{\star,S}(b)$ directly.
-From the expansion above, $$\bar V_\theta^{\star,S}(b)=-m^\top Pm-\tr(M\Sigma)-c_0.$$
-Meanwhile, $$\widetilde V_\theta^\star(b)=\int V_\theta^{\star,S}(s)\,b(\mathrm ds)=\int(-s^\top Ps-c_0)\,b(\mathrm ds)=-m^\top Pm-\tr(P\Sigma)-c_0.$$
-Therefore $\Xi_\theta(b)=\tr((M-P)\Sigma)$.
-Since $$M-P=\gamma^2\Phi^\top P\Gamma(R+\gamma\Gamma^\top P\Gamma)^{-1}\Gamma^\top P\Phi\succeq 0,$$ this is nonnegative.
-Taking the supremum over beliefs generated by the stationary Kalman filter yields $$\Xi_\theta\le\tr((M-P)\bar\Sigma),$$ where $\bar\Sigma$ is the steady-state Kalman predictive covariance.
-
-When $\Gamma=0$, the DARE gives $M=P$, so $\Xi_\theta=0$.
-
-\emph{Structural residual (part~1).}
-Let $\mu_t(\cdot):=\PP(C=\cdot\mid H_t)$ be the posterior on context and $c^\star$ the true context.
-By the definition of the Bayes classifier $$\hat C_t^{\mathrm{MAP}}=\arg\max_c\mu_t(c),$$
-we have that
-$$\E[1-\max_c\mu_t(c)]\le \PP(\widehat C_t\neq C)\le \rho_t.$$
-For any bounded $f:\gC\to[-V_{\max},V_{\max}]$, let $c_t^{\mathrm{MAP}}=\arg\max_c\mu_t(c)$. Then
-$$\bigl|\sum_c \mu_t(c)f(c)-f(c_t^{\mathrm{MAP}})\bigr|\le 2V_{\max}(1-\max_c\mu_t(c)),$$
-since the total posterior mass on contexts other than $c_t^{\mathrm{MAP}}$ is $1-\max_c\mu_t(c)$.
-The structural residual is bounded directly (without the triangle inequality):
-\begin{align*}
-\Xi_{\theta,t}(b)
-&= \sum_c\mu_t(c)\max_a Q_c^{\star,S}(s,a) - \max_a\sum_c\mu_t(c)Q_c^{\star,S}(s,a) \\
-&\le \sum_c\mu_t(c)\max_a Q_c^{\star,S}(s,a) - \sum_c\mu_t(c)Q_c^{\star,S}(s,a_{c_t^{\mathrm{MAP}}}^\star) \\
-&= \sum_{c\neq c_t^{\mathrm{MAP}}}\mu_t(c)\bigl[\max_a Q_c^{\star,S}(s,a)-Q_c^{\star,S}(s,a_{c_t^{\mathrm{MAP}}}^\star)\bigr] \\
-&\le \sum_{c\neq c_t^{\mathrm{MAP}}}\mu_t(c)\cdot 2V_{\max}
-\;=\; 2V_{\max}(1-\max_c\mu_t(c)),
-\end{align*}
-where $a_{c_t^{\mathrm{MAP}}}^\star:=\arg\max_a Q_{c_t^{\mathrm{MAP}}}^{\star,S}(s,a)$ and the first inequality uses $$\max_a\sum_c\mu_t(c)Q_c(s,a)\ge\sum_c\mu_t(c)Q_c(s,a_{c_t^{\mathrm{MAP}}}^\star),$$
-Taking expectations yields $$\E[\Xi_{\theta,t}]\le 2V_{\max}\E[1-\max_c\mu_t(c)]\le 2V_{\max}\rho_t.$$
-
-\emph{Policy suboptimality (part~2).}
-From Proposition~\ref{prop:structural_error}, $$\|Q_\theta^{\star,B}-Q_{\theta,0}\|_\infty\le\frac{\gamma}{1-\gamma}\Xi_{\theta,t}.$$
-For any belief $b$, let $$a^\star=\arg\max_a Q_\theta^{\star,B}(b,a), \qquad a_{\mathrm{Q}}=\pi_{\mathrm{Q}}(b).$$ Then
-$$Q_\theta^{\star,B}(b,a^\star)-Q_\theta^{\star,B}(b,a_{\mathrm{Q}})
-\le 2\|Q_\theta^{\star,B}-Q_{\theta,0}\|_\infty
-\le \frac{2\gamma}{1-\gamma}\Xi_{\theta,t},$$
-where the first inequality uses $$a_{\mathrm{Q}}=\arg\max_a Q_{\theta,0}(b,a).$$
-By standard policy-loss arguments (telescoping the per-step suboptimality),
-$$\sup_b[V_\theta^{\star,B}(b)-V_\theta^{\pi_{\mathrm{Q}},B}(b)]
-\le \frac{1}{1-\gamma}\cdot\frac{2\gamma}{1-\gamma}\Xi_{\theta,t}
-\le \frac{4\gamma V_{\max}}{(1-\gamma)^2}\rho_t.$$
-
-
-
-
-\begin{aigenblock}
-\section{Additional Empirical Validation and Camera-Ready Ablations}
+\label{cor:lqg}
 \label{sec:app08-validation-details}
-
-\subsection{Regret Decomposition Audit and Scaling Laws}
-In the Doeblin-mixing Tiger audit of Section~\ref{sec:validation}, the online maximum likelihood estimation run achieves total-variation model error scaling as $n^{-0.55}$ and optimistic bonus decay $\varepsilon_{\mathrm{opt}} \propto n^{-0.59}$ down to a known-model numerical floor of $1.3 \times 10^{-4}$. Across POMDP instances with multi-step information gap $\Xi \in [0.20, 0.40]$, the structural planning error contracts geometrically at rate $\gamma = 0.80$ inside the envelope predicted by Proposition~\ref{prop:variance_qmdp_bias_main} (Figure~\ref{fig:ch08_bound_scaling}).
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\linewidth]{figures/ch08/Figures/bound_scaling.pdf}
-    \caption{\aigen{Online MLE estimation error scaling and structural depth contraction across varying information gaps $\Xi \in [0.20, 0.40]$.}}
-    \label{fig:ch08_bound_scaling}
-\end{figure}
-
-\subsection{Controlled Stress Tests of Theoretical Assumptions}
+\label{fig:ch08_bound_scaling}
 \label{sec:app08-stress-tests}
-
-Figure~\ref{fig:ch08_stress_tests} and Tables~\ref{tab:ch08_active_sensing}--\ref{tab:ch08_box_search} examine two diagnostic environments designed to stress-test the bounded measurement density assumption ($g_{\min} > 0$) and the shallow QMDP leaf approximation ($d \in \{0,1\}$):
-\begin{enumerate}
-    \item \textbf{Light--Dark active sensing (structural depth $d$):} When an agent must first take an unrewarded sensing action before committing to a terminal prediction, depth $d \in \{0,1\}$ QMDP planning cannot value the multi-step information gain and achieves a flat normalized return of $0.500$, whereas belief-tree planning at depths $d \in \{2,3\}$ recovers near-optimal return across sensor accuracies (Table~\ref{tab:ch08_active_sensing}).
-    \item \textbf{$K=32$ box search with $g_{\min}=0$ (particle filter support collapse):} When observations deterministically rule out hypotheses ($g_{\min}=0$), a finite-$J$ particle filter suffers support collapse with probability $(1 - 1/K)^J$, matching the empirical collapse frequencies in Table~\ref{tab:ch08_box_search}.
-\end{enumerate}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\linewidth]{figures/ch08/Figures/assumption_stress_tests.pdf}
-    \caption{\aigen{Controlled stress tests of planning depth $d$ under active sensing (left) and particle support collapse when $g_{\min}=0$ in $K=32$ box search (right).}}
-    \label{fig:ch08_stress_tests}
-\end{figure}
-
-\begin{table}[htbp]
-\centering
-\caption{\aigen{Normalized return on the active-sensing POMDP as a function of sensor accuracy and belief-tree depth $d$.}}
+\label{fig:ch08_stress_tests}
 \label{tab:ch08_active_sensing}
-\small
-\begin{tabular}{lcccc}
-\toprule
-Sensor Accuracy & QMDP ($d = 0, 1$) & Depth $d = 2$ & Depth $d = 3$ & Exact Belief Optimum \\
-\midrule
-0.55 & 0.500 & 0.500 & 0.500 & 0.500 \\
-0.75 & 0.500 & 0.500 & 0.641 & 0.643 \\
-0.85 & 0.500 & 0.717 & 0.717 & 0.722 \\
-0.95 & 0.500 & 0.793 & 0.794 & 0.798 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[htbp]
-\centering
-\caption{\aigen{Empirical versus analytic particle support collapse rate $(1 - 1/K)^J$ in $K=32$ box search with $g_{\min}=0$.}}
 \label{tab:ch08_box_search}
-\small
-\begin{tabular}{lccccc}
-\toprule
-Particle Count $J$ & 8 & 16 & 32 & 64 & 128 \\
-\midrule
-Empirical collapse rate & 0.773 & 0.602 & 0.360 & 0.128 & 0.017 \\
-Analytic $(1 - 1/K)^J$ & 0.776 & 0.602 & 0.362 & 0.131 & 0.017 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Comparison of Belief-Tree Planners at Depth $d > 0$}
 \label{sec:app08-planner-comparison}
-
-Table~\ref{tab:ch08_planner_comp} compares uniform-exploration and UCB1 variants of Algorithm~\ref{alg:mctq} against POMCP and Sparse-PFT on the active-sensing POMDP ($\gamma = 0.9$, exact belief optimum $7.45 \pm 0.20$, exact QMDP policy return $5.54 \pm 0.32$, $40$ episodes $\times 3$ seeds sharing a $256$-particle root belief). Moving from $d \in \{0,1\}$ to $d=2$ yields the primary jump in return predicted by Proposition~\ref{prop:variance_qmdp_bias_main}, and UCB1 allocation improves upon uniform allocation at matched simulator call budgets.
-
-\begin{table}[htbp]
-\centering
-\caption{\aigen{Finite-depth belief-tree planner comparison on the active-sensing POMDP ($\gamma=0.9$).}}
 \label{tab:ch08_planner_comp}
-\small
-\begin{tabular}{llrr}
-\toprule
-Planner & Depth $d$ & Simulator Calls / Decision & Return ($\text{mean} \pm \text{s.e.}$) \\
-\midrule
-Algorithm~\ref{alg:mctq} (uniform) & 0 & 0 & $5.04 \pm 0.11$ \\
-Algorithm~\ref{alg:mctq} (uniform = UCB1) & 1 & 768 & $5.06 \pm 0.13$ \\
-POMCP & -- & 768 / 3072 & $5.47$ / $5.52$ \\
-Algorithm~\ref{alg:mctq} (uniform) & 2 & 1536 & $6.37 \pm 0.27$ \\
-Algorithm~\ref{alg:mctq} (UCB1) & 2 & 1536 & $6.96 \pm 0.11$ \\
-Sparse-PFT ($J=64$) & 2 & 2688 & $7.18 \pm 0.08$ \\
-Algorithm~\ref{alg:mctq} (uniform) & 2 & 6144 & $7.30 \pm 0.12$ \\
-Algorithm~\ref{alg:mctq} (uniform / UCB1) & 3 & 2304 & $5.69$ / $6.74$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Full-Horizon MuJoCo Ant Stability Ablation}
 \label{sec:app08-ant-full}
+\label{fig:ch08_ant_full}
 
-Figure~\ref{fig:ch08_ant_full} displays the full-horizon $49.2\text{k}$-step Ant training trajectories across update-to-data (UTD) and regularization configurations, contrasting the initial high-UTD configuration against the stabilized configuration reported in Section~\ref{ch08:sec:experiments}.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\linewidth]{figures/ch08/Figures/ant_full_horizon.pdf}
-    \caption{\aigen{Full-horizon $49.2\text{k}$-step MuJoCo Ant stability ablation comparing the initial high-UTD configuration against the stabilized configuration under hidden position and hidden velocity.}}
-    \label{fig:ch08_ant_full}
-\end{figure}
-\end{aigenblock}
+\aigen{The greedy-exploitation regret analysis under offline single-policy concentrability (Proposition~\ref{prop:offline_regret}), the posterior-variance curvature bound on the QMDP leaf value bias (Proposition~\ref{prop:variance_qmdp_bias}), the closed-form LQG and contextual MDP case studies (Corollary~\ref{cor:lqg}), and the empirical regret-decomposition audits, stress tests, and depth-$d$ planner ablations appear in Appendices~D.7--D.9 and~E of \citet{tan2026pomdp}.}
