@@ -1,23 +1,10 @@
-\chapter{STATISTICALLY AND COMPUTATIONALLY EFFICIENT ACTOR--CRITIC METHODS}
+\chapter{STATISTICALLY EFFICIENT ACTOR--CRITIC METHODS}
 \label{ch:actor-critic}
 
-\aigen{\emph{This chapter is based on joint work with Wei Fan and Yuting Wei \citep{tan2025actor} (Part~I: Kevin Tan, Wei Fan, and Yuting Wei, ``Actor-Critics Can Achieve Optimal Sample Efficiency,'' in Proceedings of the 42nd International Conference on Machine Learning (ICML), PMLR 267, 2025) and joint work with Max Qiushi Lin, Reza Asad, Haque Ishfaq, Csaba Szepesv\'ari, and Sharan Vaswani \citep{lin2026parametric} (Part~II: Max Qiushi Lin, Reza Asad, Kevin Tan, Haque Ishfaq, Csaba Szepesv\'ari, and Sharan Vaswani, ``Optimistic Actor-Critic with Parametric Policies for Linear Markov Decision Processes,'' in Proceedings of the 29th International Conference on Artificial Intelligence and Statistics (AISTATS), PMLR 300, 2026).}}
+\aigen{\emph{This chapter is based on joint work with Wei Fan and Yuting Wei \citep{tan2025actor}: Kevin Tan, Wei Fan, and Yuting Wei, ``Actor-Critics Can Achieve Optimal Sample Efficiency, in Proceedings of the 42nd International Conference on Machine Learning (ICML), PMLR 267, 2025. The dissertation author carried out the problem formulation, algorithm design, experiments, and writing, with the theoretical analysis and proofs developed jointly with Wei Fan.}}
 
-\todoresolve{CHAPTER 4 COMBINES TWO ACTOR-CRITIC PAPERS: PART I (TAN, FAN, AND WEI, ICML 2025) AND PART II (LIN, ASAD, TAN, ISHFAQ, SZEPESVARI, AND VASWANI, AISTATS 2026).}
-
-\begin{aigenblock}
-Chapters~\ref{ch:hybrid-rl} and \ref{ch:latent-bandits} studied how offline datasets reduce the statistical complexity of value-based and bandit learning. In practice, however, many reinforcement learning systems maintain an explicit policy (an \emph{actor}) updated by policy-gradient or mirror-descent steps alongside a value estimator (a \emph{critic}). This chapter investigates both the \emph{statistical} and \emph{computational} efficiency of actor--critic methods in two parts:
-\begin{enumerate}
-    \item \textbf{Part~I (Section~\ref{sec:ch04-part1}): Achieving optimal sample efficiency with general function approximation.} Standard online actor--critic methods update the critic at every step to track $Q^{\pi^{(t)}}$, which causes the log-covering number of the induced policy class $\Pi_T$ to grow linearly with the number of episodes $T$ unless the policy cover happens to remain small (Algorithm~\ref{alg:DOUHUA}). We resolve this fundamental statistical obstacle in Algorithm~\ref{alg:NORA} by designing a rare-switching optimistic critic that targets the optimal action-value function $Q^\star$ directly and resets the actor to the uniform distribution whenever the critic switches, achieving minimax-optimal $\widetilde O(\sqrt{d_{\mathrm{BE}} H^3 T})$ regret without policy completeness.
-    \item \textbf{Part~II (Section~\ref{sec:ch04-part2}): Achieving constant per-step policy evaluation complexity with parametric policies.} Even when the critic switches rarely, non-parametric mirror-descent actors sum over all historical critic estimates at deployment time, incurring $O(t)$ per-step action-selection cost at episode $t$. In Part~II, we maintain an explicitly parameterized log-linear policy updated via weighted least-squares logit matching on a $G$-optimal experimental design coreset (Algorithm~\ref{alg:actor_npg}), paired with a computationally tractable Langevin Monte Carlo optimistic critic (Algorithm~\ref{alg:lmc}) inside an optimistic parametric actor--critic loop (Algorithm~\ref{alg:optimistic_actor_critic}).
-\end{enumerate}
-All proofs and supplementary experimental details for both parts of this chapter are provided in Appendix~\ref{app:actor-critic}.
-\end{aigenblock}
-
-\section{Part I: Optimal Sample Efficiency via Rare-Switching Optimistic Actor--Critics}
-\label{sec:ch04-part1}
-\subsection{Introduction}
-% \subsubsection{Background and motivation}
+\section{Introduction}
+% \section{Background and motivation}
 % Problems with Zhou:
 % \begin{enumerate}
 %     \item Requirement of Monte Carlo rollouts and sampling on-policy at each policy evaluation iteration. Why can't you just minimize error under some buffer? 
@@ -110,7 +97,7 @@ However, the problem is unresolved with general function approximation -- the be
 
 
 
-\subsubsection{Contributions of Part I}
+\section{Contributions of Part I}
 We resolve this open problem in the affirmative. As a warm-up, we first consider an easy case -- where the complexity of the class of policies considered by the policy optimization procedure does not increase exponentially with the number of (critic) updates.\footnote{It was previously considered in \citet{zhong2023theoretical} that the log-covering number of the policy class increases in the number of actor and critic updates.  
 We sharpen this bound to the number of critic updates in Lemma \ref{lem:b2-covering-number-policy}, which may be of independent interest.} Then, a simple modification to the GOLF algorithm of \citet{jin2021bellmaneluder} (Algorithm~\ref{alg:DOUHUA} in Section~\ref{sec:douhua-easy}) allows one to achieve a regret of $\sqrt{H^4\log|\gA|T} + \sqrt{dH^4 \log|\gF| \;T}$,
 in line with the results of \citet{efroni2020optimisticpolicyoptimizationbandit, cai2020provably} for tabular and linear mixture MDPs respectively.
@@ -125,7 +112,7 @@ However, this is not the case in many practical scenarios -- for example, where 
 
 %and accompanying resets can be seen theoretically as bypassing the issue of covering a prohibitively large policy space raised by \citet{zhong2023theoretical, liu2023optimistic}, and practically as choosing batch sizes adaptively to balance the frequency and noisiness of gradient updates.  and to alleviate a technical issue with regard to the rare-switching critic updates that elaborate on later. 
 
-\subsubsection{Extensions to hybrid RL}
+\section{Extensions to hybrid RL}
 
 \citet{zhou2023offline} use both offline and online data to bypass the need to perform strategic exploration in policy optimization. This corresponds to the setting of hybrid RL \citep{nakamoto2023calql, amortila2024harnessing, ren2024hybrid, wagenmaker2023leveraging}, where \citet{song2023hybrid} show that using both offline and online data allows one to achieve $\sqrt{T}$ regret without optimism. However, the claimed $\sqrt{T}$ regret bound in \citet{zhou2023offline} requires on-policy sampling of $O(T)$ samples per timestep that does not contribute to the regret, leading to a sample complexity of $1/\epsilon^6$. Their algorithm cannot achieve sublinear regret in the more common setup where each sample contributes to the regret. Furthermore, they require bounded occupancy measure ratios of the optimal policy to \textit{any} policy.
 
@@ -146,7 +133,7 @@ algorithm that only additionally requires $N_{\off} \geq c_{\off}^*(\gF,\Pi)dH^4
 $o(g(n))$ denotes the same, except that the inequality $0 \leq f(n) < C\cdot g(n)$ is strict, and so grows strictly slower than $g(n)$ asymptotically. $\Omega(g(n))$ involves the inequality $0 \leq C\cdot g(n) \leq f(n)$, and so denotes the set of functions $f(n)$ that grow at least as fast as $g(n)$. Finally, $\Theta(g(n))$ denotes the set of functions that are both $O(g(n))$ and $\Omega(g(n))$.
 
 
-\subsection{Problem setting}
+\section{Problem setting}
 \label{sec:ch04-part1-prelim}
 
 
@@ -242,7 +229,7 @@ As mirror ascent, this update is identical to the multiplicative weights or Hedg
 
 % \vspace{-2ex}
 
-\subsection{Optimistic actor-critics -- The easy case}
+\section{Optimistic actor-critics -- The easy case}
 \label{sec:douhua-easy}
 We now present an optimistic actor-critic algorithm, \aigen{Algorithm~\ref{alg:DOUHUA}}, with provable guarantees under general function approximation. \aigen{Algorithm~\ref{alg:DOUHUA}} is a natural derivative of the GOLF algorithm of \citet{jin2021bellmaneluder} for actor-critic approaches\footnote{Or a completely off-policy version of \citet{liu2023optimistic}.}, with only two (very natural) changes. The critic targets $Q^{\pi^{(t)}}$ instead of $Q^*$ while performing optimistic planning at every $s,a$ pair, and we maintain a stochastic policy that is updated with Equation \ref{eqn:multiplicative-weights-update}. Learning an optimistic critic off-policy achieves sample efficiency by reusing data while exploring efficiently.\footnote{Similarly to \citet{cai2020provably} in linear mixture MDPs.}
 
@@ -357,12 +344,12 @@ However, closure under truncated sums is a strong condition that is not fulfille
 
 This prompts us to explore the possibility of algorithmic modifications to Algorithm \ref{alg:DOUHUA} in order to achieve the optimal regret rates in more general settings where the log-covering number of the policy class may increase linearly in the number of critic updates. We do so in the next section.
 
-\subsection{Optimistic actor-critics -- The hard case}
+\section{Optimistic actor-critics -- The hard case}
 \label{sec:nora-hard}
 
 Given what we have seen in our analysis of Algorithm \ref{alg:DOUHUA}, can we simply modify Algorithm \ref{alg:DOUHUA} to include rare-switching critic updates? If we can perform only $O(dH\log T)$ critic updates as in \cite{xiong2023generalframeworksequentialdecisionmaking}, perhaps it may be possible to obtain a similar regret bound to Corollary \ref{cor:good-case-douhua}. 
 
-\subsubsection{Challenges and algorithm design} 
+\section{Challenges and algorithm design} 
 
 
 
@@ -424,7 +411,7 @@ Lastly, we increase the learning rate to reduce the regret incurred by the polic
 % That is, we update the critic when the cumulative temporal difference (TD) loss exceeds a certain threshold. If we used the TD loss with respect to the current policy, large changes in the policy may cause correspondingly large changes in the TD loss, 
 
 
-\subsubsection{Regret bound for rare-switching optimistic actor-critic}
+\section{Regret bound for rare-switching optimistic actor-critic}
 
 
 To control the switching cost with the framework of \citet{xiong2023generalframeworksequentialdecisionmaking}, we concern ourselves with function classes of low $D_\Delta$-type Bellman Eluder dimension \citep{jin2021bellmaneluder}:
@@ -551,7 +538,7 @@ It is known that the Bellman eluder dimension may scale unfavorably with $T$ in 
 \end{cor}
 
 
-\subsubsection{Connections to deep actor-critic methods}
+\section{Connections to deep actor-critic methods}
 
 
 \paragraph{Targeting $Q^*$.} We are not the only ones who consider a critic that targets $Q^*$ instead of $Q^{\pi^{(t)}}$. By way of illustration, \citet{crites1994actorcriticqlearning} propose an actor-critic algorithm that mimics Q-learning via a critic that targets $Q^*$. Another example is the popular DDPG algorithm \citep{lillicrap2015continuous} and its successor, TD3 \citep{fujimoto2018addressing}, that take turns to update an approximately greedy deterministic policy that approximately maximizes an estimate of the approximately greedy deterministic policy's Q-function (and so approximately targets $Q^*$), while performing stochastic exploration that tracks the deterministic policy over time. 
@@ -566,7 +553,7 @@ It is known that the Bellman eluder dimension may scale unfavorably with $T$ in 
 while exploring according to a stochastic exploration policy that tracks the deterministic policy. In practice, the exploration policy $\pi_{\text{exp}}^{(t)}(a|s) \propto \mathbbm{1}(a = g^{(t)}(s)) + \gN_t$ is often given by the deterministic function perturbed by Gaussian noise. The critic is optimized according to slowly updating targets approximating the actor and critic from a few steps ago -- in a manner reminiscent of the rare-switching critic update in Algorithm \ref{alg:NORA}. As the deterministic policy approximates the greedy policy, and the approximately greedy policy is used when computing TD error targets, the DDPG critic approximately targets $Q^*$. This suggests that DDPG and its successor TD3 \citep{fujimoto2018addressing} may be useful backbones for adapting algorithmic insights garnered from the design and analysis of Algorithm \ref{alg:NORA} for practical RL.\footnote{This provides insight on why DDPG/TD3 are more sample-efficient than on-policy PPO. Algorithm \ref{alg:NORA} needs $1/\epsilon^2$ samples, while on-policy sampling needs at least $1/\epsilon^4$ \citep{liu2023optimistic}} 
 
 
-\subsection{Extension to hybrid RL}
+\section{Extension to hybrid RL}
 \label{sec:hybrid-rl}
 
 In this section, we demonstrate that the benefits of having access to both offline and online data are two-fold with actor-critic algorithms. With optimism, actor-critic algorithms achieve sample efficiency gains. However, if one does not wish to use an optimistic algorithm (as optimism is difficult to implement in practice with deep function approximation), having access to offline data allows one to omit the use of optimism, achieving computational efficiency gains \citep[e.g.,][]{jin2021pessimism, li2024settling, rashidinejad2021bridging}. 
@@ -587,7 +574,7 @@ In this section, we demonstrate that the benefits of having access to both offli
 %     \label{defn:single-policy-concentrability}
 % \end{defn}
 
-\subsubsection{Computational efficiency through optimism-free hybrid RL}
+\section{Computational efficiency through optimism-free hybrid RL}
 
 The benefits of hybrid RL extend beyond sample efficiency gains. \citet{song2023hybrid, amortila2024harnessing, zhou2023offline} show that it is possible for a hybrid RL algorithm to bypass the need for optimism altogether, as long as the offline dataset achieves sufficient coverage. In this spirit, we provide \aigen{two non-optimistic hybrid actor-critic variants} in Algorithms \ref{alg:NOAH-pi} and \ref{alg:NOAH-star} that achieve $\sqrt{T}$ regret without using optimism. Algorithm \ref{alg:NOAH-pi} targets $\pi^{(t)}$, and follows the very natural procedure of performing a critic update via Fitted Q-Evaluation (FQE) \citep{munos2008finite} and an actor update in every episode. It therefore requires closure of the critic function class under truncated sums as in Definition \ref{defn:closure-truncated-sums} to control the growth of the policy class as in Lemma \ref{lem:policy-class-growth-sums}. Algorithm \ref{alg:NOAH-star}, like \aigen{Algorithm~\ref{alg:NORA}}, circumvents this by targeting $\pi^*$ and performing a rare-switching critic update. Both algorithms are fully off-policy, utilizing offline data and all collected online data without throwing any away. 
 
@@ -681,7 +668,7 @@ Still, our result shows that the provable efficiency achieved without optimism b
 
 
 
-\subsubsection{Sample efficiency gains with hybrid RL}
+\section{Sample efficiency gains with hybrid RL}
 We now extend Algorithm \ref{alg:NORA} to leverage both offline and online data, which aligns with the framework of \citet{tan2024natural}. The extension, found in Algorithm \ref{alg:NORA-long}, appends $N_{\off}$ offline samples to the online data at rounds $t=1,...,T$ and minimizes the TD error over the combined dataset when constructing the confidence sets. 
 
 \begin{algorithm}[h]
@@ -748,7 +735,7 @@ by \citet{li2023reward, tan2024hybrid}.
 This guarantee in Theorem \ref{thm:hybrid-nora-regret_bound} for Algorithm \ref{alg:NORA-long} is stronger than the result in Theorem \ref{thm:hybrid-noah-star} for Algorithm \ref{alg:NOAH-star}. As mentioned earlier, if the offline data is plentiful and enjoys good coverage, the regret in Theorem \ref{thm:hybrid-nora-regret_bound} primarily comes from the $\sqrt{dH^5 T \log|\gA|}$ cost of optimizing the actor as $\mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)$ is small if $\gX_{\on}$ is small.\footnote{Which can possibly be mitigated as well by performing offline policy optimization.} On the other hand, Algorithm \ref{alg:NOAH-star} incurs a term depending on $\mathsf{SEC}(\gF, \Pi, T)$, which can be much larger than $\mathsf{SEC}(\gF \mathbbm{1}_{\gX_{\on}}, \Pi, T)$.
 
 
-% \subsection{Linear Function Approximation}
+% \section{Linear Function Approximation}
 
 
 % \begin{algorithm}[H]
@@ -776,7 +763,7 @@ This guarantee in Theorem \ref{thm:hybrid-nora-regret_bound} for Algorithm \ref{
 
 
 
-% \subsubsection{Linear MDPs}
+% \section{Linear MDPs}
 
 
 
@@ -822,7 +809,7 @@ This guarantee in Theorem \ref{thm:hybrid-nora-regret_bound} for Algorithm \ref{
 
 
 
-% \subsubsection{Computationally Tractable Deep Optimism with the Neural Tangent Kernel}
+% \section{Computationally Tractable Deep Optimism with the Neural Tangent Kernel}
 
 % \yutingcomment{maybe state NTK only as extension/corollary}
 
@@ -874,7 +861,7 @@ This guarantee in Theorem \ref{thm:hybrid-nora-regret_bound} for Algorithm \ref{
 %     $$\sum_{t=1}^T \E_{\pi^*}\left[\left\langle Q_{t,h}(s_h,\cdot), \pi_h^*(\cdot \mid s_h) - \pi_h^{(t)}(\cdot \mid s_h) \right\rangle\right] \lesssim \sqrt{T \cdot \text{OPT}(H,\gA)}.$$
 % \end{aspt}
 
-\subsection{Numerical experiments}
+\section{Numerical experiments}
 
 % \kevin{Experiments: 1. Fork Cal-QL repo, show that additional policy optimization achieves similar regret. Do so via MWU update on discrete action space. 2. Implement optimism, and show that rare-switching, $\pi^*$-targeting actor-critics are efficient. Compare with optimistic, off-policy, $\pi^{(t)}$-targeting actor-critics and other benchmarks. 3. Do everything in linear MDPs with LSVI-UCB++.}
 
@@ -912,7 +899,7 @@ Algorithm~2H outperforms Cal-QL, which in turn slightly outperforms Algorithm~1H
     \label{fig:average-return}
 \end{figure}
 
-\subsection{Conclusions and future work}
+\section{Conclusions and future work}
 
 To conclude, we resolve an open problem in the online RL literature by designing an actor-critic method, \aigen{Algorithm~\ref{alg:NORA}}, with general function approximation that achieves $1/\epsilon^2$ (and matching $\sqrt{T}$ regret) without making any reachability or coverage assumptions. This was achieved through several key ingredients in the algorithm design. By (1) performing optimistic exploration, (2) learning a critic off-policy without throwing away any data, (3) having the critic target $Q^*$ instead of $Q^{\pi^{(t)}}$ to ensure sufficient optimism and enable rare-switching critic updates, and (4) performing policy resets to control the deviation of the current policy from the greedy policy, we achieve the desired result in Theorem \ref{thm:nora-regret_bound}.
 
@@ -928,394 +915,3 @@ Lastly, adapting the work of \citet{he2023nearly} to see if policy optimization 
 % This is because updating the base function class every episode allows one to get past the moving target issue in targeting $Q^{\pi^{(t)}}$, while achieving sufficient optimism from the rare-switching bonuses. However, their techniques and analyses do not readily extend to general function approximation. Shrinking features does not necessarily shrink the Q-functions, for example. While reward-agnostic exploration is possible \citep{xie2022role}, it is unclear how to use this to avoid truncation, or employing rare-switching updates for bonuses, without involving an assumption on the structure of the bonuses. We suggest that the framework of \citet{zhao2023nearlyoptimallowswitchingalgorithm} provides a potential way forward, but leave this for future work. 
 
 % Adapting the work of \citet{he2023nearly} to see if policy optimization can be (close to) minimax-optimal in linear MDPs is an appealing idea. However, in attempting to do so, we encountered a fundamental barrier. \citet{he2023nearly} require a monotonically decreasing Q-function estimate for technical reasons. This is not an issue when the target is $Q^*$ across all episodes, but becomes an issue when the target is $Q^{\pi^{(t)}}$, a moving target. When the policy is poor, and the Q-function is correctly estimated, enforcing the monotonicity constraint will render Q-function estimates for subsequent episodes wildly inaccurate. Resolving this technical issue would be a welcome contribution to the literature. 
-
-
-
-
-\section{Part II: Computationally Efficient Parametric Actor--Critic via Projected Natural Policy Gradient}
-\label{sec:ch04-part2}
-
-\begin{aigenblock}
-While Part~I resolved the statistical sample-efficiency barrier for actor--critic algorithms under general function approximation by combining rare-switching $Q^\star$ critics with actor resets, the resulting actor policies are represented implicitly as Boltzmann distributions over cumulative historical critic estimates. Evaluating $\pi^{(t)}(\cdot \mid s)$ when the critic does not reset (or across long inner mirror-descent loops) requires evaluating all accumulated critic functions, and computing global optimistic confidence sets in general function classes requires solving nonconvex constrained optimization problems. In Part~II, based on joint work with Max Qiushi Lin, Reza Asad, Haque Ishfaq, Csaba Szepesv\'ari, and Sharan Vaswani \citep{lin2026parametric}, we address both computational bottlenecks in linear MDPs by projecting natural policy gradient updates onto an explicit parametric log-linear policy class over a $G$-optimal design coreset (yielding $O(1)$ test-time policy evaluation cost with respect to $T$) and replacing explicit confidence-ellipsoid maximization with Langevin Monte Carlo critic sampling.
-\end{aigenblock}
-\subsection{Introduction}
-Recent works~\citep{cai2020provably, jin2021bellmaneluder, zanette2021cautiously, zhong2023theoretical, agarwal2023vo, he2023nearly, liu2023optimistic, sherman2023rate, cassel2024warm, tan2025actor} tackle strategic exploration in actor-critic methods directly. However, the algorithms analyzed are significantly different from those implemented in practice. Much of this body of work studies AC methods that use the natural policy gradient ($\NPG$) update for policy optimization. However, the canonical implementation of the $\NPG$ update does not consider an explicit policy parameterization. Instead, the update involves constructing ``implicit'' policies \textit{on the fly} using all previously stored $Q$-functions. This makes it computationally expensive to sample from these policies and use them to interact with the environment (see~\cref{tab:comparison}). In contrast, the algorithms used in practice typically employ explicitly parameterized complex models as learnable policies and optimize them with gradient descent-based methods. Therefore, we aim to address the following question:
-
-\grayboxed{
-\begin{center}
-\textit{Can we design a provably efficient actor--critic algorithm with parametric \\ policies for linear MDPs in both on- and off-policy settings?}
-\end{center}
-}
-
-\begin{table}[tbh]
-\centering
-\resizebox{\linewidth}{!}{
-\begin{tabular}{lccccc}
-\toprule[1.2pt]
-\textbf{Algorithm} &
-  \textbf{\begin{tabular}[c]{@{}c@{}}Sample Complexity\\ (On-Policy)\end{tabular}} &
-  \textbf{\begin{tabular}[c]{@{}c@{}}Sample Complexity\\ (Off-Policy)\end{tabular}} &
-  \textbf{\begin{tabular}[c]{@{}c@{}}Policy\\ Param.\end{tabular}} &
-  \textbf{\begin{tabular}[c]{@{}c@{}}Clipping\\ Q-Function\end{tabular}} &
-  \textbf{\begin{tabular}[c]{@{}c@{}}Computational Cost\\ for Policy Inference\end{tabular}} \\ \midrule \addlinespace
-\citet{liu2023optimistic} &
-  $\wt{\cO}(\frac{1}{\eps^4})$ &
-  $\xmark$ &
-  implicit &
-  yes &
-  $\cO( d_{\vc}^2 \, H \, \abs{\cA} \, \eps^{-2})$ \\ \addlinespace
-\citet{sherman2023rate} &
-  \multirow{2}{*}[-0.3em]{$\xmark$} & 
-  \multirow{2}{*}[-0.3em]{$\wt{\cO}(\frac{1}{\eps^2})$} & 
-  \multirow{2}{*}[-0.3em]{implicit} & 
-  \multirow{2}{*}[-0.3em]{no} & 
-  \multirow{2}{*}[-0.3em]{$\cO( d_{\vc}^2 \, H \, \abs{\cA} \, \eps^{-2})$} \\ \addlinespace
-\citet{cassel2024warm} &
-   &
-   &
-   &
-   &
-   \\ \addlinespace
-Ours &
-  $\wt{\cO}(\frac{1}{\eps^4})$ &
-  $\wt{\cO}(\frac{1}{\eps^2})$ &
-  explicit &
-  yes &
-  $\cO( d_{\va}^2 \, H \, \abs{\cA})$ \\ \addlinespace \bottomrule[1.2pt]
-\end{tabular}
-}
-\caption[Comparison of sample complexity and inference cost for linear MDP actor--critic methods]{Comparison with the state-of-the-art algorithms for episodic finite-horizon linear MDPs (with feature dimension $d_{\vc}$ and horizon $H$). The sample complexity refers to the number of interactions required for outputting an $\epsilon$-optimal policy, whereas the cost of policy inference refers to the per-episode cost for interacting with the environment for $H$ steps. Our proposed algorithm matches the optimal sample efficiency in both the on- and off-policy settings. Furthermore, in contrast to existing works, our algorithm employs an explicit policy parameterization (log-linear policies with dimension $d_{\va}$), resulting in lower computational cost for policy inference.}
-\label{tab:comparison}
-\end{table}
-
-\paragraph{Contributions} We answer the above question affirmatively and make the following contributions.
-
-\paragraph{1. General framework with an explicitly parameterized actor}
-In~\cref{sec:optimistic_actor_critic}, we propose a general optimistic actor-critic framework that utilizes an explicitly parameterized policy. We apply this framework in the setting of linear function approximation for both the environment (i.e., linear MDP, \citealp{jin2020provably}) and the policy (i.e., log-linear policy class). In~\cref{sec:actor_npg}, we propose an actor algorithm that learns a log-linear policy by solving a specific regression problem at each iteration. This allows us to directly control the error between the explicitly parametrized policy and the implicit policy induced by $\NPG$. Using this error bound in conjunction with the well-established theoretical results of $\NPG$~\citep{hazan2016introduction,szepesvari2022algorithms} enables us to analyze the performance of the parameterized actor. We show that the proposed algorithm benefits from a substantially improved memory complexity, while retaining similar theoretical guarantees. 
-
-\paragraph{2. LMC critic for practical strategic exploration}
-In~\cref{sec:critic_lmc}, instead of constructing $\UCB$ bonuses~\citep{jin2020provably}, which are ubiquitous within prior works~\citep{zhong2023theoretical,liu2023optimistic,sherman2023rate,cassel2024warm}, we adopt a more practical approach. We employ Langevin Monte Carlo ($\LMC$)~\citep{welling2011bayesian} to update the critic parameters at each episode. Unlike $\UCB$-based approaches that require computing confidence sets at every episode, $\LMC$ simply perturbs (by Gaussian noise) the gradient descent update on the critic loss. This gradient descent-based approach is both easier to implement~\citep{ishfaq2025langevin} and to extend to general function approximation~\citep{ishfaq2024more}. Furthermore, the $\LMC$ algorithm directly leads to an optimistic estimate of the $Q$-function that has similar guarantees as $\UCB$ bonuses. Nevertheless, previous works have only successfully designed provably efficient algorithms for solving multi-armed bandits~\citep{mazumdar2020approximate}, contextual bandits~\citep{xu2022langevin}, and linear MDPs via value-based methods~\citep{ishfaq2024provable}. This work is the first to analyze an $\LMC$-based approach in the context of policy optimization.
-
-\paragraph{3. End-to-end theoretical guarantees for actor-critic}
-In~\cref{sec:sample_efficiency_analysis}, we analyze the proposed actor-critic framework in both the on-policy and off-policy settings without making any assumptions on the mismatch ratio or data coverage. In particular, in the on-policy setting, we prove that our method requires $\wt{\gO}(\eps^{-4})$ samples to learn an $\eps$-optimal policy. This matches the result in~\citet{liu2023optimistic} that uses an implicit $\NPG$ policy in conjunction with $\UCB$ bonuses. On the other hand, we also prove that our framework can attain a sample complexity of $\wt{\gO}(\eps^{-2})$ in the off-policy setting. This matches the results of~\citet{sherman2023rate,cassel2024warm}, but with a far less complicated algorithm design. 
-
-We thus demonstrate that our proposed algorithm is both sample-efficient and aligned with practice.
-
-\subsection{Preliminaries}
-\label{sec:preliminaries}
-In this section, we introduce the finite-horizon linear MDP setting and the log-linear policy class, adopting the episodic MDP setup and value function definitions from Section~\ref{sec:ch04-part1-prelim}. For any function $V: \gS \to \sR$, we define $[\sP_h \, V_{h+1}] (s, a) \coloneq \E_{s^\prime \sim \sP_h(\cdot \mid s, a)} V_{h+1}(s^\prime)$.
-\paragraph{Finite-Horizon Linear MDP} We assume that both $\sP$ and $r$ are unknown to the agent. In order to efficiently learn these quantities, we consider the linear MDP assumption~\citep{jin2020provably} where both the transition kernel and the reward function are assumed to be linear functions of given features.
-
-\begin{definition}[Linear MDP]
-    \label{def:linear_mdp}
-    A finite-horizon MDP $\gM = (\gS, \gA, \sP, r, H)$ is a linear MDP with a feature map $\phi: \gS \times \gA \mapsto \sR^{d_{\vc}}$ if the following holds. There exist $H$ signed measures $\psi_h: \gS \to \sR^{d_{\vc}}$ and $\upsilon_h: \sR^{d_{\vc}}$ such that $\sP_h(s^\prime\mid s,a) = \tri*{ \phi(s,a), \psi_h(s^\prime)}$ and $r_h(s,a) = \tri*{ \phi(s,a), \upsilon_h}$ for all $h$, $s$, and $a$. It should also satisfy the following constraints: $\nrm*{\phi(s, a)}_2 \leq 1$ and $\nrm*{\upsilon_h}_2 \leq \sqrt{d_{\vc}}$ for all $h$, $s$, and $a$. Additionally, for any measurable function $V: \gS \to [0, 1]$, $\nrm*{\int_{s\in\gS} V(s) \, \psi_h(s) \, \mathrm{d} s }_2 \leq \sqrt{d_{\vc}}$.
-\end{definition}
-
-According to~\citet[Proposition 2.3]{jin2020provably}, for a linear MDP and any policy $\pi$, $Q_h^\pi$ is a linear function of the features:  for all $(h, s, a)$, there exists a $w_h \in \sR^{d_{\vc}}$ such that $Q_h^\pi(s, a) = \tri*{ \phi(s, a), w_h}$.
-
-\paragraph{Learning Objective} For this linear MDP setting, we assume that only $\phi$ is given to the learner whereas $\psi$ and $\upsilon$ are not. The agent sequentially interacts with the environment for $T$ episodes and aims to minimize the \textit{cumulative regret} defined as $\texttt{Reg}(T) \coloneq \sum_{t = 1}^{T} \brk*{ V_1^\star(s_1) - V_1^{\pi_t}(s_1) }$, where $V_1^\star \coloneq V_1^{\pi^\star}\coloneq \sup_{\pi} V_1^{\pi}$ is the value function of the optimal policy $\pi^\star \coloneq \arg\sup_{\pi} V_1^{\pi}(s_1)$. Equivalently, if $\ol{\pi}^T$ denotes the mixture policy that picks a policy among $\{\pi^1, \ldots,\pi^T\}$ uniformly randomly, we aim to learn an $\eps$-optimal $\ol{\pi}^T$, i.e., its \textit{optimality gap} (\texttt{OG}) is bounded such that
-\begin{align}
-    \texttt{OG}(T) \coloneq \E \brk*{ V_1^\star(s_1) - V_1^{\ol{\pi}^T}(s_1) } = \frac{\texttt{Reg}(T)}{T} \leq \wt{\gO}(\eps) \,,
-\end{align}
-where the expectation is taken with respect to the randomness of the mixture policy.
-
-\paragraph{Log-Linear Policy} We consider a restricted policy class $\Pi_{\text{lin}}$ consisting of \textit{log-linear policies}. Log-linear policies are represented using the softmax function with linear function approximation. In particular, a log-linear policy is defined as follows: for all $h \in [H]$, 
-\begin{align}
-    \pi_{h}(a \mid s, \theta) = \frac{\exp(z_h(s, a \mid \theta_h))}{\sum_{a^\prime \in \gA} \exp(z_h(s, a^\prime \mid \theta_h))} \,, \label{eq:log_linear_policy}
-\end{align}
-where $z_h(s, a \mid \theta_h) = \tri*{ \varphi(s, a), \theta_h }$ represents the logits parameterized by $\theta_h$, and $\varphi: \gS \times \gA \mapsto \sR^{d_{\va}}$ are policy features given to the learner. W.l.o.g, we assume that $\nrm*{\varphi(s, a)} \leq 1$ for all $s$ and $a$. For convenience, we use the shorthand $\pi(\theta): [H] \times \gS \rightarrow \Delta(\gA)$ to refer to the log-linear policy corresponding to the parameters $\theta$.
-
-\subsection{A General Actor-Critic Framework with Parametric Policies}
-\label{sec:optimistic_actor_critic}
-In this section, we start by introducing our general optimistic actor-critic framework as shown in~\cref{alg:optimistic_actor_critic}. Starting with a uniform policy $\pi^1$, at the beginning of every learning episode $t \in [T]$, the agent interacts with the environment using policy $\pi^t$ (Line 4). Our framework allows for collecting data from the environment in either an on-policy or off-policy fashion. In the on-policy setting, at episode $t$, the agent collects $N$ fresh trajectories $\gD^t$ by interacting with the environment using the current policy $\pi^t$. On the other hand, in the off-policy setting, at episode $t$, the agent collects only $1$ trajectory from the environment using $\pi^t$. However, the agent stores all the historical data collected by the previous policies, and hence, $\gD^t$ consists of $t$ trajectories, each collected by $\pi^1, \ldots,\pi^t$ respectively. 
-
-The \textit{critic} uses the collected data and estimates an (optimistic) $Q$-function via learning the critic parameters $w^{t+1} \in [H] \times \sR^{d_{\vc}}$ (Line 5). The \textit{actor} then uses the estimated $Q$-function, and updates the parameters of $\theta^t \in [H] \times \sR^{d_{\va}}$ of the log-linear policy (Line 6). The updated log-linear policy is denoted by $\pi^{t+1}$ (Line 7), and is used to collect data in the next episode. 
-
-\begin{algorithm}[!t]
-\caption{Actor-Critic with Parametric Policies}
-\label{alg:optimistic_actor_critic}
-\begin{algorithmic}[1]
-\State \textbf{Input}:
-number of update steps $T$, data collection batch size $N$ (only for on-policy)
-\State set $\gD^0 \gets \emptyset,\, w_h^1 \gets \mathbf{0},\, \pi^1_h(\cdot \mid s) \gets \mathrm{Unif}(\gA) \quad \forall (h,s)$
-\For{$t=1,\ldots, T-1$}
-    \State $\gD^t \gets
-    \begin{cases}
-        \text{On-Policy:}& \crl*{N \text{ fresh traj. }\stackrel{\text{i.i.d.}}{\sim} \pi^{t}} \\
-        \text{Off-Policy:}& \gD^{t-1} \cup \crl*{1 \text{ traj. } \sim \pi^{t}} \\
-    \end{cases}$
-    \State $w^{t+1} \gets \texttt{CRITIC\_UPDATE} (\gD^t, \pi^{t}, w^t)$
-    \State $\theta^{t+1} \gets \texttt{ACTOR\_UPDATE} (w^{t+1}, \theta^{t})$
-    \State $\pi^{t+1} = \pi(\theta^{t+1})$
-\EndFor
-\State \textbf{Return}: mixture policy $\ol{\pi}^{T}$
-\end{algorithmic}
-\end{algorithm}
-Given this general framework, we will next instantiate the actor in~\cref{sec:actor_npg} and the critic in~\cref{sec:critic_lmc}.
-
-\subsection{Instantiating the Actor: Projected Natural Policy Gradient}
-\label{sec:actor_npg}
-
-In this section, we instantiate the actor using natural policy gradient ($\NPG$) with parametric policies and analyze its behavior. In particular, in~\cref{subsec:projected_npg}, we devise an algorithm that projects the standard $\NPG$ update onto the class of realizable policies. In~\cref{subsec:bounding_projection_error}, we analyze and control the errors induced by the projection step. Finally, in~\cref{subsec:npg_llp}, we put everything together and instantiate the complete actor algorithm for the log-linear policy class.
-
-\subsubsection{Projected Natural Policy Gradient}
-\label{subsec:projected_npg}
-At episode $t \in [T]$, given $\wh{Q}_h^t$, the estimated $Q$-function, $\NPG$ updates the policy as: for every $(h,s) \in [H] \times \cS$,  
-\begin{align}
-    \pi_h^{t+1}(\cdot \mid s) &\propto \pi_h^{t}(\cdot \mid s) \, \exp (\eta \, \wh{Q}_h^t(s, \cdot))
-\label{eq:npg}
-\end{align}
-with the corresponding normalization across $\gA$. Existing work on policy optimization in linear MDPs~\citep{liu2023optimistic,sherman2023rate,cassel2024warm} uses $\NPG$ to update the actor because of its favorable theoretical properties. Importantly, \textit{these results do not consider any explicit parameterization for the actor}. Directly implementing the update in~\cref{eq:npg} requires $\gO(\abs{\gS} \abs{\gA})$ memory, and is therefore impractical with large state-action spaces.
-
-Consequently, existing work uses the following equivalent form of the $\NPG$ update: for every $(h,s) \in [H] \times \cS$, 
-\begin{align}
-    \textstyle
-    \pi_h^{t+1}(\cdot \mid s) \propto \pi_h^{1}(\cdot \mid s) \, \exp \prn*{\eta \, \sum_{i=1}^t \wh{Q}_h^i(s, \cdot)} \,, 
-\end{align}
-which characterizes the policy implicitly. In particular, at episode $t$, for any $(h, s, a)$, we can compute the policy \textit{on the fly} if we have access to the sum of all the parameterized $Q$-functions up to episode $t$. However, in existing works~\citep{liu2023optimistic,sherman2023rate,cassel2024warm}, the sum of parameterized $Q$ functions cannot be stored in a succinct manner, and they require storing \textit{all} the parameterized $Q$ functions. Consequently, when interacting with the environment using such an implicit policy, these works suffer from an extensive per-episode computational cost of $\cO( d_{\vc}^2 \, H \, \abs{\cA} \, T)$. Therefore, the resulting algorithm is far from practice that typically uses an explicit (and often sophisticated) actor parameterization.
-
-To alleviate these issues, we aim to compute a policy that is (i) realizable by the explicit actor parameterization and (ii) provably approximates the policy induced by the $\NPG$ update in~\cref{eq:npg} (referred to as the \textit{implicit policy}). To this end, we use a projected $\NPG$ update:
-\begin{align}
-\pi_h^{t+1}(\cdot \mid s) = \Proj_{\Pi} \brk*{ \frac{\pi_h^{t}(\cdot \mid s) \exp (\eta \, \wh{Q}_h^t(s, \cdot))}{\sum_{a^\prime} \pi_h^{t}(a^\prime \mid s) \exp (\eta \, \wh{Q}_h^t(s, a^\prime))} } \,,
-\end{align}
-where $\Proj$ is the projection operator, which will be instantiated subsequently in~\cref{subsec:bounding_projection_error}.
-
-When theoretically analyzing policy optimization methods, an important intermediate result is the bound on the regret for a specific online linear optimization problem. For the standard $\NPG$ update in~\cref{eq:npg}, this regret can be bounded by $\wt{\gO}(\sqrt{T})$~\citep{hazan2016introduction,szepesvari2022algorithms}. In the following lemma, we analyze the effect of the projection operator and bound the regret for the projected $\NPG$.
-\grayboxed{
-\begin{theorem}
-\label{lem:generalized_omd_regret}\label{thm:actor_guarantees}
-Given a sequence of linear functions $\{\tri*{ p^t, g^t }\}_{t \in [T]}$ for a sequence of vectors $\{g^t\}_{t \in [T]}$ where for any $t \in [T]$, $p^t \in \Delta(\gA)$, $g^t \in \sR^{\abs{\gA}}$, and $\nrm*{g^t}_\infty \leq H$. Consider $p^{t \in [T]}$ where $p^1$ is the uniform distribution, and for all $t \in [T]$,
-\begin{align}
-    p^{t+1/2} &= \argmin_{p \in \Delta_A} \crl*{ \tri*{ p, -\eta \, g^t } + \KL(p \Mid p^t) } \,, \label{eq:standard_npg} \\
-    p^{t+1} &= {\rm{Proj}}_{\Pi} (p^{t+1/2}) \,. \label{eq:projection}
-\end{align}
-Let $\eps^t \coloneq \KL (u \Mid p^{t+1}) - \KL (u \Mid p^{t+1/2})$ be the projection error induced by~\cref{eq:projection}. Then, for any comparator $u \in \Delta(\gA)$, it holds that
-\begin{align}
-    \sum_{t=1}^T \tri*{ u - p^t, g^t } \leq \frac{\log \abs{\gA} + \sum_{t=1}^T \eps^t}{\eta} + \frac{\eta \, H^2 \, T}{2}.
-\end{align}
-\end{theorem}
-}
-The update in~\cref{eq:standard_npg} with $p^t = \pi_h^t(\cdot|s)$ is equivalent to the standard $\NPG$ update in~\cref{eq:npg}~\citep{xiao2022convergence}. Using this lemma for each state $s$ and step $h$, with $g^t = \wh{Q}^t_h(s,\cdot)$ and an appropriate choice of $\eta$ gives the following regret bound\footnote{This generalized regret bound holds for any other mirror descent-based policy optimization method (e.g., \texttt{SPMA}, \citealp{asad2025fast}, in~\cref{subsec:spma_actor}), but we discuss $\NPG$ within the main text for the ease of exposition.}  for the projected $\NPG$: 
-\begin{align}
-    \sum_{t=1}^{T} \, \sum_{h = 1}^H \max_{s \in \gS} \tri*{ \pi_h^\star(\cdot | s) - \pi_h^t(\cdot | s), \wh{Q}_h^t (s, \cdot) } \leq \gO \prn*{H^2 \, \sqrt{\log \abs{\gA}} \, \sqrt{T} + H^2 \, \sqrt{\ol{\eps}} \, T} \,, \label{eq:npg-regret-bound}
-\end{align}
-where $\ol{\eps} \coloneq \max_{t,s,h} \eps^t_h(s)$ is the largest error across all $t$, $s$, and $h$. For the $\NPG$ in~\cref{eq:npg} without projection, $\ol{\eps} = 0$ and the above result recovers the standard regret bound for $\NPG$. The above lemma suggests that by choosing the projection operator carefully and controlling the projection errors, we can bound the regret. 
-
-\subsubsection{Controlling the Projection Error for Log-Linear Policies}
-\label{subsec:bounding_projection_error}
-To bound the projection error in~\cref{lem:generalized_omd_regret}, one could choose that $\Proj_\Pi (p) = \argmin_{p} \KL(u \Mid p) - \KL(u \Mid p^{t+1/2})$, and hence directly control $\eps_h^t$. However, this results in a non-convex optimization problem. Consequently, we instead choose $\mathrm{Proj}$ to minimize the following regression loss in the logit space: $\frac{1}{2} \nrm*{z - (z^t + \eta \, g^t)}$ where $z^t$ is the logit corresponding to $p^t$ such that $p^t \propto \exp(z^t)$. For the projected $\NPG$ with log-linear policies, we aim to minimize the sum of such regression losses (across all $(s, a) \in \gS \times \gA$) at episode $t$ and step $h$, and obtain the loss function:
-\begin{align}
-    \ell^t_h(\theta) = \frac{1}{2} \sum_{(s, a) \in \cS \times \cA} \brk*{ \tri*{ \varphi(s, a), \theta - \wh{\theta}_h^{t}} - \eta \, \wh{Q}^t_h(s, a)}^2 \,,
-\end{align}
-where $\wh{Q}_h^t(s, a)$ is the estimated $Q$-function from the critic. As a regression problem, this actor loss can be easily optimized via gradient descent-based methods.
-
-However, note that the above actor loss requires a minimization over the entire state-action space, which may be impractical. Therefore, we propose to construct a good and preferably small subset $\gD_{\exp} \subset \gS \times \gA$ along with a corresponding distribution $\rho_{\exp} \in \Delta(\gD_{\exp})$ that offers good coverage of the feature space. Given $\gD_{\exp}$ and $\rho_{\exp}$ (the construction of which will be detailed subsequently), we instantiate the actor loss, $\wt{\ell}_h^t(\theta)$, in terms of a \textit{logit-matching} regression:
-\begin{align}
-    \wt{\ell}_h^t (\theta) = \frac{1}{2} \, \sum_{(s,a) \in \gD_{\exp}} \,  \rho_{\exp}(s,a) \, \brk*{ \tri*{\varphi(s, a), \theta - \wh{\theta}_h^{t}} - \wh{Q}^t_h(s, a)}^2\,,  \label{eq:actor_loss} 
-\end{align}
-In order to show that optimizing the above actor loss can indeed bound the projection error, we require the following assumptions. 
-We assume that the given policy features $\varphi$ are expressive enough to control the bias when minimizing $\ell_h^t(\theta)$. 
-\begin{assumption}[Bias]
-    \label{asm:bias}
-     $\min_{\theta} \, \sup_{t, h} \wt{\ell}_h^t(\theta) \leq \eps_{\bias}$
-\end{assumption}
-In practice, $\eps_{\bias}$ can be controlled by choosing high-dimensional features (e.g., $d_{\va} \gg d_{\vc}$) or a sufficiently expressive policy class (e.g., neural network).
-
-Next, we assume the loss $\wt{\ell}_h^t (\theta)$ is sufficiently minimized. 
-\begin{assumption}[Optimization Error]
-    \label{asm:opt_error}
-    Suppose $\theta_h^{t}$ is obtained by minimizing $\wt{\ell}_h^t(\theta)$ in the critic update, then
-    $$\sup_{t, h} \abs*{\wt{\ell}_h^t(\theta_h^t) - \min_\theta \wt{\ell}_h^t(\theta) } \leq \eps_{\opt}\,.$$
-\end{assumption}
-In practice, minimizing $\wt{\ell}_h^t(\theta)$ by $K_t$ steps of gradient descent ensures that $\eps_\opt \leq \gO(\exp(-K_t))$. 
-Given these two mild assumptions, we can then proceed to bound the projection error. Using~\cref{lem:generalized_omd_regret} for the projected $\NPG$ update at state $s$, step $h$, and setting $u = \pi^\star(\cdot \mid s)$, the projection error $\eps_h^t(s)$ can be bounded as follows.
-\begin{lemma}
-    \label{lem:projection_error}
-    Let $\ol{\varphi}_G \coloneq \sup_{(s, a) \in \gS \times \gA} \nrm*{\varphi(s, a)}_{G^{-1}}$ where $G \coloneq \sum_{(s, a) \in \gD_{\exp}} \rho_{\exp}(s, a) \, \varphi(s, a) \, \varphi(s, a)^\top$. Under~\cref{asm:bias,asm:opt_error}, it holds that
-    \begin{align}
-        \abs*{ \eps_h^t(s) } \leq \ol{\eps} \coloneq 2 \, (\ol{\varphi}_G + 1) \, \sqrt{\eps_{\bias}} + 2 \, \sqrt{\eps_{\opt}} \; \quad \forall (t, h, s) \,.
-    \end{align}
-\end{lemma}
-The above lemma is true for any choice of $\gD_{\exp}$ and $\rho_{\exp}$, and suggests that if we can control $\ol{\varphi}_G$, the projection error can be bounded. \aigen{To bound $\ol{\varphi}_G \leq \gO(d_{\va})$ with a coreset of size $\abs*{\gD_{\exp}} \leq \wt{\gO}(d_{\va})$, one can construct $(\gD_{\exp}, \rho_{\exp})$ offline via $G$-optimal experimental design using the Kiefer--Wolfowitz theorem~\citep{kiefer1960equivalence} and Frank--Wolfe optimization, or online via reward-free exploration procedures such as \texttt{CoverTraj}~\citep{wagenmaker2022reward}. We defer the complete coreset construction and experimental design details to~\citet{lin2026parametric}.}\label{alg:covertraj}
-
-\subsubsection{Putting Everything Together: Projected NPG with Log-Linear Policies}
-\label{subsec:npg_llp}
-In~\cref{alg:actor_npg}, we instantiate the complete actor algorithm, which uses the projected $\NPG$ update for log-linear policies. Unlike the standard $\NPG$ update,~\cref{alg:actor_npg} alleviates the necessity of storing past $Q$-functions, improving the memory complexity to $\gO(d_{\va})$, while enjoying similar theoretical guarantees. Furthermore, the actor parameters are updated by using gradient descent on a properly defined surrogate loss, rendering it closer to the practical implementation of common algorithms (e.g., PPO, \citealp{schulman2017proximal}). 
-
-We remark that although we focused on the log-linear policies, our theoretical guarantees readily extend to general function approximation when~\cref{asm:bias,asm:opt_error} are satisfied, and one has access to an exploratory policy~\citep[Definition 1]{hao2021online}. In the next section, we instantiate the critic in~\cref{alg:optimistic_actor_critic}.
-
-\begin{algorithm}[!t]
-\caption{Actor: Projected NPG}
-\label{alg:actor_npg}
-\begin{algorithmic}[1]
-\State \textbf{Input}: critic parameters $w^t$, policy optimization learning rate $\eta$, number of actor updates $K_t$, actor learning rate $\alpha^t_{\va}$, subset and distribution of  the state-action space $\gD_{\exp}$ and $\rho_{\exp}$
-\For{$h=1, 2, \ldots, H$}
-    \State $\wh{Q}_h^t (\cdot, \cdot) = \min\{ \tri*{ \phi(\cdot, \cdot), w^t_h }, H - h + 1 \}^+$ \footnotemark
-    \State Define the actor loss $\wt{\ell}_h^t (\theta)$ using~\cref{eq:actor_loss}
-    \For{$k=1, \ldots, K_t$}
-        \State $\theta_h^{t, k} \gets \theta_h^{t, k-1} - \alpha^t_{\va} \, \nabla_\theta \wt{\ell}_h^t(\theta_h^{t, k-1})$
-    \EndFor
-\EndFor
-\State \textbf{Return}: actor parameters for the policy $\theta^t$
-\end{algorithmic}
-\end{algorithm}
-\footnotetext{$\min\{x, a\}^+ \coloneq \max\{\min\{x, a\}, 0\}$ is the clipping function that bounds the given value $x$ to the range $[0, a]$.}
-
-\subsection{Instantiating the Critic: Langevin Monte Carlo}
-\label{sec:critic_lmc}
-In this section, we use Langevin Monte Carlo ($\LMC$) to instantiate the critic. We describe the resulting algorithm in~\cref{subsec:lmc_for_linear_mdps}, and analyze it in~\cref{subsec:optimism_guarantee_and_error_bound}.
-
-The $\LMC$ approaches allow for sampling from a posterior distribution and have recently been used in sequential decision-making problems. For example,~\citet{mazumdar2020approximate} achieves optimal instance-dependent regret bounds for multi-armed bandits using Langevin dynamics for approximate Thompson sampling. On the other hand,~\citet{xu2022langevin} uses $\LMC$ for contextual bandits, achieving comparable theoretical results to Thompson sampling. More recently,~\citet{ishfaq2024provable} leverages $\LMC$ for linear MDPs by using it to sample the $Q$-function from its posterior distribution, achieving the optimal $\wt{\gO}(\sqrt{T})$ regret.
-
-Nevertheless, all existing $\LMC$-based approaches for MDPs, including those for general function approximation~\citep{ishfaq2024more,jorge2024isoperimetry} use value-based algorithms. To the best of our knowledge, such approaches have never been theoretically analyzed in the context of policy optimization. Next, we incorporate the $\LMC$ algorithm into our actor-critic framework and provide the first provable result. 
-
-\subsubsection[Langevin Monte Carlo for Linear MDPs]{LMC for Linear MDPs}
-\label{subsec:lmc_for_linear_mdps}
-At episode $t$, the critic uses the collected dataset $\gD^t$ to obtain an optimistic estimate of the $Q$ function. In order to instantiate the critic loss, we consider the dataset $\gD^t$ as split into $H$ disjoint subsets $\crl*{\gD_h^t}_{h \in [H]}$, where $\gD_h^t$ consists of $(s_h, a_h, s_{h+1})$ tuples indexed as $\crl*{(s^i_h, a^i_h, s^i_{h+1})}_{i=1}^{\abs{\gD^t}}$ \footnote{$\abs{\gD^t}$ represents the number of trajectories in $\gD^t$ or the number of $(s_h, a_h, s_{h+1})$ tuples in $\gD_h^t$}. The critic loss at episode $t$ and step $h$ uses the estimated value function at step $h+1$, and forms the following ridge regression problem: 
-\begin{align}
-    \MoveEqLeft
-    \gL_h^t (w) = \frac{1}{2} \, \sum_{i=1}^{\abs*{\gD^t}} \brk*{ r_h(s_h^i, a_h^i) + \wh{V}_{h+1}^t (s_{h+1}^i) - \tri*{\phi(s_h^i, a_h^i), w} }^2 + \frac{\lambda }{2} \, \nrm*{w}^2\,.  \label{eq:critic_loss}
-\end{align}
-For each step $h$, the $\LMC$ algorithm iteratively adds Gaussian noise to the gradient descent updates on $\gL_h^t (w)$, and aims to produce approximate samples of the critic parameters from its underlying posterior distribution (Line 6-8). In particular, for an arbitrary loss $\ell$, the $\LMC$ update can be written as:
-\begin{align}
-    w^{t+1} = w^t - \alpha^t \nabla_w \ell (w^t) + \sqrt{\alpha^t / \zeta} \, \nu^t \,,
-\end{align}
-where $\alpha_t$ is the learning rate, $\zeta$ is the inverse temperature parameter, and $\nu_t$ is sampled from an isotropic Gaussian distribution. After $J_t$ steps of the $\LMC$ update on the critic loss (Lines 6-8 in~\cref{alg:lmc}), the resulting critic parameters are used to produce an optimistic sample of the $Q$-function (Line 9). From a theoretical perspective, we note that it is important to clip $Q_h^t$ appropriately. In order to improve the optimism guarantees of the $\LMC$ algorithm, we follow the idea in~\citet{ishfaq2021randomized}, and repeat the $\LMC$ update $M$ times, taking the maximum over these samples (Line 9). Iterating this procedure backwards from $h = H$ to $1$, we can obtain the desired critic parameters.
-
-Note that compared to $\UCB$-based approaches, $\LMC$ does not require computing confidence sets at every episode. Instead, it simply perturbs gradient descent by injecting Gaussian noise, allowing for a natural extension beyond the linear function approximation setting and rendering it easier to implement in practice.
-
-\begin{algorithm}[!t]
-\caption{Critic: LMC}
-\label{alg:lmc}
-\begin{algorithmic}[1]
-\State \textbf{Input}: collected data $\gD^t$, policy $\pi^{t-1}$, number of critic updates $J_t$, critic learning rate $\alpha^{h, t}_{\vc}$, inverse temperature $\zeta$, number of critic samples $M$
-\State $\wh{V}^t_{H+1} (\cdot) \gets 0$
-\For{$h=H, H-1, \ldots, 1$}
-    \State Define the critic loss $\gL_h^t (w)$ using~\cref{eq:critic_loss}
-    \State $w_h^{t, m, 0} \gets w_h^{t-1, m, J_{t-1}} \quad \forall m \in [M]$
-    \For{$j=1, \ldots, J_t$}
-        \State $\nu_h^{t, m, j} \gets \textbf{N}(0, I) \quad \forall m \in [M]$
-        \State $w_h^{t, m, j} \gets w_h^{t, m, j-1} - \alpha^{h, t}_{\vc} \nabla_w \gL_h^t( w_h^{t, m, j-1})$ 
-        \Statex$\hspace{8em} + \sqrt{\alpha^{h, t}_{\vc} / \zeta} \,  \nu_h^{t, m, j} \quad \forall m \in [M]$
-    \EndFor
-    \State $\displaystyle \wh{Q}^t_h (\cdot, \cdot) = \min \left\{ \max_{m \in [M]} \tri*{ \phi(\cdot, \cdot), w_h^{t, m, J_t} }, H \right\}^+$
-    \State $\wh{V}^t_h (\cdot) = \E_{a \sim \pi^{t-1}(\cdot \mid s)} \wh{Q}_h^t (\cdot, a)$
-\EndFor
-\State \textbf{Return}: critic parameters for the estimated $Q$-function $\{w_h^{t, m, J_t}\}_{(m, h) \in [M] \times [H]}$
-\end{algorithmic}
-\end{algorithm}
-
-\subsubsection{Optimism Guarantee and Error Bound}
-\label{subsec:optimism_guarantee_and_error_bound}
-In order to theoretically analyze~\cref{alg:lmc}, we first define the following model prediction error.
-\begin{definition}
-    \label{def:model_prediction_error}
-    Given an estimated $Q$-function $\wh{Q}^t$ and the corresponding estimated value function $\wh{V}^t$, for all $(t,h, s, a)$, the model prediction error is defined as: $\iota_h^t(s, a) \coloneq r_h(s, a) + \sP_h \, \wh{V}_{h+1}^t (s, a) - \wh{Q}_h^t (s, a)$.    
-\end{definition}
-The theoretical analyses in existing work~\citep{jin2020provably,zhong2023theoretical,liu2023optimistic} that use $\UCB$ bonuses typically proceed by proving an upper bound of $0$ on $\iota_h^t$ (\textit{optimism}) and a lower bound of $\wt{\gO}(\sqrt{T})$. The following lemma shows that $\LMC$ can offer similar guarantees.
-\begin{lemma}
-    \label{lem:informal_lmc_optimism_and_error_bound}
-    Let $\Lambda_h^t \coloneq \sum_{(s, a, s^\prime) \in \gD_h^t} \phi(s, a) \, \phi(s, a)^\top + \lambda \, I$. With appropriate choices of $\lambda$, $\zeta$, $J_t$, $\alpha_{\vc}^t$, $M$ and for any $\delta \in (0, 1)$,~\cref{alg:optimistic_actor_critic} with the $\LMC$ critic in~\cref{alg:lmc} ensures that in both the on-policy and off-policy settings, for all $t$, $h$, $s$, $a$ and some constant $\Gamma_{\LMC} = \wt{\gO} (H \, d_{\vc})$, with probability at least $1 - \delta$,
-    \begin{center}
-        $- \Gamma_{\LMC} \times \nrm*{\phi(s, a)}_{(\Lambda_h^t)^{-1}}\leq \iota_h^t(s, a) \leq 0$.
-    \end{center}
-\end{lemma}
-The exact definition of $\Gamma_{\LMC}$ varies between the on-policy and off-policy settings, although they are both bounded by $\wt{O}(H \, d_{\vc})$ (see~\cref{sec:critic_analyses} for the full version of this lemma). In order to prove this result in the on-policy setting, we use the fact that all the data points in $\gD_h^t$ are collected via independent trajectories from the same policy $\pi^t$, and are therefore independent and identically distributed. Hence, we can use the self-normalized bounds in~\citet{abbasi2011improved} to analyze the dependence in $h$, and prove the corresponding result. In the off-policy setting, since the data points in $\gD_h^t$ are collected by different data-dependent policies, these samples are correlated in a complicated manner. Hence, we use the value-aware uniform concentration result from~\citet{jin2020provably}. We remark that this result requires control over the covering number of the value function class, which is deferred to~\cref{sec:sample_efficiency_analysis}. 
-
-Therefore, we conclude that, compared to $\UCB$ bonuses, $\LMC$ offers significant practical advantages while still providing similar theoretical guarantees. 
-
-\subsection{Sample Complexity Analysis}
-\label{sec:sample_efficiency_analysis}
-In this section, we analyze the sample complexity of~\cref{alg:optimistic_actor_critic} with the projected $\NPG$ actor from~\cref{alg:actor_npg} and the $\LMC$ critic from~\cref{alg:lmc}.~\cref{subsec:analysis_for_on_policy} focuses on the on-policy setting, while~\cref{subsec:analysis_for_off_policy} addresses the off-policy setting.
- 
-\subsubsection{On-Policy Setting}
-\label{subsec:analysis_for_on_policy}
-We now present the following theorem that shows that our proposed algorithm achieves a sample complexity of $\wt{\gO}(\eps^{-4})$ in the on-policy setting.
-
-\grayboxed{
-\begin{theorem}
-\label{thm:on_policy_sample_efficiency}
-Under~\cref{asm:bias,asm:opt_error}, consider~\cref{alg:optimistic_actor_critic} in the on-policy setting with the projected $\NPG$ actor (\cref{alg:actor_npg}) and the $\LMC$ critic (\cref{alg:lmc}). Suppose $\ol{\eps}$ is the projection error in the actor. For an appropriate choice of the actor and critic parameters, including $N = H^4 / \eps^2$, and any $\delta \in (0,1)$, it holds that with probability at least $1 - \delta$,
-\begin{align}
-    \texttt{OG}(T) \leq \wt{\gO} \prn*{ \frac{H^2 \, \sqrt{d_{\vc}^3 \, \log \abs*{\gA}}}{\sqrt{T}} + H^2 \, \sqrt{ \ol{\eps} } } \,.
-\end{align}
-Hence, for any $\eps > 0$,~\cref{alg:optimistic_actor_critic} with $T = d_{\vc}^{3} \, H^4 \, \log \abs{\gA} \, \eps^{-2}$ yields a $(\eps + H^2 \sqrt{\ol{\eps}})$-optimal mixture policy, and therefore requires $T \times N = \wt{\gO}(\eps^{-4})$ samples. 
-\end{theorem}
-}
-
-\begin{proof}[Proof Sketch]
-We decompose the difference between $V_1^{\overline{\pi}^T} (s_1)$ and $V_1^{\star} (s_1)$ into two terms that only depend on either the actor or the critic. 
-\begin{align}
-    \E \brk*{V_1^{\pi^\star} - V_1^{\overline{\pi}^T} (s_1)} = &\frac{1}{T} \underbrace{\sum_{t=1}^T \sum_{h=1}^H \E_{\pi^\star} \brk*{ \tri*{ \pi^\star_h(\cdot \mid s_h) - \pi^t_h(\cdot \mid s_h), \wh{Q}_h^t(s_h, \cdot)} }}_{\text{policy optimization (actor) error}} \\
-    &+ \frac{1}{T} \underbrace{\sum_{t=1}^T \sum_{h=1}^H \prn*{ \E_{\pi^\star} [\iota_h^t(s_h, a_h)] - \E_{\pi^t} [\iota_h^t(s_h, a_h)] } }_{\text{policy evaluation (critic) error}} \,.
-\end{align}
-The policy optimization (actor) error can be bounded using~\cref{eq:npg-regret-bound}, and the policy evaluation (critic) error is bounded using~\cref{lem:lmc_optimism_and_error_bound}.
-In particular, in the on-policy setting, the lower-bound in~\cref{lem:lmc_optimism_and_error_bound} can be instantiated as:
-\begin{align}
-    \sum_{t=1}^T \sum_{h=1}^H \E_{\pi^t} \brk*{-\iota_h^t(s, a)} \leq \gO \prn*{ \sqrt{ d_{\vc}^{3} \,  H^4\, T \, \log^2( N / \delta) / N} } \,.
-\end{align}
-Putting everything together with the chosen value of $N$ leads to the stated sample complexity.
-\end{proof}
-
-\subsubsection{Off-Policy Setting}
-\label{subsec:analysis_for_off_policy}
-Next, we show that, in the off-policy setting,~\cref{alg:optimistic_actor_critic} can achieve $\wt{\gO}(\eps^{-2})$ sample complexity. 
-
-\grayboxed{
-\begin{theorem}
-\label{thm:off_policy_sample_efficiency}
-Under~\cref{asm:bias,asm:opt_error}, consider~\cref{alg:optimistic_actor_critic} in the off-policy setting with the projected $\NPG$ actor (\cref{alg:actor_npg}) and the $\LMC$ critic (\cref{alg:lmc}). Suppose $\ol{\eps}$ is the projection error in the actor. For an appropriate choice of the actor and critic parameters and any $\delta \in (0,1)$, it holds that with probability at least $1 - \delta$,
-\begin{align}
-    \texttt{OG}(T) \leq \wt{\gO} \prn*{ \frac{H^2 \sqrt{d_{\vc}^3 \, \max \crl*{d_{\va}, d_{\vc}} \, \log \abs{\gA}}}{\sqrt{T}} + H^2 \, \sqrt{\ol{\eps}} } \,.
-\end{align}
-Hence, for any $\eps > 0$,~\cref{alg:optimistic_actor_critic} with $T = d_{\vc}^3 \, \max \crl*{d_{\va}, d_{\vc}} \, H^4 \, \log \abs{\cA} \, \eps^{-2}$ yields a $(\eps + H^2 \sqrt{\ol{\eps}})$-optimal mixture policy, and therefore requires $T \times 1 = \wt{\gO}(\eps^{-2})$ samples.
-\end{theorem}
-}
-
-\begin{proof}[Proof Sketch]
-    The proof uses a similar regret decomposition to~\cref{thm:on_policy_sample_efficiency}. Compared to the on-policy setting, the most significant difference is the bound on the policy evaluation (critic) errors. First, using~\cref{lem:informal_lmc_optimism_and_error_bound}, we have that
-    \begin{align}
-        \MoveEqLeft
-        \sum_{t=1}^T \sum_{h=1}^H \E_{\pi^t} \brk*{-\iota_h^t(s, a)} \leq \Gamma \, \sum_{t=1}^T \sum_{h=1}^H \E_{\pi^t} \nrm*{ \phi(s,a) }_{(\Lambda_h^t)^{-1} } \,.
-    \end{align}
-    The term, $ \sum_{t=1}^T \sum_{h=1}^H \E_{\pi^t} \nrm*{ \phi(s,a) }_{(\Lambda_h^t)^{-1} }$, can be bounded using the standard elliptical potential lemma. However, since we are in the off-policy setting, bounding $\Gamma > 0$ requires the uniform concentration argument from~\citet{jin2020provably}, which yields that
-    \begin{align}
-        \Gamma \leq \gO \prn*{H \sqrt{d_{\vc} \log T + \log \prn*{ \frac{\gN_\Delta (\gV)}{\delta}}} + T \, \Delta} \,.
-    \end{align}
-    This involves obtaining a bound on $\log \prn*{\gN_\Delta (\gV) }$, the logarithm of the covering number of the value function class. The covering number is a measure of the complexity of the space of value functions. In particular, we show that for an actor with log-linear policies, we can bound the logarithm of the covering number using the following lemma. 
-    \begin{lemma}
-        \label{lem:covering_number_of_v}
-        Let $\Pi_{\text{lin}}$ be the policy class induced by~\cref{eq:log_linear_policy} such that $\sup_{\theta, h, s, a} \nrm*{z_h (s, a \mid \theta)} \leq \ol{Z}$. Let $\gQ = \left\{ \min\left\{\tri*{ \phi(\cdot, \cdot), w }, H\right\}^+ \mid \nrm*{w} \leq \ol{W} \right\}$ be the $Q$-function class and $\gV = \{ \tri*{ Q(\cdot, \cdot), \pi (\cdot \mid \cdot, \theta) }_{\gA} \mid Q \in \gQ, \; \pi \in \Pi_{\text{lin}}\}$ be the corresponding value function class. Then, it holds that $$\log\gN_\Delta (\gV) \leq \sfV \coloneq d_{\vc} \, \log \prn*{ 1 + \frac{4 \, \ol{W} +  4\, H \, \sqrt{2 \, \ol{Z}}}{\Delta}} + d_{\va} \, \log \prn*{ 1 + \frac{4\, H \, \sqrt{2 \, \ol{Z}}}{\Delta}}\,.$$
-    \end{lemma}
-    In particular, we can show that $\ol{W} \leq \gO (\sqrt{T})$ (\cref{lem:w_bound}), and $\ol{Z} \leq \gO(\ol{\eps} \, T)$ (\cref{lem:logit_bound}). Putting everything together and setting $\Delta = 1 / T$ yields that
-    \begin{align}
-        \sum_{t=1}^T \sum_{h=1}^H \E_{\pi^t} \brk*{-\iota_h^t(s, a)} \leq \wt{\gO} \prn*{ \sqrt{d_{\vc}^3 \, \max \crl*{d_{\va}, d_{\vc}}\, H^4 \, T} }\,. 
-    \end{align}
-    Following a proof similar to~\cref{thm:on_policy_sample_efficiency} leads to the desired sample complexity.
-\end{proof}
-
-\begin{remark}
-In order to effectively bound the logarithm of the covering number, previous work~\citep{sherman2023rate,cassel2024warm,tan2025actor} has incorporated various algorithmic tweaks, including reward-free warm-ups, feature contractions, and rare-switching. On the contrary, since our algorithm projects the implicit policy onto the log-linear policy class at each iteration, the logarithm of the covering number can be bounded in a more direct manner.   
-\end{remark}
-
-\subsection{Experiments}
-\label{sec:ch04-experiments}
-In this section, we evaluate our proposed algorithm in linear MDPs, consistent with our theoretical analyses.
-
-\subsubsection{Experiments in Linear MDPs}
-
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=0.42\linewidth]{figures/ch04/figures/lmc_vs_npg_d_critic_30_d_actor_30.png}    
-\caption[Episodic return of parametric projected NPG with Langevin Monte Carlo critic on a synthetic linear MDP]{Comparison of \aigen{projected NPG with LMC critic (explicit coreset)} (our proposed algorithm), \aigen{projected NPG with LMC critic (implicit coreset)} (memory-intensive variant), and $\LMC$ (value-based baseline) in the Random MDP.}
-\label{fig:random_mdp}\label{fig:linear_mdp_exp}
-\end{figure}
-
-To demonstrate the practical value of our proposed algorithm, we evaluate it over various benchmarks. We first test our proposed algorithm in the randomly generated linear MDPs (Random MDP). We compare our proposed algorithm, \aigen{projected NPG with LMC critic (explicit coreset)}, with the memory-intensive variant with implicit policy parameterization, \aigen{projected NPG with LMC critic (implicit coreset)}, and the value-based baseline, \texttt{LMC}~\citep{ishfaq2024provable}. As shown in~\cref{fig:random_mdp}, our proposed algorithm can achieve comparable performance with the memory-intensive variant and better performance than \texttt{LMC}. \aigen{Additional linear MDP experiments on Deep Sea, ablation studies, and deep RL evaluations on Atari benchmarks comparing against PPO and DQN are deferred to~\citet{lin2026parametric}.}
-
-\subsection{Discussion}
-\label{sec:discussion}
-We proposed an optimistic actor--critic algorithm with explicitly parameterized policies and a systematic exploration mechanism. In particular, for the actor, we demonstrated that using projected $\NPG$ with parametric policies is not only practical, but also equipped with theoretical guarantees. For the critic, we demonstrated that $\LMC$ is a principled and easy-to-implement exploration scheme for policy optimization methods. We derived theoretical guarantees in both the on-policy and off-policy settings, showcasing that the proposed actor-critic algorithm can simultaneously achieve sample efficiency and practicality. 
-
-For future work, eliminating the dependence on $\cD_{\exp}$ and $\rho_{\exp}$ will result in a more practical algorithm. We also aim to investigate the actor-critic algorithms in more realistic setups (e.g., infinite-horizon discounted MDPs) with more general function approximation schemes beyond linear models for both the environment and the policy. It would also be fruitful to further evaluate their empirical performance in more challenging large-scale deep RL applications.
-

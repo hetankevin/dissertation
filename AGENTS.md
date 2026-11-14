@@ -11,5 +11,5 @@ Read [HANDOFF.md](./HANDOFF.md) first before making changes. Keep `HANDOFF.md` c
   - Write connected, conversational technical prose without semicolons in prose.
   - Display identities, bounds, and derivation steps in `\displaystyle` (`equation`, `align`, `aligned`) with explanatory prose between steps.
   - Keep exact theorem scope, assumptions, sample-size thresholds, and distinctions between guarantees explicit.
-  - Credit coauthored papers in original author order without individual contribution statements.
+  - Credit coauthored papers in original author order with the author's contribution sentence at the end of each chapter's opening attribution paragraph.
   - Do not invent cross-chapter connections.

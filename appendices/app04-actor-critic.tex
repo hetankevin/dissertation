@@ -5,12 +5,12 @@
 
 \section{Proofs and Extensions for Part I}
 \label{sec:app04-part1}
-\subsection{Proofs for Theorem \ref{thm:regret-bound-douhua}}
+\section{Proofs for Theorem \ref{thm:regret-bound-douhua}}
 \label{app:proof-douhua}
 \aigen{The proof of Theorem~\ref{thm:regret-bound-douhua} for Algorithm~\ref{alg:DOUHUA} decomposes regret into mirror descent actor tracking error, negative Bellman error under $\pi^\star$ controlled via $Q^{\pi^{(t)}}$-critic optimism, and on-policy Bellman error bounded via the Sequential Extrapolation Coefficient ($\mathsf{SEC}$). Complete proofs of Theorem~\ref{thm:regret-bound-douhua}, Lemma~\ref{lem:b2-covering-number-policy}, and Lemma~\ref{lem:policy-class-growth-sums} are deferred to~\citet{tan2025actor}.}%
 \label{lem:regret-decomp-douhua-ac}\label{equ:regret-decompose}\label{eqn:decomp-Qpi-1}\label{eqn:decomp-Qpi-2}\label{eqn:mwu-update}\label{lem:mirror-descent-douhua}\label{eqn:mirror-alg1-tel1}\label{eqn:mirror-alg1-tel2}\label{eqn:mirror-alg1-tel3}\label{eqn:pinsker1}\label{eqn:mirror-alg1-tel4}\label{eqn:kl-unifotm}\label{lem:negative-bellman-decomp-douhua}\label{eqn:decom-bellman}\label{eqn:decom-bellman2}\label{lem:occ-measure-regret-douhua}\label{eqn:bellman-learned}\label{eqn:bellman-learned1}\label{eqn:bellman-learned2}\label{lem:ac-loss-bounded-optimism-pi}\label{app:ac-covering-number}\label{app:closure-truncated-sums}
 
-\subsection{Proofs for Theorem \ref{thm:nora-regret_bound}}
+\section{Proofs for Theorem \ref{thm:nora-regret_bound}}
 \label{app:proof-nora}
 
 Recall the motivation for this solution:
@@ -27,7 +27,7 @@ Recall the motivation for this solution:
 Given the above, we are now in a position to continue our analysis below.
 
 
-\subsubsection{Regret decomposition}
+\section{Regret decomposition}
 We employ the following regret decomposition below. This is a slightly different regret decomposition than that of \citet{cai2020provably} and \citet{zhong2023theoretical}, as our critic targets $Q^*$. 
 
 \begin{lem}[Regret Decomposition For $Q^*$-Targeting Actor-Critics]
@@ -77,7 +77,7 @@ Each term within the regret decomposition is dealt with differently. We bound th
 
 The attentive reader will note that the Bellman error is defined as $f - \gT f$ in our setup and that of \citet{liu2023optimistic}, and $\gT f - f$ in that of \citet{zhong2023theoretical}.
 
-\subsubsection{Bounding the tracking error}
+\section{Bounding the tracking error}
 \begin{lem}[Mirror Descent Tracking Error for Algorithm \ref{alg:NORA}]
     Let $t_k$ and $t_{k+1}$ be switch times within Algorithm \ref{alg:NORA}, where we use the convention that $\pi^{(t_k)} \propto 1$ is post-policy reset and $\pi^{(t_{k+1})} \not\propto 1$ is pre-policy reset. The tracking error with respect to the optimal policy is then bounded by:
     $$\sum_{t=t_k+1}^{t_{k+1}-1} \sum_{h=1}^H \mathbb{E}_{\pi^*}\left[\left\langle f_h^{(t)}\left(s_h, \cdot\right), \pi_h^*\left(\cdot \mid s_h\right)-\pi_h^{(t)}\left(\cdot \mid s_h\right)\right\rangle\right] \leq \eta H^3 (t_{k+1} - t_k)/2 + \frac{H \log |\gA|}{\eta} + H^2.$$
@@ -133,7 +133,7 @@ and so we can conclude that
 \begin{align}\text{KL}\left(\pi_{h+1}^{*}(\cdot | s')\; || \;\pi_{h+1}^{(t_k+1)}(\cdot | s')\right) \leq \log\left(\frac{1}{\pi_{h+1}^{(t_k+1)}(\cdot | s')}\right) \leq \log|\gA| + \eta H.\end{align}
 \end{proof}
 
-\subsubsection{Asserting optimism}
+\section{Asserting optimism}
 
 \begin{lem}[Negative Bellman Error For Algorithm \ref{alg:NORA}]
     Within Algorithm \ref{alg:NORA}, we have that
@@ -144,7 +144,7 @@ and so we can conclude that
 Applying Lemma \ref{lem:ac-loss-bounded-optimism}, we note that $f_h^{(t)} \geq \gT_h^{\pi^{*}} f_{h+1}^{(t)}$. The result then follows.
 \end{proof}
 
-\subsubsection{Bounding the Bellman error under the learned policies}
+\section{Bounding the Bellman error under the learned policies}
 
 We now turn our attention to the Bellman error with respect to $\gT_h$ under the current policy's occupancy measure.
 
@@ -245,7 +245,7 @@ Therefore, we obtain that
 \end{align}
 \end{proof}
 
-\subsubsection{Auxiliary lemmas}
+\section{Auxiliary lemmas}
 
 \paragraph{Bound on rare-switching update frequency}
 
@@ -347,11 +347,7 @@ by choosing $\beta=c_1\left(\log \left[H T\mathcal{N}_{\gF,\gT \gF}(\rho) / \del
     \begin{align}\sum_{i=1}^{t-1}\E_{d_h^{(i)}}\left[\left(f_h^{(t)} - \gT_h f_{h+1}^{(t)}\right)^2\right] \leq 7H^2\beta.\end{align}
 \end{proof}
 
-\subsection{Deferred Proofs, Auxiliary Lemmas, and Experimental Details for Part I}
+\section{Deferred Proofs, Auxiliary Lemmas, and Experimental Details}
 \label{app:noah-pi-proofs}\label{eqn:reg-decom-alg3}\label{eqn:reg-decom-alg3-1}\label{app:noah-star-proofs}\label{app:hybrid-rl-nora}\label{lem:optimism-Q-pi-t}\label{lem:optimism-Q-pi-star}\label{lem:ac-loss-bounded-optimism-hybrid}\label{lem:g1-ac-loss-bounded}\label{lem:g2-ac-loss-concentration-ub}\label{lem:g3-ac-loss-concentration-ub}\label{app:problem-target-q-pi}\label{alg:NORA-pi-long}\label{lem:b1-covering-number-value}\label{lem:b3-zhong-policy-q-ineq}\label{lem:policy-value-difference-lemma}\label{lem: KL}\label{lem:policy-difference}\label{app:experiment_details}
 \aigen{The proofs for the hybrid RL extensions in Section~\ref{sec:hybrid-rl} (Theorem~\ref{thm:hybrid-noah-pi}, Theorem~\ref{thm:hybrid-noah-star}, and Theorem~\ref{thm:hybrid-nora-regret_bound}), the Freedman concentration inequalities for the empirical squared Bellman loss, the analysis of rare-switching critics targeting $Q^{\pi^{(t)}}$, standard covering number and performance difference lemmas, and supplementary experimental details for Figure~\ref{fig:cumulative-regret} and Figure~\ref{fig:average-return} are deferred to~\citet{tan2025actor}.}
 
-\section{Proofs and Supplementary Details for Part II}
-\label{sec:app04-part2}
-\label[appendix]{sec:notation}\label{sec:actor_analyses}\label{eq:optimality_condition}\label{subsec:spma_actor}\label{eq:actor_loss_spma}\label[lemma]{lem:generalized_omd_regret_spma}\label{eq:standard_spma}\label{eq:projection_spma}\label{eq:d_upper_bound}\label{eq:d_lower_bound}\label{eq:optimality_condition_spma}\label[lemma]{lem:three_point}\label{sec:experimental_design}\label{subsec:kiefer_wolfowitz}\label[proposition]{prop:kiefer--wolfowitz}\label{subsec:exploratory_policy}\label{sec:critic_analyses}\label[lemma]{lem:good_event}\label[lemma]{lem:lmc_optimism_and_error_bound}\label{eq:lmc_optimism_and_error_bound}\label{eq:derivative_of_critic_loss}\label{eq:w_hat}\label[lemma]{lem:gaussian_w}\label{eq:w_mean}\label{eq:w_variance}\label[lemma]{lem:phi_mu_minus_w_hat}\label{eq:phi_mu_minus_w_hat}\label[lemma]{lem:phi_sigma_bound}\label[lemma]{lem:w_hat_bound}\label[lemma]{lem:w_bound}\label[lemma]{lem:w_hat_and_w}\label[lemma]{lem:iota_for_w_hat}\label{eq:model_prediction_error_decomposition}\label[lemma]{lem:elliptical_potential}\label[lemma]{lem:gaussian_l2_norm_bound}\label[lemma]{lem:gaussian_abramowitz}\label[lemma]{lem:trace_inequality}\label[lemma]{lem:symmetric_matrix_norm}\label[lemma]{lem:l1_norm_and_matrix_norm}\label[lemma]{lem:kappa_and_sigma}\label{sec:on_policy_sample_complexity}\label[lemma]{lem:on_policy_self_normalized_concentration}\label{subsec:proof_on_policy_sample_efficiency}\label{eq:on_policy_ellpitical_potential_sum}\label{eq:on_policy_uncertainty}\label[lemma]{lem:extended_value_diff}\label[lemma]{lem:self_normalized_concentration}\label[lemma]{lem:determinant_trace_inequality}\label[lemma]{lem:sum_induced_norm}\label{sec:off_policy_sample_complexity}\label[lemma]{lem:logit_bound}\label[lemma]{lem:off_policy_self_normalized_concentration}\label{eq:off_policy_ellpitical_potential_sum}\label[lemma]{lem:covering_number_v_q_pi}\label[lemma]{lem:d4_jin2020provably}\label[lemma]{lem:covering_number_euclidean_ball}\label[lemma]{lem:softmax_policy_distance}\label{subsec:exp_linear_mdp}\label{subsubsec:environment_setup}\label{fig:placeholder}\label{alg:g_experimental_design}\label{tab:hyperparams}\label{fig:deep_sea}\label{subsec:ablation_studies}\label{subsubsec:ablation_exploration}\label{fig:lmc-npg-exp-exploration-ablation}\label{subsubsec:ablation_dimension}\label{fig:deep_sea_d_ablation}\label{subsubsec:ablation_inverse_temp}\label{fig:deep_sea_inv_temp_ablation}\label{subsubsec:ablation_num_critic_samples}\label{fig:deep_sea_M_ablation}\label{subsec:atari_experiments}\label{subsec:atari_hyperparams}\label{tab:atari-on-policy-hyperparams}\label{tab:atari-off-policy-hyperparams}\label{fig:atari_lmc_vs_ppo}\label{fig:atari_lmc_vs_dqn}
-\aigen{Complete proofs and supplementary details for Part~II of Chapter~\ref{ch:actor-critic}---including the projected online mirror descent and SPMA actor regret bounds (\cref{lem:generalized_omd_regret,lem:projection_error}), the Kiefer--Wolfowitz $G$-optimal experimental design and reward-free coreset constructions, the Langevin Monte Carlo critic optimism and prediction error bounds (\cref{lem:informal_lmc_optimism_and_error_bound}), the on-policy and off-policy sample complexity proofs (\cref{thm:on_policy_sample_efficiency,thm:off_policy_sample_efficiency,lem:covering_number_of_v}), and additional experimental details and ablations on Random MDP, Deep Sea, and Atari---are deferred to~\citet{lin2026parametric}.}
